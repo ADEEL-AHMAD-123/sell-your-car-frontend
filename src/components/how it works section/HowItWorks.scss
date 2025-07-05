@@ -1,0 +1,116 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.how-it-works {
+  padding: 4rem 1.5rem;
+  background-color: $color-primary-background;
+
+  .container {
+    @include container;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+    color: $color-dark;
+    margin-bottom: 0.5rem;
+
+    @include responsive(md) {
+      font-size: 2rem;
+    }
+
+    @include responsive(sm) {
+      font-size: 1.6rem;
+    }
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: $color-gray;
+    margin-bottom: 2.5rem;
+
+    @include responsive(md) {
+      font-size: 1rem;
+    }
+
+    @include responsive(sm) {
+      font-size: 0.95rem;
+    }
+  }
+
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+
+    @include responsive(md) {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    @include responsive(sm) {
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+  }
+
+  .step {
+    flex: 1;
+    background: $color-accent-background;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: $shadow-primary;
+    text-align: center;
+    max-width: 300px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    @include responsive(sm) {
+      padding: 1.5rem 1rem;
+      max-width: 100%;
+    }
+
+    .step-number {
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      background-color: $color-primary;
+      color: $color-light;
+      font-weight: 700;
+      font-size: 1.3rem;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+
+      @include responsive(sm) {
+        font-size: 1.1rem;
+        width: 42px;
+        height: 42px;
+        line-height: 42px;
+        margin-bottom: 0.8rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: $color-dark;
+
+      @include responsive(sm) {
+        font-size: 1rem;
+      }
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $color-gray;
+
+      @include responsive(sm) {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

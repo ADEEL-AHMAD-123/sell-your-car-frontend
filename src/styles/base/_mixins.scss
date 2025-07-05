@@ -1,0 +1,45 @@
+@use './variables' as *;
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  // MEDIA QUERIES
+  @mixin responsive($breakpoint) {
+    @if $breakpoint == sm {
+      @media (max-width: $breakpoint-sm) { @content; }
+    } @else if $breakpoint == md {
+      @media (max-width: $breakpoint-md) { @content; }
+    } @else if $breakpoint == lg {
+      @media (max-width: $breakpoint-lg) { @content; }
+    } @else if $breakpoint == xl {
+      @media (max-width: $breakpoint-xl) { @content; }
+    }
+  }
+  
+  // CONTAINER
+  @mixin container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 $spacing-sm;
+  
+    @include responsive(md) {
+      padding: 0 $spacing-xs;
+    }
+  }
+  
+  // SECTION SPACING
+  @mixin section-spacing {
+    padding: $spacing-lg 0;
+  
+    @include responsive(md) {
+      padding: $spacing-md 0;
+    }
+  
+    @include responsive(sm) {
+      padding: $spacing-sm 0;
+    }
+  }
+  

@@ -1,0 +1,195 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.testimonials-section {
+  padding: 5rem 2rem;
+  background-color: #126EFD;
+  color: $color-light;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 3rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+color: $color-light;
+    @media (max-width: $breakpoint-sm) {
+      font-size: 2.2rem;
+    }
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    font-weight: 300;
+    margin-bottom: 3rem;
+    color: $color-light;
+  }
+
+  .carousel-wrapper {
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 5rem;
+  }
+
+  .carousel {
+    display: flex;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    gap: 1.5rem;
+    padding: 0 1rem; 
+  }
+
+  .card {
+    background: $color-light;
+    padding: 2rem;
+    text-align: center;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    width: calc((100% - (1.5rem * (var(--visible-cards) - 1))) / var(--visible-cards));
+    
+    .quote {
+      font-size: qrem;
+      line-height: 1.7;
+      color: $color-dark;
+      margin-bottom: 1.2rem;
+    }
+  
+    .client-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: $color-dark;
+    }
+  
+    .client-role {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: $color-gray;
+      margin-top: 0;
+    }
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    .card {
+      padding: 1.5rem;
+  
+      .quote {
+        font-size: 1.2rem;
+      }
+  
+      .client-name {
+        font-size: 0.95rem;
+      }
+  
+      .client-role {
+        font-size: 0.85rem;
+      }
+    }
+  }
+  
+  @media (max-width: $breakpoint-sm) {
+    .card {
+      padding: 1.2rem;
+  
+      .quote {
+        font-size: 1rem;
+      }
+  
+      .client-name {
+        font-size: 0.9rem;
+      }
+  
+      .client-role {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+
+  .arrows {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    button {
+      background: $color-light;
+      color: $color-dark;
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background: $color-primary;
+        color: $color-light;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  @media (max-width: $breakpoint-md) {
+    .card {
+      padding: 1.5rem;
+    }
+
+    .quote {
+      font-size: 0.95rem;
+    }
+
+    .carousel-wrapper {
+      padding-bottom: 5rem;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 4rem 1rem;
+
+    .card {
+      margin: 0;
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+    }
+
+    .quote {
+      font-size: 0.9rem;
+    }
+  }
+}
+.stars {
+  margin: 0.5rem 0 1rem;
+  font-size: 1.1rem;
+  color: gold;
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem;
+
+  .empty {
+    color: $color-gray;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+  }
+}

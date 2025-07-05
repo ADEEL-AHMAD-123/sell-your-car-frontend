@@ -1,0 +1,34 @@
+// Colors
+$color-primary: #3534FF;
+$color-secondary: #ecf0f3;
+$color-dark: #000000;
+$color-light: #fff;
+$color-gray: #a19a9a;
+
+$color-primary-background:#FFFFFF;
+$color-secondary-background:#0B0A33;
+$color-accent-background: #c3c8c57e;
+
+
+// Border
+$border-primary:1px solid #eee;
+
+// Box shadow 
+$shadow-primary:0 8px 24px rgba(0, 0, 0, 0.06);
+
+// TYPOGRAPHY
+$font-family: 'Inter', sans-serif;
+$font-size-base: 16px;
+
+// SPACING
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 2rem;
+$spacing-lg: 3rem;
+$spacing-xl: 5rem;
+
+// BREAKPOINTS
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;

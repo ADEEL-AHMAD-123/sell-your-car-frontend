@@ -1,0 +1,94 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.key-benefits {
+  padding: $spacing-lg $spacing-md;
+  background-color: $color-accent-background;
+
+  .section-title {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: $color-dark;
+    margin-bottom: $spacing-sm;
+
+    @include responsive(sm) {
+      font-size: 1.5rem;
+    }
+  }
+
+  .section-subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: $color-dark;
+    margin-bottom: $spacing-lg;
+
+    @include responsive(sm) {
+      font-size: 0.95rem;
+      margin-bottom: $spacing-md;
+    }
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include responsive(sm) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-sm;
+    }
+  }
+
+  .benefit-card {
+    background-color: $color-primary-background;
+    padding: $spacing-md;
+    border-radius: 10px;
+    box-shadow: $shadow-primary;
+    text-align: center;
+    transition: transform 0.3s ease;
+    @include responsive(sm) {
+        padding: $spacing-sm $spacing-md;
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    .icon {
+      font-size: 2rem;
+      color: $color-primary;
+      margin-bottom: $spacing-xs;
+
+      @include responsive(sm) {
+        font-size: 1.6rem;
+        margin-bottom: 0.4rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: $color-dark;
+      margin-bottom: 0.3rem;
+
+      @include responsive(sm) {
+        font-size: 0.95rem;
+      }
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $color-gray;
+      line-height: 1.4;
+
+      @include responsive(sm) {
+        display: none; 
+      }
+    }
+  }
+}

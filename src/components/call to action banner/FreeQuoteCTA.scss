@@ -7,6 +7,10 @@
   padding: 4rem;
   position: relative;
   overflow: hidden;
+  &.cta-grey {
+    background-color: $color-accent-background;
+    color: $color-light;
+
   @include responsive(sm) {
     padding: 3rem 2rem;
   }
@@ -88,4 +92,5 @@
       display: none;
     }
   }
+}
 }

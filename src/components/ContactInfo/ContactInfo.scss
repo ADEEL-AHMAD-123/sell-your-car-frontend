@@ -1,0 +1,57 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.contact-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin: 4rem auto;
+  padding: 2rem 4rem;
+
+  @include responsive(md) {
+    padding: 2rem;
+  }
+
+  @include responsive(sm) {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .info-card {
+    background: $color-light;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); // Enhanced visible shadow
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    @include responsive(sm) {
+      padding: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      color: $color-primary;
+      margin-bottom: 0.5rem;
+
+      @include responsive(sm) {
+        font-size: 1.1rem;
+      }
+    }
+
+    p {
+      color: $color-dark;
+      font-weight: 500;
+      font-size: 1rem;
+
+      @include responsive(sm) {
+        font-size: 0.95rem;
+      }
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+  }
+}

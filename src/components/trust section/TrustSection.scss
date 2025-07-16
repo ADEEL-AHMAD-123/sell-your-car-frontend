@@ -1,0 +1,57 @@
+// TrustSection.scss
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.trust-section {
+  padding: 4rem 1.5rem;
+  background-color: $color-accent-background;
+
+  .container {
+    @include container;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 2rem;
+    color: $color-dark;
+    margin-bottom: 2rem;
+  }
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include responsive(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .trust-card {
+    background: $color-light;
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    box-shadow: $shadow-primary;
+    transition: transform 0.3s ease;
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: $color-primary;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      color: $color-dark;
+    }
+  }
+}

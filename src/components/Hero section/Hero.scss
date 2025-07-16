@@ -104,3 +104,12 @@
     }
   }
 }
+.input-error {
+  border: 1px solid red !important;
+}
+
+.hero__error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}

@@ -28,12 +28,12 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="header__nav">
-          <ul className="header__nav-list">
-            <li><a href="#home" className="header__nav-link">Home</a></li>
-            <li><a href="#about" className="header__nav-link">About</a></li>
-            <li><a href="#how-it-works" className="header__nav-link">How It Works</a></li>
-            <li><a href="#faqs" className="header__nav-link">FAQs</a></li>
-            <li><a href="#contact" className="header__nav-link">Contact</a></li>
+          <ul className="header__nav-list"> 
+            <li><a href="/" className="header__nav-link">Home</a></li>
+            <li><a href="/about" className="header__nav-link">About</a></li>
+            <li><a href="/how-it-works" className="header__nav-link">How It Works</a></li>
+            <li><a href="/faqs" className="header__nav-link">FAQs</a></li>
+            <li><a href="/contact" className="header__nav-link">Contact</a></li>
           </ul>
         </nav>
 
@@ -64,11 +64,11 @@ const Header = () => {
         {/* Mobile Navigation */}
         <nav className="header__mobile-nav">
           <ul className="header__mobile-nav-list">
-            <li><a href="#home" className="header__mobile-nav-link" onClick={closeMobileMenu}>Home</a></li>
-            <li><a href="#about" className="header__mobile-nav-link" onClick={closeMobileMenu}>About</a></li>
-            <li><a href="#how-it-works" className="header__mobile-nav-link" onClick={closeMobileMenu}>How It Works</a></li>
-            <li><a href="#faqs" className="header__mobile-nav-link" onClick={closeMobileMenu}>FAQs</a></li>
-            <li><a href="#contact" className="header__mobile-nav-link" onClick={closeMobileMenu}>Contact</a></li>
+            <li><a href="/home" className="header__mobile-nav-link" onClick={closeMobileMenu}>Home</a></li>
+            <li><a href="/about" className="header__mobile-nav-link" onClick={closeMobileMenu}>About</a></li>
+            <li><a href="/how-it-works" className="header__mobile-nav-link" onClick={closeMobileMenu}>How It Works</a></li>
+            <li><a href="/faqs" className="header__mobile-nav-link" onClick={closeMobileMenu}>FAQs</a></li>
+            <li><a href="/contact" className="header__mobile-nav-link" onClick={closeMobileMenu}>Contact</a></li>
           </ul>
         </nav>
 

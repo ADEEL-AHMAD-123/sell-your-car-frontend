@@ -1,18 +1,33 @@
+import PropTypes from 'prop-types';
 import './FreeQuoteCTA.scss';
 
-const FreeQuoteCTA = () => {
+const FreeQuoteCTA = ({
+  heading,
+  paragraph,
+  buttonText,
+  buttonLink = "#quote",
+  className = ''
+}) => {
   return (
-    <section className="cta-section">
+    <section className={`cta-section ${className}`}>
       <div className="container">
         <div className="cta-content">
-          <h2>Still have questions?</h2>
-          <p>Get in touch or get your free quote in under 60 seconds. It's fast, easy and completely free.</p>
-          <a href="#quote" className="cta-button">Get My Free Quote</a>
+          <h2>{heading}</h2>
+          <p>{paragraph}</p>
+          <a href={buttonLink} className="cta-button">{buttonText}</a>
         </div>
         <div className="cta-pattern" aria-hidden="true"></div>
       </div>
     </section>
   );
+};
+
+FreeQuoteCTA.propTypes = {
+  heading: PropTypes.string.isRequired,
+  paragraph: PropTypes.string.isRequired,
+  buttonText: PropTypes.string.isRequired,
+  buttonLink: PropTypes.string,
+  className: PropTypes.string, 
 };
 
 export default FreeQuoteCTA;

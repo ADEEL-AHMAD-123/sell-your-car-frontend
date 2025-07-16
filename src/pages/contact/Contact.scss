@@ -1,0 +1,40 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.contact-hero {
+  position: relative;
+  background: url('../../assets/contact-hero.jpg') center center/cover no-repeat;
+  min-height: 60vh;
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: $color-light;
+    padding: 2rem;
+
+    .hero-content {
+      h1 {
+        font-size: 2.8rem;
+        margin-bottom: 0.5rem;
+        color: $color-light;
+
+        @include responsive(sm) {
+          font-size: 2rem;
+        }
+      }
+
+      p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+        font-weight: lighter;
+        opacity: 0.9;
+      }
+    }
+  }
+}

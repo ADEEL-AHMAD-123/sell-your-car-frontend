@@ -14,7 +14,12 @@ const Home = () => {
 <KeyBenefits/>
 <TestimonialsSection/>
 <ScrapGuideSection/>
-<FreeQuoteCTA/>
+<FreeQuoteCTA
+  heading="Still have questions?"
+  paragraph="Get in touch or get your free quote in under 60 seconds. It's fast, easy and completely free."
+  buttonText="Get My Free Quote"
+/>
+
 </>
   )
 }

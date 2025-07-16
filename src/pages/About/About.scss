@@ -1,0 +1,173 @@
+// src/pages/About.scss
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.about-hero {
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url('../../assets/about-hero.jpg') center/cover no-repeat;
+  color: $color-light;
+  text-align: center;
+  padding: 6rem 1.5rem;
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: $color-light;
+
+    @include responsive(sm) {
+      font-size: 2rem;
+    }
+  }
+
+  p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    color: $color-light;
+    opacity: 0.9;
+    font-weight: lighter;
+
+    @include responsive(sm) {
+      font-size: 1rem;
+    }
+  }
+}
+
+.about-section {
+  padding: 4rem 1.5rem;
+  text-align: center;
+
+
+  h2 {
+    font-size: 2rem;
+    color: $color-dark;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    max-width: 720px;
+    margin: 0 auto;
+    color: $color-gray;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+}
+
+.about-stats {
+  background-color: $color-accent-background;
+  display: flex;
+  justify-content: space-around;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  @include responsive(md) {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .stat {
+    h3 {
+      font-size: 2.2rem;
+      color: $color-primary;
+    }
+
+    p {
+      margin-top: 0.5rem;
+      color: $color-dark;
+      font-size: 1rem;
+    }
+  }
+}
+
+.cta-section {
+    background-color: $color-primary-background;
+    color: $color-light;
+    padding: 4rem;
+    position: relative;
+    overflow: hidden;
+    @include responsive(sm) {
+      padding: 3rem 2rem;
+    }
+  
+    .container {
+      @include container;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+   
+  
+    .cta-content {
+      max-width: 600px;
+      z-index: 2;
+  
+      h2 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+  
+        @include responsive(sm) {
+          font-size: 1.7rem;
+        }
+      }
+  
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.9;
+        color: $color-dark;
+        font-weight: lighter;
+  
+        @include responsive(sm) {
+          font-size: 1rem;
+        }
+      }
+  
+      .about-btn {
+        display: inline-block;
+        background-color: $color-primary;
+        color: $color-light;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s ease;
+        border: 1px solid $color-primary;
+        font-size: 1rem;
+        @include responsive(sm) {
+          font-size: 0.9rem;
+          padding: 0.7rem 1rem;
+        }
+  
+        &:hover {
+          background-color: $color-light;
+          color: $color-primary;
+        }
+      }
+    }
+  
+    .cta-pattern {
+      background: url('../../assets/pattern.png') no-repeat center center/contain;
+      width: 400px;
+      height: 200px;
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      opacity: 2;
+  
+      @include responsive(lg) {
+        width: 160px;
+        height: 160px;
+        right: -30px;
+        bottom: -30px;
+      }
+  
+      @include responsive(md) {
+        display: none;
+      }
+    }
+  }
+  

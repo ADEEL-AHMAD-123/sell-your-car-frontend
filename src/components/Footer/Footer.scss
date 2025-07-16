@@ -1,0 +1,98 @@
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+.footer {
+  background-color: $color-dark;
+  color: $color-light;
+  padding: 4rem 1.5rem 2rem;
+
+  &__top {
+    @include container;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include responsive(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__col {
+    h3, h4 {
+      color: $color-primary;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $color-gray;
+      line-height: 1.6;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        margin-bottom: 0.6rem;
+
+        a {
+          font-size: 0.95rem;
+          color: $color-light;
+          text-decoration: none;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: $color-primary;
+          }
+        }
+      }
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+
+      @include responsive(sm) {
+        justify-content: flex-start;
+      }
+
+      a {
+        display: inline-flex;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba($color-light, 0.1);
+        color: $color-light;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: $color-primary;
+          color: $color-dark;
+        }
+      }
+    }
+  }
+
+  &__bottom {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.9rem;
+    color: $color-gray;
+  }
+}

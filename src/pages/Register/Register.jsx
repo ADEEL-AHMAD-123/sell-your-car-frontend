@@ -6,6 +6,7 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import '../../styles/AuthForm.scss';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -21,28 +22,33 @@ const Register = () => {
       phone: '',
     },
     validationSchema: Yup.object({
-      firstName: Yup.string().required('Required'),
-      lastName: Yup.string().required('Required'),
-      email: Yup.string().email('Invalid email').required('Required'),
-      password: Yup.string().min(6).required('Required'),
-      phone: Yup.string().required('Phone is required'),
+      firstName: Yup.string().required('First name is required'),
+      lastName: Yup.string().required('Last name is required'),
+      email: Yup.string().email('Invalid email address').required('Email is required'),
+      password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+      phone: Yup.string().required('Phone number is required'),
     }),
     onSubmit: async (values) => {
-      const result = await dispatch(
-        registerUser({
-          data: {
-            name: `${values.firstName} ${values.lastName}`,
-            email: values.email,
-            password: values.password,
-            phone: values.phone,
-          },
-        })
-      );
-      if (registerUser.fulfilled.match(result)) {
-        navigate('/login');
+      const payload = {
+        name: `${values.firstName} ${values.lastName}`,
+        email: values.email,
+        password: values.password,
+        phone: values.phone,
+      };
+
+      try {
+        const result = await dispatch(registerUser({  data:payload}));
+
+        if (registerUser.fulfilled.match(result)) {
+          toast.success('Registration successful! Please login.');
+          navigate('/login');
+        } else if (registerUser.rejected.match(result)) {
+          toast.error(result.payload?.message || 'Registration failed');
+        }
+      } catch (error) {
+        toast.error('Something went wrong');
       }
-    }
-    
+    },
   });
 
   return (
@@ -68,6 +74,7 @@ const Register = () => {
               )}
             </div>
           </div>
+
           {/* Email */}
           <div className="form-group">
             <label>Email</label>
@@ -76,6 +83,7 @@ const Register = () => {
               <div className="error">{formik.errors.email}</div>
             )}
           </div>
+
           {/* Password */}
           <div className="form-group">
             <label>Password</label>
@@ -84,6 +92,7 @@ const Register = () => {
               <div className="error">{formik.errors.password}</div>
             )}
           </div>
+
           {/* Phone */}
           <div className="form-group">
             <label>Phone Number</label>
@@ -102,6 +111,7 @@ const Register = () => {
             {isLoading ? 'Registering...' : 'Register'}
           </button>
         </form>
+
         <p className="auth-switch">
           Already have an account? <Link to="/login">Login</Link>
         </p>

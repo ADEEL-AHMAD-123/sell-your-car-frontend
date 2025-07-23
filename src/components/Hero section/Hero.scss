@@ -5,11 +5,18 @@
   position: relative;
   background: url('../../assets/hero.jpg') center center/cover no-repeat;
   min-height: 100vh;
+
+
+  @supports (height: 100dvh) {
+    min-height: 100dvh;
+  }
+
   color: $color-light;
+  overflow: hidden;
 
   &__overlay {
     position: absolute;
-    inset: 0; // replaces top, right, bottom, left = 0
+    inset: 0;
     background: rgba(0, 0, 0, 0.6);
     z-index: 1;
   }
@@ -54,47 +61,54 @@
 
     .hero__form {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: row; 
       gap: 1rem;
       justify-content: center;
       width: 100%;
-
-      input {
-        padding: 0.8rem 1rem;
+      max-width: 100%;
+    
+      input,
+      button {
+        padding: 0.9rem 1rem;
         font-size: 1rem;
         border-radius: 6px;
         border: none;
-        width: 220px;
-        max-width: 100%;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
-
+    
+      input {
+        width: 60%; // input gets more space
+        background-color: $color-light;
+        color: $color-dark;
+      }
+    
       button {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
-        font-weight: 600;
+        width: auto;
         background-color: $color-primary;
         color: $color-light;
-        border: none;
-        border-radius: 6px;
+        font-weight: 600;
         cursor: pointer;
         transition: background 0.3s ease;
         box-shadow: 0 2px 6px rgba($color-primary, 0.3);
-
+    
         &:hover {
           background-color: darken($color-primary, 10%);
         }
-
-        @include responsive(sm) {
-          width: 100%;
-        }
       }
-
+    
+      // Mobile styles
       @include responsive(sm) {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
+    
+        input,
+        button {
+          width: 80%;
+        }
       }
     }
+    
+    
 
     .hero__note {
       margin-top: 1.5rem;
@@ -104,6 +118,7 @@
     }
   }
 }
+
 .input-error {
   border: 1px solid red !important;
 }

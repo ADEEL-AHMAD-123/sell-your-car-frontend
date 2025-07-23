@@ -1,41 +1,43 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { createApiAsyncThunk } from '../../utils/apiHelper';
+// src/redux/slices/quoteSlice.js
+import { createSlice } from "@reduxjs/toolkit";
+import { createApiAsyncThunk } from "../../utils/apiHelper";
 
-export const quoteAsyncActions = {
-  getQuote: createAsyncThunk('quote/getQuote', createApiAsyncThunk({
-    name: 'getQuote',
-    method: 'POST',
-    url: '/quote/get',
-  })),
-};
+export const getQuote = createApiAsyncThunk({
+  name: "getQuote",
+  method: "POST",
+  url: "/api/quote/get",
+  typePrefix: "quote",
+});
 
 const initialState = {
   quote: null,
-  checksLeft: null,
   isLoading: false,
   error: null,
+  status: "idle",
 };
 
 const quoteSlice = createSlice({
-  name: 'quote',
+  name: "quote",
   initialState,
   reducers: {
     resetQuote: () => initialState,
   },
   extraReducers: (builder) => {
     builder
-      .addCase(quoteAsyncActions.getQuote.pending, (state) => {
+      .addCase(getQuote.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.status = "loading";
       })
-      .addCase(quoteAsyncActions.getQuote.fulfilled, (state, { payload }) => {
+      .addCase(getQuote.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.quote = payload.quote;
-        state.checksLeft = payload.checksLeft;
+        state.quote = action.payload?.data?.vehicle || null;
+        state.status = "succeeded";
       })
-      .addCase(quoteAsyncActions.getQuote.rejected, (state, { payload }) => {
+      .addCase(getQuote.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = payload;
+        state.error = action.payload?.message || "Something went wrong";
+        state.status = "failed";
       });
   },
 });

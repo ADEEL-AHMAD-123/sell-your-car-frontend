@@ -27,7 +27,7 @@ const Login = () => {
       );
 
       if (loginUser.fulfilled.match(result)) {
-        navigate('/dashboard'); // or any protected route
+        navigate('/');
       }
     },
   });

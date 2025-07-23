@@ -4,6 +4,7 @@
 .key-benefits {
   padding: $spacing-lg $spacing-md;
   background-color: $color-accent-background;
+  overflow: hidden;
 
   .section-title {
     text-align: center;
@@ -11,6 +12,7 @@
     font-weight: 600;
     color: $color-dark;
     margin-bottom: $spacing-sm;
+   
 
     @include responsive(sm) {
       font-size: 1.5rem;
@@ -33,16 +35,17 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: $spacing-md;
-
+  
     @include responsive(md) {
       grid-template-columns: repeat(2, 1fr);
     }
-
+  
     @include responsive(sm) {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr; 
       gap: $spacing-sm;
     }
   }
+  
 
   .benefit-card {
     background-color: $color-primary-background;

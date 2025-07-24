@@ -8,10 +8,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 const App = () => (
   <BrowserRouter> 
-  <Header />
+
     <AppRoutes />
     <ToastContainer position="top-right" autoClose={3000} />
-  <Footer/>  
+
   </BrowserRouter>
 );
 

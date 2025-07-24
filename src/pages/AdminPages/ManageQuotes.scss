@@ -1,0 +1,62 @@
+@use '../../styles/base/variables' as *;
+
+.manage-quotes {
+    padding: $spacing-lg;
+  
+    h1 {
+      margin-bottom: $spacing-md;
+      color: $color-dark;
+    }
+  
+    .search-bar {
+      display: flex;
+      gap: $spacing-sm;
+      flex-wrap: wrap;
+      margin-bottom: $spacing-md;
+  
+      input {
+        flex: 1;
+        min-width: 250px;
+        padding: $spacing-sm;
+        border: $border-primary;
+        border-radius: 6px;
+      }
+  
+      button {
+        padding: 0.6rem 1.4rem;
+        background-color: $color-primary;
+        color: $color-light;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s;
+  
+        &:hover {
+          background-color: darken($color-primary, 5%);
+        }
+      }
+    }
+  
+    .quote-list {
+      display: grid;
+      gap: $spacing-md;
+  
+      .quote-card {
+        background: $color-secondary;
+        padding: $spacing-md;
+        border-radius: 8px;
+        box-shadow: $shadow-primary;
+  
+        p {
+          margin: 0.4rem 0;
+          color: $color-dark;
+          font-size: 0.95rem;
+  
+          strong {
+            color: $color-primary;
+          }
+        }
+      }
+    }
+  }
+  

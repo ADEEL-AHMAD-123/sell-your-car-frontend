@@ -1,0 +1,107 @@
+@import '../../../styles/base/admin-variables.scss';
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $admin-bg-color;
+  color: $admin-text-color;
+  padding: 2.5rem 2.5rem;
+  height: 80px; 
+  box-shadow: 0 2px 8px $admin-header-shadow;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  @media (max-width: 768px) {
+    padding: 1.5rem 2.5rem;
+  }
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+
+    .toggle-btn {
+      font-size: 2rem;
+      background: none;
+      border: none;
+      color: $admin-accent;
+      cursor: pointer;
+
+      // Hide toggle on large devices
+      @media (min-width: 769px) {
+        display: none;
+      }
+    }
+
+    .logo-text {
+
+      font-weight: 600;
+      color: $admin-accent;
+
+      display: none;
+    
+      @media (min-width: 769px) {
+        font-size: 1.8rem;
+        display: block;
+
+      }
+    }
+    
+  }
+
+  .search-bar {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: $admin-search-bg;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: $admin-text-color;
+      flex: 1;
+      font-size: 1.1rem;
+
+      &::placeholder {
+        color: $admin-muted;
+      }
+    }
+
+    svg {
+      font-size: 1.2rem;
+      color: $admin-accent;
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .icon {
+      font-size: 1.8rem;
+      color: $admin-muted;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $admin-accent;
+      }
+    }
+
+    .avatar {
+      font-size: 2.2rem;
+      color: $admin-accent-light;
+    }
+  }
+}

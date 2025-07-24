@@ -4,7 +4,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import { combineReducers } from 'redux';
 import authReducer from './slices/authSlice';
 import quoteReducer from './slices/quoteSlice';
-
+import adminReducer from './slices/adminSlice';
 const persistConfig = {
   key: 'root',
   storage,
@@ -13,6 +13,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   quote: quoteReducer,
+  admin: adminReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

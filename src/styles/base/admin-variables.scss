@@ -1,0 +1,29 @@
+// src/styles/base/admin-variables.scss
+
+// Base Backgrounds
+$admin-bg-color: #1e2633db; // main content background (slightly lighter than before)
+$admin-sidebar-bg: #1e2633; // sidebar background — less harsh than #111827
+
+// Text Colors
+$admin-text-color: #f4f7fa; // light text
+$admin-muted: #a0aec0; // soft muted text (labels, secondary text)
+
+// Accents
+$admin-accent: #3b82f6; // vibrant blue
+$admin-accent-light: #60a5fa; // for lighter accent hover/active states
+
+// Link Colors
+$admin-link-color: #cbd5e1; // regular nav links
+$admin-link-hover: #e2e8f0;
+$admin-link-active-bg: #3b82f6;
+$admin-link-active-text: #ffffff;
+
+// Header and Sidebar Styling
+$admin-header-shadow: rgba(0, 0, 0, 0.2); // slightly softened shadow
+$admin-sidebar-hover: #2f3a4c; // lighter hover for better contrast
+
+// Search
+$admin-search-bg: #222831; // input background
+
+// Borders
+$admin-border-color: #475569; // subtle borders

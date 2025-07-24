@@ -1,0 +1,80 @@
+@import '../../../styles/base/admin-variables.scss';
+
+.admin-sidebar {
+  width: 260px;
+  background: $admin-sidebar-bg;
+  color: $admin-text-color;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+  position: sticky;
+  top: 0;
+
+  &.closed {
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .sidebar-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.3rem;
+      color: $admin-accent;
+    }
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: $admin-link-color;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.3s;
+
+      svg {
+        font-size: 1.1rem;
+      }
+
+      &:hover {
+        background: $admin-sidebar-hover;
+        color: $admin-text-color;
+      }
+
+      &.active {
+        background: $admin-link-active-bg;
+        color: $admin-link-active-text;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    position: relative;
+    width: 40%;
+    min-height: auto;
+    padding: 1.5rem 1rem;
+  
+    nav {
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+  
+      a {
+        flex: 1 1 45%;
+
+      }
+    }
+  }
+  
+}

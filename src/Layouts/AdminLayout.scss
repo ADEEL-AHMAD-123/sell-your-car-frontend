@@ -1,0 +1,59 @@
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+
+  // Sidebar on the left for large devices
+  .admin-sidebar {
+    width: 250px;
+    height: 100vh;
+   
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+
+      height: 100%;
+    }
+  }
+
+  .admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    @media (max-width: 768px) {
+      height: auto;
+    }
+
+    .admin-header {
+      height: 60px;
+     
+     
+
+      @media (min-width: 769px) {
+        width: calc(100% - 250px);
+        margin-left: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+    }
+
+    .admin-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+
+      @media (min-width: 769px) {
+
+        margin-top: 60px;
+      }
+
+      @media (max-width: 768px) {
+        margin-top: 1rem;
+      }
+    }
+  }
+}

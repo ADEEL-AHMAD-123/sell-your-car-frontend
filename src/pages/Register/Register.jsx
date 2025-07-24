@@ -30,7 +30,8 @@ const Register = () => {
     }),
     onSubmit: async (values) => {
       const payload = {
-        name: `${values.firstName} ${values.lastName}`,
+        firstName: values.firstName,
+        lastName:values.lastName,
         email: values.email,
         password: values.password,
         phone: values.phone,

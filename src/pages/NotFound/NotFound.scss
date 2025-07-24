@@ -1,0 +1,51 @@
+@use '../../styles/base/variables' as *;
+
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: $color-primary-background;
+  padding: $spacing-lg;
+
+  .content {
+    max-width: 600px;
+
+    h1 {
+      font-size: 8rem;
+      font-weight: 700;
+      color: $color-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: $color-dark;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $color-gray;
+      margin-bottom: $spacing-md;
+    }
+
+    button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      background-color: $color-primary;
+      color: $color-light;
+      box-shadow: $shadow-primary;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background-color: darken($color-primary, 5%);
+      }
+    }
+  }
+}

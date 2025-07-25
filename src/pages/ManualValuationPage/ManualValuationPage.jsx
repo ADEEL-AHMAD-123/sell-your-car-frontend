@@ -1,4 +1,9 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestManualQuote } from '../../redux/slices/quoteSlice';
+import { useNavigate } from 'react-router-dom';
+import MessageCard from '../../components/common/MessageCard';
 import { useFormik } from 'formik';
 import { useLocation } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -7,7 +12,19 @@ import './ManualValuationPage.scss';
 
 const ManualValuationPage = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [showSuccess, setShowSuccess] = useState(false);
   const prefill = location.state || {};
+
+  const { manualStatus, manualError } = useSelector((state) => state.quote);
+
+  useEffect(() => {
+    if (manualStatus === 'succeeded' && !manualError) {
+      setShowSuccess(true);
+    }
+  }, [manualStatus, manualError]);
 
   const formik = useFormik({
     initialValues: {
@@ -17,6 +34,7 @@ const ManualValuationPage = () => {
       fuelType: prefill.fuelType || '',
       wheelPlan: prefill.wheelPlan || '',
       weight: '',
+      userEstimatedPrice: '',
       year: '',
       message: '',
       images: null,
@@ -33,16 +51,46 @@ const ManualValuationPage = () => {
         .max(new Date().getFullYear(), 'Year cannot be in the future')
         .required('Year is required'),
       weight: Yup.number().nullable().typeError('Weight must be a number'),
+      userEstimatedPrice: Yup.number()
+  .typeError('Estimated price must be a number')
+  .positive('Must be positive')
+  .required('Estimated price is required'),
       message: Yup.string(),
     }),
-    onSubmit: (values) => {
-      console.log('Manual Valuation Submitted:', values);
-      // Handle API submission
+    onSubmit: async (values) => {
+      const formData = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        if (key === 'images' && value) {
+          Array.from(value).forEach((file) => formData.append('images', file));
+        } else {
+          formData.append(key, value ?? '');
+        }
+      });
+
+      dispatch(requestManualQuote(formData));
     },
   });
 
+  // Redirect after showing success message
+  const handleSuccessRedirect = () => {
+    setShowSuccess(false);
+    navigate('/');
+  };
+
   return (
+
+
+    
     <div className="manual-valuation-page">
+ {/* Show success message */}
+ {showSuccess && (
+        <MessageCard
+          title="Request Submitted Successfully!"
+          message="Our valuation experts have received your request. You will hear back within 24–48 hours."
+          onConfirm={handleSuccessRedirect}
+          confirmLabel="Okay, Go to Home"
+        />)}
+
       <div className="container">
         {/* Header Section */}
         <div className="page-header">
@@ -288,6 +336,42 @@ const ManualValuationPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* SECTION 4: Estimated Price */}
+            <div className="form-section">
+            <h3 className="section-title">
+                <span className="section-number">4</span>
+                Expected Price
+              </h3>
+  <div className="form-group full-width">
+    <label htmlFor="expectedPrice">
+      Your Expected Price in GBP <span className="optional">(Optional)</span>
+      <span className="info-icon" data-tooltip-id="priceTip">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                        <path d="m9,9 h0 m3.5,0 v6 m0,-3 h2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </span>
+                    <Tooltip id="priceTip" place="top" content="Please enter the amount you expect to receive (in GBP £) " />
+    </label>
+    <div className="input-wrapper">
+      <input
+        type="number"
+        id="userEstimatedPrice"
+        placeholder="e.g., £15000"
+        className={formik.touched.userEstimatedPrice && formik.errors.userEstimatedPrice ? 'error' : ''}
+  {...formik.getFieldProps('userEstimatedPrice')}
+      />
+      <div className="input-icon">£</div>
+    </div>
+    {formik.touched.userEstimatedPrice && formik.errors.userEstimatedPrice && (
+  <div className="error-message">{formik.errors.userEstimatedPrice}</div>
+)}
+
+  </div>
+</div>
+
+
 
             {/* Submit */}
             <div className="form-actions">

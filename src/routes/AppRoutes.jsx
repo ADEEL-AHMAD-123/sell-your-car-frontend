@@ -12,7 +12,7 @@ import Register from '../pages/Register/Register';
 import QuoteResult from '../pages/QuoteResult/QuoteResult';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import NotFound from '../pages/NotFound/NotFound';
-
+import ManualValuationPage from '../pages/ManualValuationPage/ManualValuationPage';
 import AdminDashboard from '../pages/AdminPages/AdminDashboard';
 import ManageUsers from '../pages/AdminPages/ManageUsers';
 import ManageQuotes from '../pages/AdminPages/ManageQuotes';
@@ -30,6 +30,8 @@ const AppRoutes = () => (
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/faqs" element={<FaqsPage />} />
       <Route path="/quote-result" element={<ProtectedRoute><QuoteResult /></ProtectedRoute>} />
+      <Route path="/manual-valuation" element={<ManualValuationPage />} />
+
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Route>

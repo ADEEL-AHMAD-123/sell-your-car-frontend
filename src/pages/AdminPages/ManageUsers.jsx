@@ -1,48 +1,53 @@
 import './ManageUsers.scss';
 import { useEffect, useState } from 'react';
-
-// Dummy user data
-const dummyUsers = [
-  { _id: '1', name: 'John Doe', email: 'john@example.com', checksLeft: 5, role: 'user' },
-  { _id: '2', name: 'Jane Admin', email: 'jane@example.com', checksLeft: 10, role: 'admin' },
-  { _id: '3', name: 'Ali Khan', email: 'ali@example.com', checksLeft: 0, role: 'user' },
-  { _id: '4', name: 'Sara Smith', email: 'sara@example.com', checksLeft: 2, role: 'moderator' },
-  { _id: '5', name: 'Dev Patel', email: 'dev@example.com', checksLeft: 8, role: 'admin' },
-  // Add more if needed
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllUsers } from '../../redux/slices/adminSlice';
 
 const ManageUsers = () => {
+  const dispatch = useDispatch();
+  const { users = [], loading, error } = useSelector((state) => state.admin);
+
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [minChecks, setMinChecks] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
 
-  const handleDelete = (id) => {
-    const updated = filteredUsers.filter((u) => u._id !== id);
-    setFilteredUsers(updated);
-  };
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
   useEffect(() => {
-    let users = [...dummyUsers];
+    if (!users || !Array.isArray(users)) return;
+
+    let filtered = [...users];
 
     if (query.trim()) {
-      users = users.filter(
+      filtered = filtered.filter(
         (u) =>
-          u.name.toLowerCase().includes(query.toLowerCase()) ||
-          u.email.toLowerCase().includes(query.toLowerCase())
+          u.name?.toLowerCase().includes(query.toLowerCase()) ||
+          u.email?.toLowerCase().includes(query.toLowerCase())
       );
     }
 
     if (roleFilter) {
-      users = users.filter((u) => u.role === roleFilter);
+      filtered = filtered.filter((u) => u.role === roleFilter);
     }
 
     if (minChecks) {
-      users = users.filter((u) => u.checksLeft >= parseInt(minChecks));
+      const min = parseInt(minChecks);
+      if (!isNaN(min)) {
+        filtered = filtered.filter((u) => u.checksLeft >= min);
+      }
     }
 
-    setFilteredUsers(users);
-  }, [query, roleFilter, minChecks]);
+    setFilteredUsers(filtered);
+  }, [query, roleFilter, minChecks, users]);
+
+  const handleDelete = (id) => {
+    const updated = filteredUsers.filter((u) => u._id !== id);
+    setFilteredUsers(updated);
+    // Optionally dispatch a delete thunk
+  };
 
   return (
     <div className="manage-users">
@@ -70,41 +75,53 @@ const ManageUsers = () => {
       </div>
 
       <div className="user-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Checks Left</th>
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((u) => (
-                <tr key={u._id}>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.checksLeft}</td>
-                  <td>{u.role}</td>
-                  <td>
-                    <button className="edit">Edit</button>
-                    <button className="delete" onClick={() => handleDelete(u._id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+        {loading ? (
+          <div className="status-message">Loading users...</div>
+        ) : error ? (
+          <div className="status-message error">Error loading users: {error}</div>
+        ) : (
+          <>
+            {users.length === 0 ? (
+              <div className="status-message">No users available.</div>
             ) : (
-              <tr>
-                <td colSpan="5" style={{ textAlign: 'center' }}>
-                  No users found.
-                </td>
-              </tr>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Checks Left</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((u) => (
+                      <tr key={u._id}>
+                        <td>{u.name}</td>
+                        <td>{u.email}</td>
+                        <td>{u.checksLeft}</td>
+                        <td>{u.role}</td>
+                        <td>
+                          <button className="edit">Edit</button>
+                          <button className="delete" onClick={() => handleDelete(u._id)}>
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="status-message">
+                        No users match the current filters.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             )}
-          </tbody>
-        </table>
+          </>
+        )}
       </div>
     </div>
   );

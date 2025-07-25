@@ -1,62 +1,55 @@
-@use '../../styles/base/variables' as *;
-
 .manage-quotes {
-    padding: $spacing-lg;
-  
-    h1 {
-      margin-bottom: $spacing-md;
-      color: $color-dark;
+  padding: 2rem;
+
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    input {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-  
-    .search-bar {
-      display: flex;
-      gap: $spacing-sm;
-      flex-wrap: wrap;
-      margin-bottom: $spacing-md;
-  
-      input {
-        flex: 1;
-        min-width: 250px;
-        padding: $spacing-sm;
-        border: $border-primary;
-        border-radius: 6px;
-      }
-  
-      button {
-        padding: 0.6rem 1.4rem;
-        background-color: $color-primary;
-        color: $color-light;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: 0.3s;
-  
-        &:hover {
-          background-color: darken($color-primary, 5%);
-        }
-      }
-    }
-  
-    .quote-list {
-      display: grid;
-      gap: $spacing-md;
-  
-      .quote-card {
-        background: $color-secondary;
-        padding: $spacing-md;
-        border-radius: 8px;
-        box-shadow: $shadow-primary;
-  
-        p {
-          margin: 0.4rem 0;
-          color: $color-dark;
-          font-size: 0.95rem;
-  
-          strong {
-            color: $color-primary;
-          }
-        }
+
+    button {
+      padding: 0.6rem 1rem;
+      background-color: #3534ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
   }
-  
+
+  .status-message {
+    margin-top: 1rem;
+    color: #555;
+    font-style: italic;
+
+    &.error {
+      color: #ff4d4f;
+      font-weight: bold;
+    }
+  }
+
+  .quote-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .quote-card {
+      background: #f9f9f9;
+      padding: 1rem;
+      border-left: 4px solid #3534ff;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+  }
+}

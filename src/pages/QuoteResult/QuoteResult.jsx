@@ -15,6 +15,8 @@ const QuoteResult = () => {
     );
   }
 
+  const hasPrice = !!quote.estimatedScrapPrice;
+
   return (
     <section className="quote-result">
       <div className="valuation-summary">
@@ -30,9 +32,46 @@ const QuoteResult = () => {
           </div>
           <div>
             <span>Estimated Price</span>
-            <strong className="price">£{quote.estimatedScrapPrice ?? "N/A"}</strong>
+            <strong className="price">
+              {hasPrice ? `£${quote.estimatedScrapPrice}` : "Unavailable"}
+            </strong>
           </div>
         </div>
+        {!hasPrice && (
+  <div className="manual-options">
+    <h4>We couldn't calculate a price automatically</h4>
+    <p>You can still continue by selecting one of the following:</p>
+    <div className="option-buttons">
+    <Link
+  to="/manual-valuation"
+  state={{
+    regNumber: quote.registrationNumber,
+    make: quote.make,
+    model: quote.model,
+    fuelType: quote.fuelType,
+    wheelPlan: quote.wheelplan,
+    color: quote.colour,
+  }}
+  className="option-card"
+>
+  <span className="emoji">📞</span>
+  <div>
+    <strong>Request a Manual Valuation</strong>
+    <p>Let our team manually assess your vehicle details.</p>
+  </div>
+</Link>
+
+      <Link to="/manual-valuation" className="option-card">
+        <span className="emoji">📅</span>
+        <div>
+          <strong>Schedule a Callback</strong>
+          <p>Book a call to discuss your vehicle and get an offer.</p>
+        </div>
+      </Link>
+    </div>
+  </div>
+)}
+
       </div>
 
       <div className="vehicle-info">

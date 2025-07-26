@@ -16,7 +16,7 @@ import ManualValuationPage from '../pages/ManualValuationPage/ManualValuationPag
 import AdminDashboard from '../pages/AdminPages/AdminDashboard';
 import ManageUsers from '../pages/AdminPages/ManageUsers';
 import ManageQuotes from '../pages/AdminPages/ManageQuotes';
-
+import QuoteConfirmation from '../pages/QuoteConfirmation/QuoteConfirmation'
 import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
 
@@ -30,6 +30,7 @@ const AppRoutes = () => (
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/faqs" element={<FaqsPage />} />
       <Route path="/quote-result" element={<ProtectedRoute><QuoteResult /></ProtectedRoute>} />
+      <Route path="/quote-confirmation" element={<ProtectedRoute><QuoteConfirmation /></ProtectedRoute>} />
       <Route path="/manual-valuation" element={<ManualValuationPage />} />
 
       <Route path="/login" element={<Login />} />

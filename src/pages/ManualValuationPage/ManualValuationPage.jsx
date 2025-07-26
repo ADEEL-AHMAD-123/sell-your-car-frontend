@@ -1,30 +1,72 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestManualQuote } from '../../redux/slices/quoteSlice';
-import { useNavigate } from 'react-router-dom';
+import { requestManualQuote, resetManualState } from '../../redux/slices/quoteSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
 import MessageCard from '../../components/common/MessageCard';
 import { useFormik } from 'formik';
-import { useLocation } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Tooltip } from 'react-tooltip';
 import './ManualValuationPage.scss';
+import { toast } from 'react-toastify';
 
 const ManualValuationPage = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // 👇 move all hooks here at the top
+  const dispatch = useDispatch();
+  const { manualStatus, manualError } = useSelector((state) => state.quote);
+
+  const [checked, setChecked] = useState(false);
+  const [allowed, setAllowed] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [showError, setShowError] = useState(false);
+  const [denied, setDenied] = useState(false);
+
+
   const prefill = location.state || {};
 
-  const { manualStatus, manualError } = useSelector((state) => state.quote);
+  useEffect(() => {
+    const fromQuote = location.state?.fromQuote;
+    const allow = sessionStorage.getItem("allowManualPage");
+  
+    if (fromQuote && allow === "true") {
+      sessionStorage.removeItem("allowManualPage");
+      setAllowed(true);
+    } else {
+      setAllowed(false);
+      setDenied(true);
+    }
+  
+    setChecked(true);
+  }, [location.state, navigate]);
+  
+
+
+
+
+
+  useEffect(() => {
+    dispatch(resetManualState());
+  }, [dispatch]);
 
   useEffect(() => {
     if (manualStatus === 'succeeded' && !manualError) {
       setShowSuccess(true);
     }
   }, [manualStatus, manualError]);
+  useEffect(() => {
+    if (manualStatus === 'succeeded' && !manualError) {
+      setShowSuccess(true);
+    } else if (manualStatus === 'failed' && manualError) {
+      setShowError(true);
+    }
+  }, [manualStatus, manualError]);
+  
 
   const formik = useFormik({
     initialValues: {
@@ -52,68 +94,175 @@ const ManualValuationPage = () => {
         .required('Year is required'),
       weight: Yup.number().nullable().typeError('Weight must be a number'),
       userEstimatedPrice: Yup.number()
-  .typeError('Estimated price must be a number')
-  .positive('Must be positive')
-  .required('Estimated price is required'),
+        .typeError('Estimated price must be a number')
+        .positive('Must be positive')
+        .required('Estimated price is required'),
       message: Yup.string(),
     }),
     onSubmit: async (values) => {
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        if (key === 'images' && value) {
-          Array.from(value).forEach((file) => formData.append('images', file));
-        } else {
-          formData.append(key, value ?? '');
-        }
-      });
+      setIsSubmitting(true);
+      setUploadError(null);
 
-      dispatch(requestManualQuote(formData));
-    },
+      try {
+        const formData = new FormData();
+        Object.entries(values).forEach(([key, value]) => {
+          if (key === 'images') {
+            selectedImages.forEach((file) => formData.append('images', file));
+          } else {
+            formData.append(key, value ?? '');
+          }
+        });
+        
+        await dispatch(requestManualQuote({ data: formData }));
+      } catch (error) {
+        setUploadError("Something went wrong while submitting. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   });
 
-  // Redirect after showing success message
+  if (!checked) {
+    return (
+      <div className="manual-page-loader">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  if (denied) {
+    return (
+      <div className="manual-page-wrapper">
+      <MessageCard
+  title="Access Denied"
+  message="You can't access the manual valuation page directly. Please go through the quote process first."
+  buttons={[
+    {
+      label: 'Go Back',
+      onClick: () => navigate(-1),
+    },
+    {
+      label: 'Go to Home',
+      onClick: () => navigate('/'),
+    },
+  ]}
+/>
+
+      </div>
+    );
+  }
+  
+  
+
+  const handleErrorDismiss = () => {
+    setShowError(false);
+    dispatch(resetManualState());
+  };
+  
   const handleSuccessRedirect = () => {
     setShowSuccess(false);
     navigate('/');
   };
 
-  return (
-
-
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const maxImages = 6;
+  
+    const newFiles = files.slice(0, maxImages - selectedImages.length);
+    if (newFiles.length === 0) return;
+  
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+  
+    setSelectedImages((prev) => [...prev, ...newFiles]);
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    formik.setFieldValue('images', [...selectedImages, ...newFiles]);
+  };
+  
+  
+  const handleRemoveImage = (index) => {
+    const updatedFiles = selectedImages.filter((_, i) => i !== index);
+    const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+  
+    setSelectedImages(updatedFiles);
+    setImagePreviews(updatedPreviews);
+    formik.setFieldValue('images', updatedFiles);
+  };
+  
     
+
+  return (
     <div className="manual-valuation-page">
- {/* Show success message */}
- {showSuccess && (
-        <MessageCard
-          title="Request Submitted Successfully!"
-          message="Our valuation experts have received your request. You will hear back within 24–48 hours."
-          onConfirm={handleSuccessRedirect}
-          confirmLabel="Okay, Go to Home"
-        />)}
+    {showSuccess && (
+      <MessageCard
+        title="Request Submitted Successfully!"
+        message="Our valuation experts have received your request. You will hear back within 24–48 hours."
+        onConfirm={handleSuccessRedirect}
+        confirmLabel="Okay, Go to Home"
+      />
+    )}
+
+{showError && (
+  <div className="overlay-error">
+    <div className="error-card">
+      <div className="error-content">
+        <h3>Something went wrong</h3>
+        <p>{manualError || "Please try again later."}</p>
+        <button onClick={handleErrorDismiss}>OK</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
       <div className="container">
         {/* Header Section */}
         <div className="page-header">
-          <div className="header-content">
-            <div className="icon-wrapper">
-              <svg className="valuation-icon" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                <path d="M8 21L9.5 17.5L13 19L9.5 20.5L8 21Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                <path d="M19 12L20.5 8.5L24 10L20.5 11.5L19 12Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <h1>Request Manual Valuation</h1>
-            <p className="subheading">
-              No instant quote available? Our vehicle experts will personally assess your vehicle 
-              and provide you with an accurate valuation within 24-48 hours.
-            </p>
-            <div className="features">
-              <div className="feature"><span className="feature-icon">✓</span><span>Expert Assessment</span></div>
-              <div className="feature"><span className="feature-icon">✓</span><span>24-48 Hour Response</span></div>
-              <div className="feature"><span className="feature-icon">✓</span><span>No Hidden Fees</span></div>
-            </div>
-          </div>
-        </div>
+  <div className="header-content">
+    <div className="icon-wrapper">
+      <svg className="valuation-icon" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M8 21L9.5 17.5L13 19L9.5 20.5L8 21Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M19 12L20.5 8.5L24 10L20.5 11.5L19 12Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      </svg>
+    </div>
+
+    <h1>
+      {prefill.reason === 'value-higher'
+        ? 'Request a Better Offer'
+        : 'Manual Vehicle Valuation'}
+    </h1>
+
+    <p className="subheading">
+      {prefill.reason === 'value-higher' ? (
+        <>
+          Think your car is worth more? Submit a custom request and our team will review it for a better offer.
+        </>
+      ) : (
+        <>
+          No instant quote available? Our valuation experts will personally assess your vehicle and provide you with an accurate price within 24–48 hours.
+        </>
+      )}
+    </p>
+
+    <div className="features">
+      {prefill.reason === 'value-higher' ? (
+        <>
+          <div className="feature"><span className="feature-icon">📈</span><span>Send Your Price Expectation</span></div>
+          <div className="feature"><span className="feature-icon">🔍</span><span>We’ll Review Manually</span></div>
+          <div className="feature"><span className="feature-icon">💬</span><span>Personal Feedback from Admin</span></div>
+        </>
+      ) : (
+        <>
+          <div className="feature"><span className="feature-icon">✓</span><span>Expert Assessment</span></div>
+          <div className="feature"><span className="feature-icon">✓</span><span>24–48 Hour Response</span></div>
+          <div className="feature"><span className="feature-icon">✓</span><span>No Hidden Fees</span></div>
+        </>
+      )}
+    </div>
+  </div>
+</div>
+
 
         {/* Form Section */}
         <div className="form-card">
@@ -310,31 +459,53 @@ const ManualValuationPage = () => {
                 />
               </div>
 
-              <div className="form-group full-width">
-                <label htmlFor="images">
-                  Upload Vehicle Photos <span className="optional">(Optional)</span>
-                </label>
-                <div className="file-upload-area">
-                  <input
-                    type="file"
-                    id="images"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => formik.setFieldValue('images', e.target.files)}
-                  />
-                  <div className="upload-content">
-                    <div className="upload-icon">
-                      <svg viewBox="0 0 24 24" fill="none">
+               {/* Image Upload Section  */}
+      <div className="form-group full-width">
+        <label htmlFor="images">
+          Upload Vehicle Photos <span className="optional">(Optional)</span>
+        </label>
+        <div className="file-upload-area">
+        <input
+  type="file"
+  id="images"
+  accept="image/*"
+  multiple
+  onChange={handleImageChange}
+  disabled={imagePreviews.length >= 6}
+/>
+
+          <div className="upload-content">
+            <div className="upload-icon">
+            <svg viewBox="0 0 24 24" fill="none">
                         <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         <polyline points="7,10 12,5 17,10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         <line x1="12" y1="5" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                       </svg>
-                    </div>
-                    <p className="upload-text"><strong>Click to upload</strong> or drag and drop</p>
-                    <p className="upload-subtext">PNG, JPG or JPEG (Max 5MB each)</p>
-                  </div>
-                </div>
-              </div>
+            </div>
+            <p className="upload-text"><strong>Click to upload</strong> or drag and drop</p>
+            <p className="upload-subtext">PNG, JPG or JPEG (Max 5MB each)</p>
+          </div>
+        </div>
+
+        {imagePreviews.length > 0 && (
+  <div className="image-preview-gallery">
+    {imagePreviews.map((src, idx) => (
+      <div key={idx} className="image-preview-wrapper">
+        <img src={src} alt={`Preview ${idx}`} className="image-thumb" />
+        <button
+          type="button"
+          className="remove-image-btn"
+          onClick={() => handleRemoveImage(idx)}
+        >
+          &times;
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
+      </div>
+
             </div>
 
             {/* SECTION 4: Estimated Price */}
@@ -375,15 +546,23 @@ const ManualValuationPage = () => {
 
             {/* Submit */}
             <div className="form-actions">
-              <button type="submit" className="submit-btn">
-                <span className="btn-icon">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polygon points="22,2 15,22 11,13 2,9 22,2" fill="currentColor"/>
-                  </svg>
-                </span>
-                Submit Valuation Request
-              </button>
+            <button type="submit" className="submit-btn" disabled={isSubmitting}>
+  {isSubmitting ? (
+    <span className="loading-spinner"></span>
+  ) : (
+    <>
+      <span className="btn-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <polygon points="22,2 15,22 11,13 2,9 22,2" fill="currentColor"/>
+        </svg>
+      </span>
+      Submit Valuation Request
+    </>
+  )}
+</button>
+{uploadError && <div className="error-message">{uploadError}</div>}
+
               <p className="submit-note">🔒 Your information is secure and will only be used for valuation purposes</p>
             </div>
           </form>

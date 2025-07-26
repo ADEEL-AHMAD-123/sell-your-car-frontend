@@ -192,3 +192,180 @@
   }
 }
 
+.accept-offer {
+  margin-top: 2rem;
+  text-align: center;
+
+  .accept-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #218838;
+    }
+  }
+
+  .confirm-modal {
+    margin-top: 1rem;
+    background: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    max-width: 400px;
+    margin-inline: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    p {
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .confirm-buttons {
+      display: flex;
+      justify-content: space-around;
+
+      .yes, .no {
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .yes {
+        background-color: #28a745;
+        color: white;
+
+        &:hover {
+          background-color: #218838;
+        }
+      }
+
+      .no {
+        background-color: #ccc;
+
+        &:hover {
+          background-color: #bbb;
+        }
+      }
+    }
+  }
+  
+}
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(1px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.confirm-modal-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 14px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+
+  h3 {
+    margin-bottom: 1rem;
+  }
+
+  .error-text {
+    background: #ffe9e9;
+    color: #b10000;
+    padding: .6rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: .9rem;
+  }
+
+  .form {
+    display: grid;
+    gap: 1rem;
+    margin: 1rem 0;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      font-size: .9rem;
+
+      input, textarea {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: .7rem .9rem;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: .7rem;
+
+    button {
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .yes {
+      background: #28a745;
+      color: white;
+
+      &:hover {
+        background: #218838;
+      }
+    }
+    .no {
+      background: #ccc;
+      color: #333;
+      &:hover {
+        background: #bbb;
+      }
+    }
+  }
+}
+.file-list {
+  margin-top: 10px;
+  padding-left: 20px;
+  font-size: 0.9rem;
+  color: #333;
+
+  .file-name {
+    margin-bottom: 4px;
+  }
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

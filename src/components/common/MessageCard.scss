@@ -7,7 +7,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba($color-dark, 0.7);
+  background-color: rgba($color-dark, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,5 +60,26 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  button {
+    background-color: $color-primary;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($color-primary, 10%);
+    }
   }
 }

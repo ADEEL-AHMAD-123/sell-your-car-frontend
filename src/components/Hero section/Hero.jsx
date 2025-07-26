@@ -37,8 +37,11 @@ const HeroSection = () => {
         );
 
         if (getQuote.fulfilled.match(resultAction)) {
-          toast.success('Quote generated successfully!');
-          navigate('/quote-result');
+
+
+          sessionStorage.setItem("allowQuoteResultPage", "true");
+navigate("/quote-result", { state: { fromQuote: true } });
+
         } else {
           const errorMessage =
             resultAction?.payload?.message ||

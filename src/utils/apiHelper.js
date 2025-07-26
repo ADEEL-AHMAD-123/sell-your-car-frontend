@@ -4,29 +4,32 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-export const createApiAsyncThunk = ({ name, method, url, typePrefix }) =>
+export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHeaders = false }) =>
   createAsyncThunk(`${typePrefix}/${name}`, async (
-    { data = {}, params = {} } = {},
+    { data = {}, params = {}, ...rest } = {},  // support dynamic params like { id }
     { rejectWithValue, getState }
   ) => {
     try {
       const token = getState().auth?.user?.token;
+
       const headers = {
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && prepareHeaders && { Authorization: `Bearer ${token}` }),
         "Content-Type": "application/json",
       };
 
+      // If url is a function, call it with dynamic args
+      const resolvedUrl = typeof url === "function" ? url(rest) : url;
+
       const response = await axios({
         method,
-        url: `${BASE_URL}${url}`,
+        url: `${BASE_URL}${resolvedUrl}`,
         data,
         params,
         headers,
         withCredentials: true,
       });
-      console.log(response)
+
       return response.data;
-     
     } catch (error) {
       const errData = {
         message:
@@ -36,7 +39,8 @@ export const createApiAsyncThunk = ({ name, method, url, typePrefix }) =>
         status: error?.response?.status || 500,
         details: error?.response?.data || null,
       };
-      console.error("API Error:", errData); // Logs shaped error to console
-      return rejectWithValue(errData); // Always return an object
+      console.error("API Error:", errData);
+      return rejectWithValue(errData);
     }
   });
+

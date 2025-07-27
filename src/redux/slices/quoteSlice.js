@@ -55,11 +55,15 @@ const initialState = {
   isLoading: false,
   status: "idle",
   error: null,
+  quoteStatus: null,
+
 
   // manual quote
   manualLoading: false,
   manualStatus: "idle",
   manualError: null,
+  manualQuoteStatus: null, 
+
 
   // client confirm (accept + collection)
   confirmLoading: false,
@@ -87,6 +91,7 @@ const quoteSlice = createSlice({
       state.manualError = null;
       state.manualStatus = "idle";
       state.manualQuote = null; 
+      state.manualQuoteStatus = null;
 
     },
   },
@@ -101,8 +106,9 @@ const quoteSlice = createSlice({
       .addCase(getQuote.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = "succeeded";
-        // ⬇️ backend now returns quote, not vehicle
         state.quote = action.payload?.data?.quote || null;
+        state.quoteStatus = action.payload?.data?.status || null;
+        state.error=null;
       })
       .addCase(getQuote.rejected, (state, action) => {
         state.isLoading = false;
@@ -119,7 +125,9 @@ const quoteSlice = createSlice({
       .addCase(requestManualQuote.fulfilled, (state, action) => {
         state.manualLoading = false;
         state.manualStatus = "succeeded";
+        state.manualError = null;
         state.manualQuote = action.payload?.data?.quote || action.payload?.data || null;
+        state.manualQuoteStatus = action.payload?.data?.status || null;
       })
       .addCase(requestManualQuote.rejected, (state, action) => {
         state.manualLoading = false;

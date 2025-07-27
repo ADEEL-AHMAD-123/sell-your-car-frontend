@@ -10,7 +10,7 @@ const QuoteConfirmation = () => {
   
   // Get confirmation data from navigation state
   const confirmationData = location.state?.confirmationData;
-  
+
   // Redirect if no confirmation data
   useEffect(() => {
     if (!confirmationData) {
@@ -26,7 +26,7 @@ const QuoteConfirmation = () => {
 
   const handleCopyQuote = async () => {
     const quoteText = `
-VEHICLE SCRAP QUOTE - ${referenceId}
+VEHICLE SCRAP QUOTE - ${quote._id}
 =====================================
 Registration: ${quote.regNumber}
 Vehicle: ${quote.make} ${quote.model} (${quote.year})
@@ -74,7 +74,7 @@ Generated: ${new Date().toLocaleDateString()}
         <div className="reference-card">
           <div className="reference-header">
             <h3>Your Reference ID</h3>
-            <span className="reference-id">{referenceId}</span>
+            <span className="reference-id">{quote._id}</span>
           </div>
           <p className="reference-note">
             📋 Keep this reference ID for your records and any future communication

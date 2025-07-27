@@ -13,13 +13,13 @@ const ManualValuationPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 👇 move all hooks here at the top
+  // Hooks
   const dispatch = useDispatch();
   const { manualStatus, manualError } = useSelector((state) => state.quote);
+  const [quoteButtons, setQuoteButtons] = useState(null);
 
-  const [checked, setChecked] = useState(false);
-  const [allowed, setAllowed] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [quoteMessage, setQuoteMessage] = useState('');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -27,46 +27,31 @@ const ManualValuationPage = () => {
   const [showError, setShowError] = useState(false);
   const [denied, setDenied] = useState(false);
 
-
   const prefill = location.state || {};
 
-  useEffect(() => {
-    const fromQuote = location.state?.fromQuote;
-    const allow = sessionStorage.getItem("allowManualPage");
-  
-    if (fromQuote && allow === "true") {
-      sessionStorage.removeItem("allowManualPage");
-      setAllowed(true);
-    } else {
-      setAllowed(false);
-      setDenied(true);
-    }
-  
-    setChecked(true);
-  }, [location.state, navigate]);
-  
-
-
-
-
-
-  useEffect(() => {
+  const handleCloseMessage = () => {
+    setQuoteMessage('');
     dispatch(resetManualState());
-  }, [dispatch]);
+  };
 
-  useEffect(() => {
-    if (manualStatus === 'succeeded' && !manualError) {
-      setShowSuccess(true);
-    }
-  }, [manualStatus, manualError]);
-  useEffect(() => {
-    if (manualStatus === 'succeeded' && !manualError) {
-      setShowSuccess(true);
-    } else if (manualStatus === 'failed' && manualError) {
-      setShowError(true);
-    }
-  }, [manualStatus, manualError]);
-  
+  // useEffect(() => {
+  //   const fromQuote = location.state?.fromQuote;
+  //   const allow = sessionStorage.getItem("allowManualPage");
+
+  //   if (fromQuote && allow === "true") {
+  //     sessionStorage.removeItem("allowManualPage");
+  //     setAllowed(true);
+  //   } else {
+  //     setAllowed(false);
+  //     setDenied(true);
+  //   }
+
+  //   setChecked(true);
+  // }, [location.state, navigate]);
+
+
+
+
 
   const formik = useFormik({
     initialValues: {
@@ -79,7 +64,7 @@ const ManualValuationPage = () => {
       userEstimatedPrice: '',
       year: '',
       message: '',
-      images: null,
+      images: [],
     },
     validationSchema: Yup.object({
       regNumber: Yup.string().required('Registration number is required'),
@@ -96,13 +81,13 @@ const ManualValuationPage = () => {
       userEstimatedPrice: Yup.number()
         .typeError('Estimated price must be a number')
         .positive('Must be positive')
-        .required('Estimated price is required'),
+,
       message: Yup.string(),
     }),
     onSubmit: async (values) => {
       setIsSubmitting(true);
       setUploadError(null);
-
+    
       try {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
@@ -112,106 +97,187 @@ const ManualValuationPage = () => {
             formData.append(key, value ?? '');
           }
         });
-        
-        await dispatch(requestManualQuote({ data: formData }));
+    
+        const resultAction = await dispatch(requestManualQuote({ data: formData }));
+    
+        if (requestManualQuote.fulfilled.match(resultAction)) {
+          const { status, quote } = resultAction.payload.data;
+    
+          switch (status) {
+            case 'manual_submitted':
+              setQuoteMessage(
+                'Your manual quote request has been submitted successfully. Our team will review it and contact you shortly.'
+              );
+              setQuoteButtons([
+                {
+                  label: 'Go Back',
+                  onClick: () => navigate(-1),
+                },
+                {
+                  label: 'Go to Home',
+                  onClick: () => navigate('/'),
+                },
+              ]);
+              break;
+            
+          
+            case 'manual_pending_review':
+              setQuoteMessage(
+                'We’ve already received a manual quote request for this vehicle. Our team is currently reviewing it. We’ll contact you once the review is complete—please stay in touch.'
+              );
+              break;
+          
+            case 'manual_reviewed':
+              setQuoteMessage(
+                'We’ve already reviewed your manual quote request for this vehicle. Please check your email for the details—we’ve already sent the response.'
+              );
+              break;
+          
+              case 'manual_accepted_pending_collection':
+                setQuoteMessage(
+                  'You’ve already accepted the quote for this vehicle. Collection is currently being arranged. Our team will contact you shortly with further details.'
+                );
+                break;
+              
+              case 'manual_accepted_collected':
+                setQuoteMessage(
+                  'You accepted the quote and this vehicle has already been collected. If you want to get a new quote, please submit a new request.'
+                );
+                break;
+              
+          
+            default:
+              setQuoteMessage(
+                'An unexpected status was received. Please contact support for assistance.'
+              );
+              break;
+          }
+          
+        } else {
+          const errorMsg =
+            resultAction?.payload?.message ||
+            resultAction?.error?.message ||
+            'Manual quote submission failed.';
+          toast.error(errorMsg);
+          setShowError(true);
+        }
       } catch (error) {
-        setUploadError("Something went wrong while submitting. Please try again.");
+        setQuoteMessage("Something went wrong while submitting. Please try again.");
       } finally {
         setIsSubmitting(false);
       }
     }
+    
   });
 
-  if (!checked) {
-    return (
-      <div className="manual-page-loader">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-  
+  // if (!checked) {
+  //   return (
+  //     <div className="manual-page-loader">
+  //       <p>Loading...</p>
+  //     </div>
+  //   );
+  // }
+
   if (denied) {
     return (
       <div className="manual-page-wrapper">
-      <MessageCard
-  title="Access Denied"
-  message="You can't access the manual valuation page directly. Please go through the quote process first."
-  buttons={[
-    {
-      label: 'Go Back',
-      onClick: () => navigate(-1),
-    },
-    {
-      label: 'Go to Home',
-      onClick: () => navigate('/'),
-    },
-  ]}
-/>
-
+        <MessageCard
+          title="Access Denied"
+          message="You can't access the manual valuation page directly. Please go through the quote process first."
+          buttons={[
+            {
+              label: 'Go Back',
+              onClick: () => navigate(-1),
+            },
+            {
+              label: 'Go to Home',
+              onClick: () => navigate('/'),
+            },
+          ]}
+        />
       </div>
     );
   }
-  
+
   
 
   const handleErrorDismiss = () => {
     setShowError(false);
     dispatch(resetManualState());
   };
-  
-  const handleSuccessRedirect = () => {
-    setShowSuccess(false);
-    navigate('/');
-  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const maxImages = 6;
-  
+
     const newFiles = files.slice(0, maxImages - selectedImages.length);
     if (newFiles.length === 0) return;
-  
+
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-  
+
     setSelectedImages((prev) => [...prev, ...newFiles]);
     setImagePreviews((prev) => [...prev, ...newPreviews]);
     formik.setFieldValue('images', [...selectedImages, ...newFiles]);
   };
-  
-  
+
   const handleRemoveImage = (index) => {
     const updatedFiles = selectedImages.filter((_, i) => i !== index);
     const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
-  
+
     setSelectedImages(updatedFiles);
     setImagePreviews(updatedPreviews);
     formik.setFieldValue('images', updatedFiles);
   };
-  
-    
 
   return (
     <div className="manual-valuation-page">
-    {showSuccess && (
-      <MessageCard
-        title="Request Submitted Successfully!"
-        message="Our valuation experts have received your request. You will hear back within 24–48 hours."
-        onConfirm={handleSuccessRedirect}
-        confirmLabel="Okay, Go to Home"
-      />
-    )}
-
-{showError && (
-  <div className="overlay-error">
-    <div className="error-card">
-      <div className="error-content">
-        <h3>Something went wrong</h3>
-        <p>{manualError || "Please try again later."}</p>
-        <button onClick={handleErrorDismiss}>OK</button>
-      </div>
-    </div>
-  </div>
+    {quoteMessage && (
+  <MessageCard
+    title="Quote Submitted"
+    message={quoteMessage}
+    buttons={
+      quoteButtons || [
+        {
+          label: 'OK',
+          onClick: handleCloseMessage,
+        },
+        {
+          label: 'Go to Home',
+          onClick: () => navigate('/'),
+        },
+      ]
+    }
+  />
 )}
+
+
+{manualError && !quoteMessage && (
+            <MessageCard
+              message={manualError}
+              buttons={[
+                {
+                  label: 'OK',
+                  onClick: handleCloseMessage,
+                },
+              ]}
+            />
+          )}
+
+
+      {showError && (
+        <div className="overlay-error">
+          <div className="error-card">
+            <div className="error-content">
+              <h3>Something went wrong</h3>
+              <p>{manualError || "Please try again later."}</p>
+              <button onClick={handleErrorDismiss}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+     
+
 
 
 

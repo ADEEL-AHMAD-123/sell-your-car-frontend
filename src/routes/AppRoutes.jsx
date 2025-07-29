@@ -19,6 +19,9 @@ import ManageQuotes from '../pages/AdminPages/ManageQuotes';
 import QuoteConfirmation from '../pages/QuoteConfirmation/QuoteConfirmation'
 import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
+import AllManualQuotes from '../pages/AdminPages/AllManualQuotes/AllManualQuotes';
+import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedManualQuotes';
+import CollectedManualQuotes from '../pages/AdminPages/CollectedManualQuotes/CollectedManualQuotes';
 
 const AppRoutes = () => (
   <Routes>
@@ -42,6 +45,9 @@ const AppRoutes = () => (
       <Route path="/dashboard" element={<AdminDashboard />} />
       <Route path="/dashboard/users" element={<ManageUsers />} />
       <Route path="/dashboard/quotes" element={<ManageQuotes />} />
+      <Route path="/dashboard/manual-quotes" element={<AllManualQuotes />} />
+      <Route path="/dashboard/accepted-quotes" element={<AcceptedManualQuotes />} />
+      <Route path="/dashboard/collected-quotes" element={<CollectedManualQuotes />} />
     </Route>
 
     {/* 404 */}

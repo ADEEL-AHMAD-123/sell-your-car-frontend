@@ -1,0 +1,41 @@
+// src/styles/pages/admin-quotes-page.scss
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.admin-quotes-page {
+  @include container;
+  @include section-spacing;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: $spacing-md;
+    color: $color-dark;
+  }
+
+  .quote-table {
+    width: 100%;
+    overflow-x: auto;
+    background-color: $color-light;
+    border: $border-primary;
+    border-radius: 4px;
+    box-shadow: $shadow-primary;
+    padding: $spacing-md;
+  }
+
+  p {
+    color: $color-gray;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  @include responsive(sm) {
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .quote-table {
+      padding: $spacing-sm;
+    }
+  }
+}

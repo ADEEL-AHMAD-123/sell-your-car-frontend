@@ -29,6 +29,7 @@ export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHead
         withCredentials: true,
       });
 
+      console.log("data",response.data)
       return response.data;
     } catch (error) {
       const errData = {

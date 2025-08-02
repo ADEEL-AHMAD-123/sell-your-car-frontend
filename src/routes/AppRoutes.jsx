@@ -20,7 +20,7 @@ import QuoteConfirmation from '../pages/QuoteConfirmation/QuoteConfirmation'
 import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
 import AllManualQuotes from '../pages/AdminPages/AllManualQuotes/AllManualQuotes';
-import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedManualQuotes';
+import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedQuotes';
 import CollectedManualQuotes from '../pages/AdminPages/CollectedManualQuotes/CollectedManualQuotes';
 
 const AppRoutes = () => (

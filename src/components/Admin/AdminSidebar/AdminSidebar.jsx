@@ -38,8 +38,8 @@ const AdminSidebar = ({ isOpen }) => {
           <FaFileAlt /> Manual Quotes
         </Link>
 
-        <Link to="/dashboard/accepted-manual-quotes" className={isActive('/dashboard/accepted-manual-quotes') ? 'active' : ''}>
-          <FaCheckCircle /> Accepted Manual Quotes
+        <Link to="/dashboard/accepted-quotes" className={isActive('/dashboard/accepted-quotes') ? 'active' : ''}>
+          <FaCheckCircle /> Accepted Quotes
         </Link>
 
         <Link to="/dashboard/vehicles" className={isActive('/dashboard/vehicles') ? 'active' : ''}>

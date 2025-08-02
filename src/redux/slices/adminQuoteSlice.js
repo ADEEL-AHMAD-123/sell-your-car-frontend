@@ -6,7 +6,7 @@ import { createApiAsyncThunk } from "../../utils/apiHelper";
 // -------------------
 const API = {
   PENDING_QUOTES: "/api/quote/pending-manual",
-  ACCEPTED_QUOTES: "/api/quote/accepted-manual",
+  ACCEPTED_QUOTES: "/api/quote/accepted",
   REVIEW_QUOTE: (id) => `/api/quote/review-manual/${id}`,
   MARK_COLLECTED: (id) => `/api/quote/collection-status/${id}`,
 };
@@ -21,12 +21,13 @@ export const fetchPendingManualQuotes = createApiAsyncThunk({
   typePrefix: "adminQuotes",
 });
 
-export const fetchAcceptedManualQuotes = createApiAsyncThunk({
-  name: "fetchAcceptedManualQuotes",
+export const fetchAcceptedQuotes = createApiAsyncThunk({
+  name: "fetchAcceptedQuotes",
   method: "GET",
   url: API.ACCEPTED_QUOTES,
   typePrefix: "adminQuotes",
 });
+
 
 export const reviewManualQuote = createApiAsyncThunk({
   name: "reviewManualQuote",
@@ -57,6 +58,10 @@ const initialState = {
     error: null,
   },
   review: {
+    loading: false,
+    error: null,
+  },
+  collect: {
     loading: false,
     error: null,
   },
@@ -97,19 +102,20 @@ const adminQuoteSlice = createSlice({
       })
 
       // === Fetch Accepted ===
-      .addCase(fetchAcceptedManualQuotes.pending, (state) => {
+      .addCase(fetchAcceptedQuotes.pending, (state) => {
         state.accepted.loading = true;
         state.accepted.error = null;
       })
-      .addCase(fetchAcceptedManualQuotes.fulfilled, (state, action) => {
+      .addCase(fetchAcceptedQuotes.fulfilled, (state, action) => {
         state.accepted.loading = false;
         state.accepted.response = action.payload.data || {};
       })
-      .addCase(fetchAcceptedManualQuotes.rejected, (state, action) => {
+      .addCase(fetchAcceptedQuotes.rejected, (state, action) => {
         state.accepted.loading = false;
         state.accepted.error =
           action.payload?.message || "Failed to fetch accepted quotes.";
       })
+      
 
       // === Review Quote ===
       .addCase(reviewManualQuote.pending, (state) => {

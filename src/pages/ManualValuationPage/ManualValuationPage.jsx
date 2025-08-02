@@ -60,9 +60,9 @@ const ManualValuationPage = () => {
       model: prefill.model || '',
       fuelType: prefill.fuelType || '',
       wheelPlan: prefill.wheelPlan || '',
-      weight: '',
+      weight:  prefill.weight || '',
       userEstimatedPrice: '',
-      year: '',
+      year: prefill.year || '',
       message: '',
       images: [],
     },
@@ -90,9 +90,18 @@ const ManualValuationPage = () => {
     
       try {
         const formData = new FormData();
+    
+        // Only include fields conditionally
         Object.entries(values).forEach(([key, value]) => {
           if (key === 'images') {
             selectedImages.forEach((file) => formData.append('images', file));
+          } else if (key === 'weight') {
+            // Only include weight if it's not in prefill and user entered it
+            const hasPrefilledWeight = !!prefill.weight;
+            const userEnteredWeight = value !== '' && value !== null && !isNaN(value);
+            if (!hasPrefilledWeight && userEnteredWeight) {
+              formData.append('weight', value);
+            }
           } else {
             formData.append(key, value ?? '');
           }
@@ -101,9 +110,11 @@ const ManualValuationPage = () => {
         const resultAction = await dispatch(requestManualQuote({ data: formData }));
     
         if (requestManualQuote.fulfilled.match(resultAction)) {
-          const { status, quote } = resultAction.payload.data;
+          const { status } = resultAction.payload.data;
+          const responseMessage=resultAction.payload.message
     
           switch (status) {
+            case 'manual_info_appended':
             case 'manual_submitted':
               setQuoteMessage(
                 'Your manual quote request has been submitted successfully. Our team will review it and contact you shortly.'
@@ -119,7 +130,6 @@ const ManualValuationPage = () => {
                 },
               ]);
               break;
-            
           
             case 'manual_pending_review':
               setQuoteMessage(
@@ -133,23 +143,32 @@ const ManualValuationPage = () => {
               );
               break;
           
-              case 'manual_accepted_pending_collection':
-                setQuoteMessage(
-                  'You’ve already accepted the quote for this vehicle. Collection is currently being arranged. Our team will contact you shortly with further details.'
-                );
-                break;
-              
-              case 'manual_accepted_collected':
-                setQuoteMessage(
-                  'You accepted the quote and this vehicle has already been collected. If you want to get a new quote, please submit a new request.'
-                );
-                break;
-              
+            case 'manual_accepted_pending_collection':
+              setQuoteMessage(
+                'You’ve already accepted the quote for this vehicle. Collection is currently being arranged. Our team will contact you shortly with further details.'
+              );
+              break;
+          
+            case 'manual_accepted_collected':
+              setQuoteMessage(
+                'You accepted the quote and this vehicle has already been collected. If you want to get a new quote, please submit a new request.'
+              );
+              break;
+          
+            case 'auto_accepted_not_collected':
+              setQuoteMessage(
+                'You have already accepted an auto-generated quote for this vehicle. Collection is being arranged — no need to request a manual quote.'
+              );
+              break;
+          
+            case 'auto_accepted_collected':
+              setQuoteMessage(
+                'This vehicle has already been collected after accepting an auto-generated quote. A new manual request is not required.'
+              );
+              break;
           
             default:
-              setQuoteMessage(
-                'An unexpected status was received. Please contact support for assistance.'
-              );
+              setQuoteMessage(responseMessage);
               break;
           }
           
@@ -167,6 +186,7 @@ const ManualValuationPage = () => {
         setIsSubmitting(false);
       }
     }
+    
     
   });
 
@@ -229,6 +249,39 @@ const ManualValuationPage = () => {
     formik.setFieldValue('images', updatedFiles);
   };
 
+  const ConditionalInput = ({ id, label, icon, placeholder, type = 'text', required = false, tooltip, optional = false, formik, prefill }) => {
+  const hasValue = !!prefill?.[id];
+
+  return (
+    <div className="form-group">
+      <label htmlFor={id}>
+        {label}
+        {required && <span className="required">*</span>}
+        {optional && <span className="optional">(Optional)</span>}
+        {tooltip}
+      </label>
+
+      <div className="input-wrapper">
+        <input
+          type={type}
+          id={id}
+          value={hasValue ? prefill[id] : undefined}
+          placeholder={placeholder}
+          readOnly={hasValue}
+          className={formik.touched[id] && formik.errors[id] ? 'error' : hasValue ? 'locked-input' : ''}
+          {...(!hasValue ? formik.getFieldProps(id) : {})}
+        />
+        <div className="input-icon">{icon}</div>
+      </div>
+
+      {formik.touched[id] && formik.errors[id] && (
+        <div className="error-message">{formik.errors[id]}</div>
+      )}
+    </div>
+  );
+};
+
+
   return (
     <div className="manual-valuation-page">
     {quoteMessage && (
@@ -264,17 +317,7 @@ const ManualValuationPage = () => {
           )}
 
 
-      {showError && (
-        <div className="overlay-error">
-          <div className="error-card">
-            <div className="error-content">
-              <h3>Something went wrong</h3>
-              <p>{manualError || "Please try again later."}</p>
-              <button onClick={handleErrorDismiss}>OK</button>
-            </div>
-          </div>
-        </div>
-      )}
+     
 
      
 
@@ -346,100 +389,57 @@ const ManualValuationPage = () => {
               </h3>
 
               <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="regNumber">
-                    Registration Number <span className="required">*</span>
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="text" 
-                      id="regNumber" 
-                      placeholder="e.g., ABC-123"
-                      className={formik.touched.regNumber && formik.errors.regNumber ? 'error' : ''}
-                      {...formik.getFieldProps('regNumber')} 
-                    />
-                    <div className="input-icon">🚗</div>
-                  </div>
-                  {formik.touched.regNumber && formik.errors.regNumber && (
-                    <div className="error-message">{formik.errors.regNumber}</div>
-                  )}
-                </div>
+              <ConditionalInput
+  id="regNumber"
+  label="Registration Number"
+  icon="🚗"
+  placeholder="e.g., ABC-123"
+  required
+  formik={formik}
+  prefill={prefill}
+/>
 
-                <div className="form-group">
-                  <label htmlFor="make">
-                    Make <span className="required">*</span>
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="text" 
-                      id="make" 
-                      placeholder="e.g., Toyota"
-                      className={formik.touched.make && formik.errors.make ? 'error' : ''}
-                      {...formik.getFieldProps('make')} 
-                    />
-                    <div className="input-icon">🏭</div>
-                  </div>
-                  {formik.touched.make && formik.errors.make && (
-                    <div className="error-message">{formik.errors.make}</div>
-                  )}
-                </div>
+<ConditionalInput
+  id="make"
+  label="Make"
+  icon="🏭"
+  placeholder="e.g., Toyota"
+  required
+  formik={formik}
+  prefill={prefill}
+/>
 
-                <div className="form-group">
-                  <label htmlFor="model">
-                    Model <span className="required">*</span>
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="text" 
-                      id="model" 
-                      placeholder="e.g., Camry"
-                      className={formik.touched.model && formik.errors.model ? 'error' : ''}
-                      {...formik.getFieldProps('model')} 
-                    />
-                    <div className="input-icon">🚙</div>
-                  </div>
-                  {formik.touched.model && formik.errors.model && (
-                    <div className="error-message">{formik.errors.model}</div>
-                  )}
-                </div>
+<ConditionalInput
+  id="model"
+  label="Model"
+  icon="🚙"
+  placeholder="e.g., Camry"
+  required
+  formik={formik}
+  prefill={prefill}
+/>
 
-                <div className="form-group">
-                  <label htmlFor="fuelType">
-                    Fuel Type <span className="required">*</span>
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="text" 
-                      id="fuelType" 
-                      placeholder="e.g., Petrol"
-                      className={formik.touched.fuelType && formik.errors.fuelType ? 'error' : ''}
-                      {...formik.getFieldProps('fuelType')} 
-                    />
-                    <div className="input-icon">⛽</div>
-                  </div>
-                  {formik.touched.fuelType && formik.errors.fuelType && (
-                    <div className="error-message">{formik.errors.fuelType}</div>
-                  )}
-                </div>
+<ConditionalInput
+  id="fuelType"
+  label="Fuel Type"
+  icon="⛽"
+  placeholder="e.g., Petrol"
+  required
+  formik={formik}
+  prefill={prefill}
+/>
 
-                <div className="form-group">
-                  <label htmlFor="year">
-                    Year <span className="required">*</span>
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="number" 
-                      id="year" 
-                      placeholder="e.g., 2019"
-                      className={formik.touched.year && formik.errors.year ? 'error' : ''}
-                      {...formik.getFieldProps('year')} 
-                    />
-                    <div className="input-icon">📅</div>
-                  </div>
-                  {formik.touched.year && formik.errors.year && (
-                    <div className="error-message">{formik.errors.year}</div>
-                  )}
-                </div>
+<ConditionalInput
+  id="year"
+  label="Year"
+  icon="📅"
+  placeholder="e.g., 2019"
+  type="number"
+  required
+  formik={formik}
+  prefill={prefill}
+/>
+
               </div>
             </div>
 
@@ -451,58 +451,45 @@ const ManualValuationPage = () => {
               </h3>
 
               <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="wheelPlan">
-                    Wheel Plan <span className="required">*</span>
-                    <span className="info-icon" data-tooltip-id="wheelplan-tip">
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                        <path d="m9,9 h0 m3.5,0 v6 m0,-3 h2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
-                    </span>
-                    <Tooltip id="wheelplan-tip" place="top" content="Drive configuration: 2WD (Front/Rear), 4WD, AWD" />
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="text" 
-                      id="wheelPlan" 
-                      placeholder="e.g., AWD"
-                      className={formik.touched.wheelPlan && formik.errors.wheelPlan ? 'error' : ''}
-                      {...formik.getFieldProps('wheelPlan')} 
-                    />
-                    <div className="input-icon">🛞</div>
-                  </div>
-                  {formik.touched.wheelPlan && formik.errors.wheelPlan && (
-                    <div className="error-message">{formik.errors.wheelPlan}</div>
-                  )}
-                </div>
+              <ConditionalInput
+  id="wheelPlan"
+  label="Wheel Plan"
+  icon="🛞"
+  placeholder="e.g., AWD"
+  required
+  tooltip={
+    <span className="info-icon" data-tooltip-id="wheelplan-tip">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+        <path d="m9,9 h0 m3.5,0 v6 m0,-3 h2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+      <Tooltip id="wheelplan-tip" place="top" content="Drive configuration: 2WD (Front/Rear), 4WD, AWD" />
+    </span>
+  }
+  formik={formik}
+  prefill={prefill}
+/>
 
-                <div className="form-group">
-                  <label htmlFor="weight">
-                    Estimated Weight (kg)
-                    <span className="optional">(Optional)</span>
-                    <span className="info-icon" data-tooltip-id="weight-tip">
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                        <path d="m9,9 h0 m3.5,0 v6 m0,-3 h2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
-                    </span>
-                    <Tooltip id="weight-tip" place="top" content="Vehicle's approximate weight helps calculate accurate value. Check vehicle manual or online specs." />
-                  </label>
-                  <div className="input-wrapper">
-                    <input 
-                      type="number" 
-                      id="weight" 
-                      placeholder="e.g., 1500"
-                      className={formik.touched.weight && formik.errors.weight ? 'error' : ''}
-                      {...formik.getFieldProps('weight')} 
-                    />
-                    <div className="input-icon">⚖️</div>
-                  </div>
-                  {formik.touched.weight && formik.errors.weight && (
-                    <div className="error-message">{formik.errors.weight}</div>
-                  )}
-                </div>
+<ConditionalInput
+  id="weight"
+  label="Revenue Estimated Weight (kg)"
+  icon="⚖️"
+  placeholder="e.g., 1500"
+  type="number"
+  optional
+  tooltip={
+    <span className="info-icon" data-tooltip-id="weight-tip">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+        <path d="m9,9 h0 m3.5,0 v6 m0,-3 h2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+      <Tooltip id="weight-tip" place="top" content="Vehicle's approximate Revenue weight helps calculate accurate value. Check vehicle manual or online specs." />
+    </span>
+  }
+  formik={formik}
+  prefill={prefill}
+/>
+
               </div>
             </div>
 
@@ -515,12 +502,12 @@ const ManualValuationPage = () => {
 
               <div className="form-group full-width">
                 <label htmlFor="message">
-                  Additional Details <span className="optional">(Optional)</span>
+                  Your Message <span className="optional">(Optional)</span>
                 </label>
                 <textarea 
                   id="message" 
                   rows="4" 
-                  placeholder="Provide condition, history, or modifications..."
+                  placeholder="Tell us anything important about your vehicle — condition, service history, modifications etc"
                   {...formik.getFieldProps('message')} 
                 />
               </div>

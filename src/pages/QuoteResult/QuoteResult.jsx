@@ -19,7 +19,7 @@ const QuoteResult = () => {
   const [checked, setChecked] = useState(false);
   const [allowed, setAllowed] = useState(false);
 
-  const { quote, confirmLoading, confirmError, confirmStatus } = useSelector(
+  const { quote, quoteStatus, confirmLoading, confirmError, confirmStatus } = useSelector(
     (state) => state.quote
   );
 
@@ -30,6 +30,8 @@ const QuoteResult = () => {
   const [formErrors, setFormErrors] = useState({});
 
   const hasPrice = !!quote?.estimatedScrapPrice;
+  const isManualReviewed = quoteStatus === "manual_reviewed";
+  const hasAdminOfferPrice = !!quote?.adminOfferPrice;
 
   // Reset confirmStatus only when modal opens
   const handleOpenModal = () => {
@@ -37,6 +39,7 @@ const QuoteResult = () => {
     setFormErrors({});
     setShowConfirm(true);
   };
+  
   useEffect(() => {
     if (showConfirm) {
       document.body.classList.add('modal-open');
@@ -55,7 +58,6 @@ const QuoteResult = () => {
     address: address.trim(),
   };
   
-
   useEffect(() => {
     const fromQuote = location.state?.fromQuote;
     const allow = sessionStorage.getItem("allowQuoteResultPage");
@@ -155,7 +157,6 @@ const QuoteResult = () => {
     return Object.keys(errors).length === 0;
   };
   
-
   const handleConfirm = async () => {
     if (!quote?._id) {
       setFormErrors({ general: "Invalid quote ID" });
@@ -215,116 +216,263 @@ const QuoteResult = () => {
         <div className="summary-box">
           <div>
             <span>Registration</span>
-            <strong>{quote.regNumber || "N/A"}</strong>
+            <strong>{quote?.regNumber || "N/A"}</strong>
           </div>
           <div>
             <span>Revenue Weight</span>
-            <strong>{quote.revenueWeight ?? "N/A"} kg</strong>
+            <strong>{quote?.revenueWeight ?? "N/A"} kg</strong>
           </div>
           <div>
-            <span>Estimated Price</span>
+            <span>{isManualReviewed && hasAdminOfferPrice ? "Admin Offered Price" : "Estimated Price"}</span>
             <strong className="price">
-              {hasPrice ? `£${quote.estimatedScrapPrice}` : "Unavailable"}
+              {isManualReviewed && hasAdminOfferPrice 
+                ? `£${quote.adminOfferPrice}` 
+                : hasPrice 
+                ? `£${quote.estimatedScrapPrice}` 
+                : "Unavailable"
+              }
             </strong>
           </div>
         </div>
 
-        {quote.status !== 'manual_reviewed' && (
-  hasPrice ? (
-    <>
-      <div className="manual-options">
-        <h4>{hasPrice ? "Think your vehicle is worth more?" : "We couldn't calculate a price automatically"}</h4>
-        <p>{hasPrice
-          ? "You can request a custom valuation or contact our team."
-          : "You can still continue by selecting one of the following options:"}</p>
-
-        <div className="option-buttons">
-          <Link
-            to="/manual-valuation"
-            state={{
-              reason: hasPrice ? "value-higher" : "no-auto-price",
-              regNumber: quote.regNumber,
-              make: quote.make,
-              model: quote.model,
-              fuelType: quote.fuelType,
-              wheelPlan: quote.wheelPlan,
-              colour: quote.colour,
-              fromQuote: true
-            }}
-            className="option-card"
-            onClick={() => {
-              sessionStorage.setItem("allowManualPage", "true");
-            }}
-          >
-            <span className="emoji">🛠️</span>
-            <div>
-              <strong>Request a Manual Valuation</strong>
-              <p>Let us review your vehicle details manually.</p>
+        {/* Manual Reviewed Case - Show Accept button only, hide manual options */}
+        {isManualReviewed ? (
+          hasAdminOfferPrice ? (
+            <>
+              <div className="manual-options">
+                <h4>✅ Manual Valuation Complete</h4>
+                <p>
+                  Great news! You requested a manual valuation on{' '}
+                  <strong>
+                    {quote?.createdAt 
+                      ? new Date(quote.createdAt).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })
+                      : 'N/A'
+                    }
+                  </strong>
+                  {quote?.reviewedAt && (
+                    <span>
+                      , and our team completed the review on{' '}
+                      <strong>
+                        {new Date(quote.reviewedAt).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </strong>
+                    </span>
+                  )}
+                  . Based on our detailed assessment, we're pleased to offer you the price shown above.
+                </p>
+               
+              </div>
+              
+              <div className="accept-offer">
+                <button
+                  onClick={handleOpenModal}
+                  className="accept-btn"
+                  disabled={confirmLoading}
+                >
+                  ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="manual-options">
+              <h4>Manual Review Completed</h4>
+              <p>
+                Your manual valuation request from{' '}
+                <strong>
+                  {quote?.createdAt 
+                    ? new Date(quote.createdAt).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })
+                    : 'N/A'
+                  }
+                </strong>
+                {' '}has been reviewed by our team
+                {quote?.reviewedAt && (
+                  <span>
+                    {' '}on{' '}
+                    <strong>
+                      {new Date(quote.reviewedAt).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </strong>
+                  </span>
+                )}
+                . Please contact us for further details about your valuation.
+              </p>
+              {quote?.adminMessage && (
+                <div className="admin-message">
+                  <p><strong>Admin Note:</strong> {quote.adminMessage}</p>
+                </div>
+              )}
+              <div className="option-buttons">
+                <Link to="/contact" className="option-card">
+                  <span className="emoji">📬</span>
+                  <div>
+                    <strong>Contact Us</strong>
+                    <p>Speak to our team about your vehicle valuation.</p>
+                  </div>
+                </Link>
+              </div>
             </div>
-          </Link>
+          )
+        ) : (
+          /* Original logic for non-manual reviewed quotes */
+          quote?.status !== 'manual_reviewed' && (
+            hasPrice ? (
+              <>
+                <div className="manual-options">
+                  <h4>{hasPrice ? "Think your vehicle is worth more?" : "We couldn't calculate a price automatically"}</h4>
+                  <p>{hasPrice
+                    ? "You can request a custom valuation or contact our team."
+                    : "You can still continue by selecting one of the following options:"}</p>
 
-          <Link to="/contact" className="option-card">
-            <span className="emoji">📬</span>
-            <div>
-              <strong>Contact Us</strong>
-              <p>Speak to our team about your vehicle or this offer.</p>
-            </div>
-          </Link>
-        </div>
+                  <div className="option-buttons">
+                    <Link
+                      to="/manual-valuation"
+                      state={{
+                        reason: hasPrice ? "value-higher" : "no-auto-price",
+                        regNumber: quote?.regNumber,
+                        make: quote?.make,
+                        model: quote?.model,
+                        fuelType: quote?.fuelType,
+                        wheelPlan: quote?.wheelPlan,
+                        colour: quote?.colour,
+                        fromQuote: true,
+                        year: quote?.year,
+                        weight: quote?.revenueWeight
+                      }}
+                      className="option-card"
+                      onClick={() => {
+                        sessionStorage.setItem("allowManualPage", "true");
+                      }}
+                    >
+                      <span className="emoji">🛠️</span>
+                      <div>
+                        <strong>Request a Manual Valuation</strong>
+                        <p>Let us review your vehicle details manually.</p>
+                      </div>
+                    </Link>
+
+                    <Link to="/contact" className="option-card">
+                      <span className="emoji">📬</span>
+                      <div>
+                        <strong>Contact Us</strong>
+                        <p>Speak to our team about your vehicle or this offer.</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="accept-offer">
+                  <button
+                    onClick={handleOpenModal}
+                    className="accept-btn"
+                    disabled={confirmLoading}
+                  >
+                    ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="manual-options">
+                <h4>We couldn't calculate a price automatically</h4>
+                <p>You can still continue by selecting one of the following:</p>
+                <div className="option-buttons">
+                  <Link
+                    to="/manual-valuation"
+                    state={{
+                      reason: "no-auto-price",
+                      regNumber: quote?.regNumber,
+                      make: quote?.make,
+                      model: quote?.model,
+                      fuelType: quote?.fuelType,
+                      wheelPlan: quote?.wheelPlan,
+                      colour: quote?.colour,
+                      fromQuote: true,
+                      year: quote?.year
+                    }}
+                    className="option-card"
+                    onClick={() => {
+                      sessionStorage.setItem("allowManualPage", "true");
+                    }}
+                  >
+                    <span className="emoji">📞</span>
+                    <div>
+                      <strong>Request a Manual Valuation</strong>
+                      <p>Let our team assess your vehicle details manually.</p>
+                    </div>
+                  </Link>
+
+                  <Link to="/contact" className="option-card">
+                    <span className="emoji">📬</span>
+                    <div>
+                      <strong>Contact Us</strong>
+                      <p>Speak to our team about your vehicle or this offer.</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            )
+          )
+        )}
       </div>
 
-      <div className="accept-offer">
-        <button
-          onClick={handleOpenModal}
-          className="accept-btn"
-          disabled={confirmLoading}
-        >
-          ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
-        </button>
+      <div className="vehicle-info">
+        <h3>Vehicle Details</h3>
+        <ul className="info-grid">
+          <li>
+            <span>Make:</span> {quote?.make || "N/A"}
+          </li>
+          <li>
+            <span>Model:</span> {quote?.model || "N/A"}
+          </li>
+          <li>
+            <span>Fuel Type:</span> {quote?.fuelType || "N/A"}
+          </li>
+          <li>
+            <span>CO₂ Emissions:</span> {quote?.co2Emissions ?? "N/A"} g/km
+          </li>
+          <li>
+            <span>Colour:</span> {quote?.colour || "N/A"}
+          </li>
+          <li>
+            <span>Year:</span> {quote?.year || "N/A"}
+          </li>
+          <li>
+            <span>Engine Capacity:</span> {quote?.engineCapacity ?? "N/A"} cc
+          </li>
+          <li>
+            <span>Tax Status:</span> {quote?.taxStatus || "N/A"}
+          </li>
+          <li>
+            <span>MOT Status:</span> {quote?.motStatus || "N/A"}
+          </li>
+          <li>
+            <span>Euro Status:</span> {quote?.euroStatus || "N/A"}
+          </li>
+          <li>
+            <span>RDE:</span> {quote?.realDrivingEmissions || "N/A"}
+          </li>
+          <li>
+            <span>Wheel Plan:</span> {quote?.wheelPlan || "N/A"}
+          </li>
+        </ul>
       </div>
-    </>
-  ) : (
-    <div className="manual-options">
-      <h4>We couldn't calculate a price automatically</h4>
-      <p>You can still continue by selecting one of the following:</p>
-      <div className="option-buttons">
-        <Link
-          to="/manual-valuation"
-          state={{
-            reason: "no-auto-price",
-            regNumber: quote.regNumber,
-            make: quote.make,
-            model: quote.model,
-            fuelType: quote.fuelType,
-            wheelPlan: quote.wheelPlan,
-            colour: quote.colour,
-            fromQuote: true
-          }}
-          className="option-card"
-          onClick={() => {
-            sessionStorage.setItem("allowManualPage", "true");
-          }}
-        >
-          <span className="emoji">📞</span>
-          <div>
-            <strong>Request a Manual Valuation</strong>
-            <p>Let our team assess your vehicle details manually.</p>
-          </div>
-        </Link>
 
-        <Link to="/contact" className="option-card">
-          <span className="emoji">📬</span>
-          <div>
-            <strong>Contact Us</strong>
-            <p>Speak to our team about your vehicle or this offer.</p>
-          </div>
-        </Link>
-      </div>
-    </div>
-  )
-)}
-
-      </div>
+      <Link to="/" className="back-link">
+        ← Back to Home
+      </Link>
 
       {/* Confirm + Collection Modal */}
       {showConfirm && (
@@ -333,7 +481,11 @@ const QuoteResult = () => {
             <h3>Confirm Quote & Collection</h3>
             <p>
               You are accepting the offer of{" "}
-              <strong>£{quote.estimatedScrapPrice}</strong>.
+              <strong>
+                £{isManualReviewed && hasAdminOfferPrice 
+                  ? quote.adminOfferPrice 
+                  : quote?.estimatedScrapPrice || "0"}
+              </strong>.
             </p>
 
             {formErrors.general && (
@@ -357,7 +509,6 @@ const QuoteResult = () => {
                   } // min = 2 days ahead
                   disabled={confirmLoading}
                   className={formErrors.pickupDate ? "field-error-border" : ""}
-
                 />
                 <small className="helper-text">
                   We'll arrange pickup on or after this date.
@@ -368,31 +519,30 @@ const QuoteResult = () => {
               </label>
 
               <label>
-  Contact Number
-  <PhoneInput
-    country={'gb'}
-    value={contactNumber}
-    onChange={(value) => setContactNumber(value)}
-    inputProps={{
-      name: 'phone',
-      required: true,
-      disabled: confirmLoading,
-    }}
-    inputStyle={{
-      width: '100%',
-      paddingLeft: '48px',
-      height: '40px',
-      borderColor: formErrors.contactNumber ? 'red' : '#ccc',
-      borderRadius: '4px',
-    }}
-  />
-  {formErrors.contactNumber && (
-    <small className="field-error">
-      {formErrors.contactNumber}
-    </small>
-  )}
-</label>
-
+                Contact Number
+                <PhoneInput
+                  country={'gb'}
+                  value={contactNumber}
+                  onChange={(value) => setContactNumber(value)}
+                  inputProps={{
+                    name: 'phone',
+                    required: true,
+                    disabled: confirmLoading,
+                  }}
+                  inputStyle={{
+                    width: '100%',
+                    paddingLeft: '48px',
+                    height: '40px',
+                    borderColor: formErrors.contactNumber ? 'red' : '#ccc',
+                    borderRadius: '4px',
+                  }}
+                />
+                {formErrors.contactNumber && (
+                  <small className="field-error">
+                    {formErrors.contactNumber}
+                  </small>
+                )}
+              </label>
 
               <label>
                 Collection Address
@@ -428,52 +578,6 @@ const QuoteResult = () => {
           </div>
         </div>
       )}
-
-      <div className="vehicle-info">
-        <h3>Vehicle Details</h3>
-        <ul className="info-grid">
-          <li>
-            <span>Make:</span> {quote.make || "N/A"}
-          </li>
-          <li>
-            <span>Model:</span> {quote.model || "N/A"}
-          </li>
-          <li>
-            <span>Fuel Type:</span> {quote.fuelType || "N/A"}
-          </li>
-          <li>
-            <span>CO₂ Emissions:</span> {quote.co2Emissions ?? "N/A"} g/km
-          </li>
-          <li>
-            <span>Colour:</span> {quote.colour || "N/A"}
-          </li>
-          <li>
-            <span>Year:</span> {quote.year || "N/A"}
-          </li>
-          <li>
-            <span>Engine Capacity:</span> {quote.engineCapacity ?? "N/A"} cc
-          </li>
-          <li>
-            <span>Tax Status:</span> {quote.taxStatus || "N/A"}
-          </li>
-          <li>
-            <span>MOT Status:</span> {quote.motStatus || "N/A"}
-          </li>
-          <li>
-            <span>Euro Status:</span> {quote.euroStatus || "N/A"}
-          </li>
-          <li>
-            <span>RDE:</span> {quote.realDrivingEmissions || "N/A"}
-          </li>
-          <li>
-            <span>Wheel Plan:</span> {quote.wheelPlan || "N/A"}
-          </li>
-        </ul>
-      </div>
-
-      <Link to="/" className="back-link">
-        ← Back to Home
-      </Link>
     </section>
   );
 };

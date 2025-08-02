@@ -12,10 +12,13 @@ export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHead
     try {
       const token = getState().auth?.user?.token;
 
+      const isFormData = data instanceof FormData;
+
       const headers = {
         ...(token && prepareHeaders && { Authorization: `Bearer ${token}` }),
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
       };
+      
 
       // If url is a function, call it with dynamic args
       const resolvedUrl = typeof url === "function" ? url(rest) : url;

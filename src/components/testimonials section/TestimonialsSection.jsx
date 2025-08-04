@@ -57,32 +57,33 @@ const TestimonialsSection = () => {
   const next = () => scrollTo(Math.min(index + 1, maxIndex));
 
   return (
-    <section className="client-testimonials">
-      <div className="client-testimonials__container">
-        <h2 className="client-testimonials__title">What Our Clients Say</h2>
-        <p className="client-testimonials__subtitle">
-          Trusted by businesses worldwide for delivering exceptional digital products.
+    <section className="testimonials-section">
+      <div className="container">
+        <h2>What Our Clients Say</h2>
+        <p className="subtitle">
+          Join thousands of satisfied customers who chose us for their car sales.
         </p>
 
-        <div className="client-testimonials__carousel-wrapper">
+        <div className="testimonials-carousel-wrapper">
           <div 
-            className="client-testimonials__carousel" 
+            className="testimonials-carousel" 
             ref={containerRef}
           >
             {testimonials.map((testimonial, i) => (
               <div
-                className="client-testimonials__card"
+                className="testimonial-card"
                 key={i}
                 style={{ "--visible-cards": visibleCards }}
               >
-                <p className="client-testimonials__quote">"{testimonial.quote}"</p>
+                <div className="quote-icon">❝</div>
+                <p className="testimonial-quote">"{testimonial.quote}"</p>
                 
-                <div className="client-testimonials__stars">
+                <div className="testimonial-stars">
                   {Array.from({ length: 5 }, (_, starIndex) => (
                     <span 
                       key={starIndex} 
-                      className={`client-testimonials__star ${
-                        starIndex < testimonial.rating ? 'client-testimonials__star--filled' : 'client-testimonials__star--empty'
+                      className={`star ${
+                        starIndex < testimonial.rating ? 'star-filled' : 'star-empty'
                       }`}
                     >
                       ★
@@ -90,15 +91,20 @@ const TestimonialsSection = () => {
                   ))}
                 </div>
                 
-                <p className="client-testimonials__name">{testimonial.name}</p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <p className="author-name">{testimonial.name}</p>
+                </div>
               </div>
             ))}
           </div>
 
           {testimonials.length > visibleCards && (
-            <div className="client-testimonials__controls">
+            <div className="carousel-controls">
               <button 
-                className="client-testimonials__btn client-testimonials__btn--prev"
+                className="control-btn prev-btn"
                 onClick={prev} 
                 disabled={index === 0}
                 aria-label="Previous testimonial"
@@ -106,7 +112,7 @@ const TestimonialsSection = () => {
                 ‹
               </button>
               <button 
-                className="client-testimonials__btn client-testimonials__btn--next"
+                className="control-btn next-btn"
                 onClick={next} 
                 disabled={index === maxIndex}
                 aria-label="Next testimonial"

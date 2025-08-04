@@ -464,7 +464,7 @@ $checks-low: #ef4444;
     border: 1px solid transparent;
     position: relative;
     overflow: hidden;
-
+    box-shadow: 0 4px 16px rgba($color-primary, 0.15);
     &::before {
       content: '';
       position: absolute;
@@ -478,7 +478,7 @@ $checks-low: #ef4444;
       color: $color-primary;
       border-color: rgba($color-primary, 0.2);
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba($color-primary, 0.15);
+      
 
       &::before {
         opacity: 1;

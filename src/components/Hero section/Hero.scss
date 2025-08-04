@@ -3,9 +3,11 @@
 
 .hero {
   position: relative;
-  background: url('../../assets/hero.jpg') center center/cover no-repeat;
+  background: linear-gradient(135deg, rgba(53, 52, 255, 0.9), rgba(102, 126, 234, 0.8)), 
+              url('../../assets/hero.jpg') center center/cover no-repeat;
   min-height: 100vh;
-
+  display: flex;
+  align-items: center;
 
   @supports (height: 100dvh) {
     min-height: 100dvh;
@@ -14,10 +16,39 @@
   color: $color-light;
   overflow: hidden;
 
+  // Animated background elements
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -15%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(120px);
+    animation: float 6s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -25%;
+    left: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    filter: blur(100px);
+    animation: float 8s ease-in-out infinite reverse;
+    z-index: 1;
+  }
+
   &__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.2);
     z-index: 1;
   }
 
@@ -28,103 +59,208 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 5rem 1.5rem;
-    max-width: 720px;
+    padding: 2rem 1.5rem;
+    max-width: 800px;
     margin: 0 auto;
-
+    width: 100%;
+top: 4rem;
     h1 {
-      font-size: 3rem;
-      font-weight: 500;
-      margin-bottom: 1rem;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 1.5rem;
       color: $color-light;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      line-height: 1.1;
+      animation: slideInUp 1s ease-out;
 
       span {
-        color: $color-primary;
-      }
-
-      @include responsive(sm) {
-        font-size: 2rem;
+        color: #FFD700;
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
 
-    p {
-      font-size: 1.15rem;
-      margin-bottom: 2rem;
-      color: $color-gray;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-
-      @include responsive(sm) {
-        font-size: 1rem;
-      }
+    > p {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      margin-bottom: 3rem;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      line-height: 1.6;
+      animation: slideInUp 1s ease-out 0.2s both;
     }
 
     .hero__form {
       display: flex;
-      flex-direction: row; 
+      flex-direction: row;
       gap: 1rem;
       justify-content: center;
       width: 100%;
-      max-width: 100%;
-    
+      max-width: 600px;
+      margin-bottom: 2rem;
+      animation: slideInUp 1s ease-out 0.4s both;
+
       input,
       button {
-        padding: 0.9rem 1rem;
-        font-size: 1rem;
-        border-radius: 6px;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        border-radius: 12px;
         border: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
       }
-    
+
       input {
-        width: 60%; // input gets more space
-        background-color: $color-light;
+        flex: 2;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
         color: $color-dark;
-      }
-    
-      button {
-        width: auto;
-        background-color: $color-primary;
-        color: $color-light;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.3s ease;
-        box-shadow: 0 2px 6px rgba($color-primary, 0.3);
-    
-        &:hover {
-          background-color: darken($color-primary, 10%);
+        font-weight: 500;
+        border: 2px solid transparent;
+
+        &::placeholder {
+          color: rgba(0, 0, 0, 0.6);
+        }
+
+        &:focus {
+          outline: none;
+          background: rgba(255, 255, 255, 1);
+          border-color: $color-primary;
+          box-shadow: 0 8px 32px rgba(53, 52, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
+        &.input-error {
+          border-color: #FF4444;
+          box-shadow: 0 8px 32px rgba(255, 68, 68, 0.2);
         }
       }
-    
-      // Mobile styles
+
+      button {
+        flex: 1;
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: $color-dark;
+        font-weight: 700;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        min-width: 160px;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s;
+        }
+
+        &:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 40px rgba(255, 215, 0, 0.4);
+
+          &::before {
+            left: 100%;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+      }
+
+      @include responsive(md) {
+        max-width: 500px;
+        
+        input,
+        button {
+          padding: 1rem 1.2rem;
+          font-size: 1rem;
+        }
+      }
+
       @include responsive(sm) {
         flex-direction: column;
         align-items: center;
-    
+        max-width: 400px;
+
         input,
         button {
-          width: 80%;
+          width: 100%;
+          padding: 1rem;
+        }
+
+        button {
+          min-width: unset;
         }
       }
     }
-    
-    
 
     .hero__note {
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-      opacity: 0.85;
+      font-size: 1rem;
+      opacity: 0.9;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      animation: slideInUp 1s ease-out 0.6s both;
+
+      &::before {
+        content: '✓';
+        color: #4CAF50;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      @include responsive(sm) {
+        font-size: 0.9rem;
+      }
     }
+  }
+
+  .hero__error {
+    color: #FF6B6B;
+    background: rgba(255, 107, 107, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    animation: shake 0.5s ease-in-out;
   }
 }
 
-.input-error {
-  border: 1px solid red !important;
+// Animations
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.hero__error {
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }

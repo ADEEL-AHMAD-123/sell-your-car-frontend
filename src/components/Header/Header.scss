@@ -3,44 +3,108 @@
 
 $transition: all 0.3s ease;
 $border-radius: 8px;
+$header-height: 70px;
+$header-height-mobile: 60px;
+
+// Check status colors
+$checks-high: #10b981;
+$checks-medium: #f59e0b;
+$checks-low: #ef4444;
 
 .header {
-  background-color: $color-primary-background;
   position: sticky;
   top: 0;
   z-index: 1000;
-  width: 100%;
+  background-color: $color-primary-background;
+  border-bottom: $border-primary;
+  box-shadow: $shadow-primary;
   font-family: $font-family;
-  box-shadow: 0 2px 6px rgba($color-dark, 0.05);
-  transition: $transition;
 
   &__container {
     @include container;
+  }
+
+  &__content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 70px;
+    justify-content: space-between;
+    height: $header-height;
 
     @include responsive(md) {
-      height: 60px;
+      height: $header-height-mobile;
     }
   }
 
-  &__logo h1 {
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: $color-primary;
-    margin: 0;
-
-    @include responsive(md) {
-      font-size: 1.6rem;
+  // Logo section
+  &__logo {
+    &-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      gap: 10px;
     }
-
-    @include responsive(sm) {
+  
+    &-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%);
+      border-radius: 10px;
+      @include flex-center;
+      color: $color-light;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+  
+      @include responsive(md) {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+  
+      @include responsive(sm) {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+    }
+  
+    &-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+  
+      @include responsive(sm) {
+        gap: 1px;
+      }
+    }
+  
+    &-main {
       font-size: 1.4rem;
+      font-weight: 700;
+      color: $color-primary;
+      line-height: 1;
+  
+      @include responsive(md) {
+        font-size: 1.2rem;
+      }
+  
+      @include responsive(sm) {
+        font-size: 1rem;
+      }
+    }
+  
+    &-tagline {
+      font-size: 0.7rem;
+      color: $color-gray;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+  
+      @include responsive(sm) {
+        font-size: 0.6rem;
+      }
     }
   }
 
+  // Desktop Navigation
   &__nav {
     display: flex;
     align-items: center;
@@ -51,6 +115,7 @@ $border-radius: 8px;
 
     &-list {
       display: flex;
+      align-items: center;
       gap: $spacing-md;
       list-style: none;
       margin: 0;
@@ -62,11 +127,12 @@ $border-radius: 8px;
     }
 
     &-link {
-      text-decoration: none;
+      display: block;
+      padding: 10px 0;
       color: $color-dark;
+      text-decoration: none;
       font-size: 1rem;
       font-weight: 500;
-      padding: 10px 0;
       position: relative;
       transition: $transition;
 
@@ -79,8 +145,8 @@ $border-radius: 8px;
         position: absolute;
         bottom: 0;
         left: 0;
-        height: 2px;
         width: 0;
+        height: 2px;
         background-color: $color-primary;
         transition: width 0.3s ease;
       }
@@ -91,124 +157,445 @@ $border-radius: 8px;
     }
   }
 
+  // Auth Area (Desktop)
   &__auth-area {
     display: flex;
     align-items: center;
 
-    &--desktop {
-      @include responsive(md) {
-        display: none;
+    @include responsive(md) {
+      display: none;
+    }
+  }
+
+  &__user-section {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  // Improved Checks System
+  &__checks-wrapper {
+    position: relative;
+  }
+
+  &__checks {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba($color-primary, 0.08) 0%, rgba($color-primary, 0.12) 100%);
+    border: 1px solid rgba($color-primary, 0.2);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba($color-primary, 0.1);
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.2) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba($color-primary, 0.2);
+    }
+
+    &--high {
+      .header__checks-icon,
+      .header__checks-count {
+        color: $checks-high;
+      }
+      background: linear-gradient(135deg, rgba($checks-high, 0.08) 0%, rgba($checks-high, 0.12) 100%);
+      border-color: rgba($checks-high, 0.2);
+      box-shadow: 0 2px 8px rgba($checks-high, 0.1);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba($checks-high, 0.15) 0%, rgba($checks-high, 0.2) 100%);
+        box-shadow: 0 4px 16px rgba($checks-high, 0.2);
       }
     }
 
-    &--mobile {
-      display: none;
-      margin-top: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: $border-primary;
+    &--medium {
+      .header__checks-icon,
+      .header__checks-count {
+        color: $checks-medium;
+      }
+      background: linear-gradient(135deg, rgba($checks-medium, 0.08) 0%, rgba($checks-medium, 0.12) 100%);
+      border-color: rgba($checks-medium, 0.2);
+      box-shadow: 0 2px 8px rgba($checks-medium, 0.1);
 
-      @include responsive(md) {
-        display: flex;
-        justify-content: flex-start;
+      &:hover {
+        background: linear-gradient(135deg, rgba($checks-medium, 0.15) 0%, rgba($checks-medium, 0.2) 100%);
+        box-shadow: 0 4px 16px rgba($checks-medium, 0.2);
+      }
+    }
+
+    &--low {
+      .header__checks-icon,
+      .header__checks-count {
+        color: $checks-low;
+      }
+      background: linear-gradient(135deg, rgba($checks-low, 0.08) 0%, rgba($checks-low, 0.12) 100%);
+      border-color: rgba($checks-low, 0.2);
+      box-shadow: 0 2px 8px rgba($checks-low, 0.1);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba($checks-low, 0.15) 0%, rgba($checks-low, 0.2) 100%);
+        box-shadow: 0 4px 16px rgba($checks-low, 0.2);
       }
     }
   }
 
-  &__user-panel {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 5px 20px;
-    background-color: rgba($color-primary, 0.05);
-    border: $border-primary;
-    border-radius: 999px;
-    box-shadow: 0 4px 16px rgba($color-dark, 0.08);
+  &__checks-icon {
+    font-size: 0.9rem;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+
+  &__checks-count {
+    font-weight: 700;
+    min-width: 16px;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  &__checks-info {
+    color: rgba($color-gray, 0.7);
+    font-size: 0.75rem;
     transition: $transition;
-    max-width: 260px;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+      color: $color-gray;
+    }
+  }
+
+  // Premium Tooltip Design
+  &__checks-tooltip {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 320px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba($color-primary, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba($color-primary, 0.1);
+    padding: 0;
+    z-index: 100;
+    text-align: left;
+    overflow: hidden;
+    animation: tooltipFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     @include responsive(sm) {
-      padding: 8px 16px;
-      max-width: 100%;
+      width: 300px;
+      right: -10px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 24px;
+      width: 16px;
+      height: 16px;
+      background: inherit;
+      border-left: 1px solid rgba($color-primary, 0.15);
+      border-top: 1px solid rgba($color-primary, 0.15);
+      transform: rotate(45deg);
+      border-radius: 2px;
+      backdrop-filter: blur(20px);
+    }
+  }
+
+  &__tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 20px 16px;
+    background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-primary, 0.08) 100%);
+    border-bottom: 1px solid rgba($color-primary, 0.1);
+
+    .fa-check-circle {
+      font-size: 1.2rem;
+      color: $color-primary;
+      filter: drop-shadow(0 2px 4px rgba($color-primary, 0.2));
+    }
+
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: $color-primary;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  &__tooltip-content {
+    padding: 20px;
+  }
+
+  &__tooltip-main {
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: $color-dark;
+    font-weight: 500;
+
+    strong {
+      color: $color-primary;
+      font-weight: 700;
+    }
+  }
+
+  &__tooltip-features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__tooltip-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: rgba($color-dark, 0.8);
+    line-height: 1.4;
+
+    &::before {
+      content: '✓';
+      color: $checks-high;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+  }
+
+  &__tooltip-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 8%) 100%);
+    color: $color-light;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+
+    &:hover {
+      background: linear-gradient(135deg, darken($color-primary, 5%) 0%, darken($color-primary, 13%) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($color-primary, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // Premium User Profile
+  &__user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba($color-gray, 0.08) 0%, rgba($color-gray, 0.12) 100%);
+    border: 1px solid rgba($color-gray, 0.2);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba($color-gray, 0.1);
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($color-gray, 0.15) 0%, rgba($color-gray, 0.2) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba($color-gray, 0.2);
+    }
+
+    &--non-clickable {
+      pointer-events: none;
+      cursor: default;
+      opacity: 0.8;
     }
   }
 
   &__user-avatar {
-    font-size: 2rem;
-    color: $color-primary;
-  }
-
-  &__user-details {
-    display: flex;
-    flex-direction: column;
-    font-size: 1rem;
-    line-height: 1.3;
-
-    @include responsive(sm) {
-      font-size: 0.95rem;
-    }
+    font-size: 1.5rem;
+    color: $color-gray;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
 
   &__user-name {
-    font-weight: 700;
-    color: $color-dark;
-    font-size: 1.05rem;
-  }
-
-  &__checks {
-    color: darken($color-gray, 50%);
+    font-size: 0.95rem;
     font-weight: 500;
-    font-size: 0.9rem;
+    color: rgba($color-dark, 0.9);
+
+    @include responsive(lg) {
+      display: none;
+    }
   }
 
-  &__login-modern {
-    background-color: $color-dark;
-    color: $color-light;
+  // Premium Auth Buttons
+  &__auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    @include responsive(xl) {
+      gap: 16px;
+    }
+  }
+
+  &__login-btn {
     padding: 10px 20px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 1rem;
+    color: $color-dark;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 25px;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-primary, 0.08) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
     &:hover {
-      background-color: lighten($color-dark, 5%);
+      color: $color-primary;
+      border-color: rgba($color-primary, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba($color-primary, 0.15);
+
+      &::before {
+        opacity: 1;
+      }
     }
 
-    @include responsive(sm) {
-      padding: 9px 16px;
+    @include responsive(xl) {
       font-size: 0.95rem;
+      padding: 12px 24px;
     }
   }
 
-  &__menu-btn {
+  &__signup-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 8%) 100%);
+    color: $color-light;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 25px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+    border: 1px solid rgba($color-primary, 0.2);
+
+    &:hover {
+      background: linear-gradient(135deg, darken($color-primary, 5%) 0%, darken($color-primary, 13%) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($color-primary, 0.4);
+    }
+
+    @include responsive(xl) {
+      font-size: 0.95rem;
+      padding: 12px 24px;
+    }
+  }
+
+  // Premium Dashboard Button
+  &__dashboard-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba($color-primary, 0.08) 0%, rgba($color-primary, 0.12) 100%);
+    border: 1px solid rgba($color-primary, 0.2);
+    border-radius: 25px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $color-primary;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba($color-primary, 0.1);
+
+    .fa-tachometer-alt {
+      font-size: 0.85rem;
+      filter: drop-shadow(0 1px 2px rgba($color-primary, 0.2));
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.2) 100%);
+      transform: translateY(-2px);
+      color: $color-primary;
+    }
+
+    @include responsive(xl) {
+      font-size: 0.95rem;
+      padding: 10px 20px;
+      gap: 12px;
+    }
+  }
+
+  // Mobile Controls
+  &__mobile-controls {
     display: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
+    align-items: center;
+    gap: 12px;
 
     @include responsive(md) {
       display: flex;
     }
+  }
 
-    .hamburger {
-      width: 26px;
-      height: 3px;
-      background-color: $color-dark;
-      border-radius: 2px;
-      transition: $transition;
+  &__mobile-checks {
+    display: flex;
+    align-items: center;
+  }
 
-      @include responsive(sm) {
-        width: 22px;
-      }
+  // Mobile Menu Button
+  &__menu-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: $transition;
+
+    &:hover {
+      background-color: rgba($color-gray, 0.1);
     }
+  }
 
-    &.active .hamburger {
+  &__hamburger {
+    width: 20px;
+    height: 2px;
+    background-color: $color-dark;
+    border-radius: 2px;
+    transition: $transition;
+  }
+
+  &__menu-btn--active {
+    .header__hamburger {
       &:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
+        transform: rotate(45deg) translate(4px, 4px);
       }
 
       &:nth-child(2) {
@@ -221,24 +608,42 @@ $border-radius: 8px;
     }
   }
 
+  // Mobile Menu Overlay
+  &__overlay {
+    position: fixed;
+    top: $header-height;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba($color-dark, 0.5);
+    z-index: 998;
+
+    @include responsive(md) {
+      top: $header-height-mobile;
+    }
+  }
+
+  // Mobile Menu
   &__mobile-menu {
     position: fixed;
-    top: 70px;
+    top: $header-height;
     right: 0;
     width: 280px;
-    height: calc(100vh - 70px);
+    height: calc(100vh - #{$header-height});
     background-color: $color-primary-background;
     box-shadow: $shadow-primary;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    padding: 0 $spacing-md;
     z-index: 999;
     overflow-y: auto;
 
     @include responsive(md) {
-      width: 260px;
-      top: 60px;
-      height: calc(100vh - 60px);
+      top: $header-height-mobile;
+      height: calc(100vh - #{$header-height-mobile});
+    }
+
+    @include responsive(sm) {
+      width: 100%;
     }
 
     &--open {
@@ -246,87 +651,213 @@ $border-radius: 8px;
     }
   }
 
-  &__overlay {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba($color-dark, 0.5);
-    z-index: 998;
-    transition: opacity 0.3s ease;
+  &__mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm;
+    border-bottom: $border-primary;
 
-    @include responsive(md) {
-      top: 60px;
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $color-dark;
+      margin: 0;
     }
   }
 
+  &__mobile-close {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: $color-gray;
+    transition: $transition;
+
+    &:hover {
+      background-color: rgba($color-gray, 0.1);
+      color: $color-dark;
+    }
+  }
+
+  &__mobile-content {
+    padding: $spacing-sm;
+  }
+
+  // Mobile User Section
+  &__mobile-user {
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-sm;
+    border-bottom: $border-primary;
+
+    &-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+
+      &--non-clickable {
+        pointer-events: none;
+        cursor: default;
+      }
+    }
+
+    &-avatar {
+      font-size: 1.8rem;
+      color: $color-gray;
+    }
+
+    &-name {
+      font-weight: 600;
+      color: $color-dark;
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+    }
+
+    &-subtitle {
+      font-size: 0.8rem;
+      color: $color-gray;
+      margin: 0;
+    }
+  }
+
+  &__mobile-dashboard-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba($color-primary, 0.08) 0%, rgba($color-primary, 0.12) 100%);
+    border: 1px solid rgba($color-primary, 0.2);
+    border-radius: 10px;
+    color: $color-primary;
+    font-weight: 600;
+    text-decoration: none;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba($color-primary, 0.1);
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.2) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba($color-primary, 0.2);
+    }
+  }
+
+  &__mobile-auth {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-sm;
+    border-bottom: $border-primary;
+  }
+
+  &__mobile-login,
+  &__mobile-signup {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__mobile-login {
+    color: $color-dark;
+    border: 1px solid rgba($color-gray, 0.3);
+    background: linear-gradient(135deg, rgba($color-gray, 0.02) 0%, rgba($color-gray, 0.05) 100%);
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($color-gray, 0.08) 0%, rgba($color-gray, 0.12) 100%);
+      border-color: rgba($color-gray, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__mobile-signup {
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 8%) 100%);
+    color: $color-light;
+    border: 1px solid rgba($color-primary, 0.2);
+    box-shadow: 0 2px 8px rgba($color-primary, 0.2);
+
+    &:hover {
+      background: linear-gradient(135deg, darken($color-primary, 5%) 0%, darken($color-primary, 13%) 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba($color-primary, 0.3);
+    }
+  }
+
+  // Mobile Navigation
   &__mobile-nav {
     &-list {
       list-style: none;
-      margin: 2rem 0;
+      margin: 0;
       padding: 0;
     }
 
     &-link {
       display: block;
-      font-size: 1.05rem;
-      font-weight: 500;
+      padding: 12px 10px;
       color: $color-dark;
-      padding: 1rem 0;
-      border-bottom: $border-primary;
       text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-radius: 6px;
       transition: $transition;
 
       &:hover {
         color: $color-primary;
-        padding-left: 0.5rem;
-      }
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      @include responsive(sm) {
-        font-size: 1rem;
-        padding: 0.9rem 0;
+        background-color: rgba($color-primary, 0.05);
       }
     }
   }
 
+  // Social Icons
   &__social-icons {
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+    border-top: $border-primary;
+  }
 
-    @include responsive(md) {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin: 1.5rem 0;
-      padding-top: 1rem;
-      border-top: $border-primary;
+  &__social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: $color-accent-background;
+    @include flex-center;
+    color: $color-dark;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: $transition;
+    border: $border-primary;
+
+    &:hover {
+      background-color: $color-primary;
+      color: $color-light;
+      transform: translateY(-2px);
     }
+  }
+}
 
-    a.header__social-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background-color: $color-accent-background;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: $color-dark;
-      text-decoration: none;
-      font-size: 1rem;
-      transition: $transition;
-      border: $border-primary;
-
-      &:hover {
-        background-color: $color-primary;
-        color: $color-light;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba($color-primary, 0.3);
-      }
-    }
+// Tooltip animation
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

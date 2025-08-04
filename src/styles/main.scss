@@ -1,4 +1,9 @@
+
 @use './base/reset';
 @use './base/variables' as *;
 @use './base/mixins' as *;
 @use './base/globals';
+
+//  Then: Tailwind directives (after all @use)
+@tailwind components;
+@tailwind utilities;

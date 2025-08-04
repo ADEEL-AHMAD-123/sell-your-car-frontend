@@ -3,38 +3,126 @@
 
 .contact-hero {
   position: relative;
-  background: url('../../assets/contact-hero.jpg') center center/cover no-repeat;
-  min-height: 60vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(100px);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -15%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    filter: blur(80px);
+  }
 
   .overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: $color-light;
-    padding: 2rem;
-
+    position: relative;
+    width: 100%;
+    z-index: 2;
+    
     .hero-content {
-      h1 {
-        font-size: 2.8rem;
-        margin-bottom: 0.5rem;
-        color: $color-light;
+      text-align: center;
+      color: $color-light;
+      padding: 4rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
 
-        @include responsive(sm) {
-          font-size: 2rem;
+      .hero-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+
+        span {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: $color-light;
         }
       }
 
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        margin-bottom: 1.5rem;
+        color: $color-light;
+        font-weight: 800;
+        line-height: 1.1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
       p {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         max-width: 600px;
-        margin: 0 auto;
-        font-weight: lighter;
-        opacity: 0.9;
+        margin: 0 auto 3rem;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.6;
+
+        @include responsive(sm) {
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
+        }
+      }
+
+      .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin-top: 2rem;
+
+        @include responsive(sm) {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .stat {
+          text-align: center;
+
+          strong {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 0.25rem;
+          }
+
+          span {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+          }
+        }
       }
     }
+  }
+
+  .hero-decoration {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: $color-light;
+    clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 80%);
   }
 }

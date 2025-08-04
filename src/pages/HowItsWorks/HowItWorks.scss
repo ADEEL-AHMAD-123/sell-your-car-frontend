@@ -1,94 +1,494 @@
 @use '../../styles/base/variables' as *;
 @use '../../styles/base/mixins' as *;
 
-.how-page {
-  background-color: $color-primary-background;
-  padding: 5rem 1.5rem;
+// Hero Section
+.how-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3534FF 0%, #667eea 100%);
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../../assets/process-bg.jpg') center/cover no-repeat;
+    opacity: 0.1;
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+  }
 
   .container {
-    @include container;
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .hero-content {
     text-align: center;
+    color: $color-light;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 0;
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+
+      span {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $color-light;
+      }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .intro {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      opacity: 0.95;
+      line-height: 1.6;
+
+      @include responsive(sm) {
+        font-size: 1.1rem;
+      }
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+
+      @include responsive(sm) {
+        gap: 1.5rem;
+      }
+
+      .stat {
+        text-align: center;
+
+        .stat-number {
+          display: block;
+          font-size: 2rem;
+          font-weight: 800;
+          color: #ffd700;
+          margin-bottom: 0.25rem;
+
+          @include responsive(sm) {
+            font-size: 1.6rem;
+          }
+        }
+
+        .stat-label {
+          font-size: 0.9rem;
+          opacity: 0.9;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// Steps Section
+.steps-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
   }
 
-  h1 {
-    font-size: 2.4rem;
-    color: $color-dark;
-    margin-bottom: 1rem;
+  .steps-header {
+    text-align: center;
+    margin-bottom: 4rem;
 
-    @include responsive(sm) {
-      font-size: 1.8rem;
+    h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      color: $color-dark;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
     }
   }
 
-  .intro {
-    font-size: 1.1rem;
-    color: $color-gray;
-    max-width: 700px;
-    margin: 0 auto 3rem;
-
-    @include responsive(sm) {
-      font-size: 1rem;
-    }
-  }
-
-  .step-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  .step-timeline {
+    display: flex;
+    flex-direction: column;
     gap: 2rem;
 
-    @include responsive(md) {
-      grid-template-columns: repeat(2, 1fr);
+    @include responsive(lg) {
+      gap: 1.5rem;
     }
+  }
+
+  .step-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    @include responsive(lg) {
+      flex-direction: column;
+    }
+
+    &:nth-child(even) {
+      flex-direction: row-reverse;
+
+      @include responsive(lg) {
+        flex-direction: column;
+      }
+
+      .step-card {
+        .step-content {
+          text-align: right;
+
+          @include responsive(lg) {
+            text-align: center;
+          }
+        }
+      }
+
+      .step-connector {
+        .connector-arrow {
+          transform: rotate(180deg);
+
+          @include responsive(lg) {
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+  }
+
+  .step-card {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: $color-light;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.4s ease;
+    flex: 1;
+    max-width: 500px;
+
+    @include responsive(lg) {
+      max-width: 100%;
+      text-align: center;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    }
+
+    .step-icon {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+      .icon-emoji {
+        font-size: 2rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      .step-number {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background: $color-dark;
+        color: $color-light;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        z-index: 3;
+      }
+    }
+
+    .step-content {
+      flex: 1;
+
+      h3 {
+        font-size: 1.4rem;
+        color: $color-dark;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+
+        @include responsive(sm) {
+          font-size: 1.2rem;
+        }
+      }
+
+      p {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.6;
+        margin: 0;
+
+        @include responsive(sm) {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+
+  .step-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2rem;
+    position: relative;
+
+    @include responsive(lg) {
+      padding: 1rem 0;
+      transform: rotate(90deg);
+    }
+
+    .connector-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #3534FF, #667eea);
+      border-radius: 2px;
+
+      @include responsive(lg) {
+        width: 40px;
+      }
+    }
+
+    .connector-arrow {
+      font-size: 1.5rem;
+      color: #3534FF;
+      margin-left: 0.5rem;
+      font-weight: bold;
+
+      @include responsive(lg) {
+        margin: 0.5rem 0 0 0;
+      }
+    }
+  }
+}
+
+// Benefits Section
+.benefits-section {
+  padding: 4rem 0;
+  background: $color-light;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .benefits-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
+      color: $color-dark;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #666;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
 
     @include responsive(sm) {
       grid-template-columns: 1fr;
     }
   }
 
-  .step-card {
-    background: $color-accent-background;
-    border-radius: 10px;
-    padding: 2rem 1.5rem;
-    box-shadow: $shadow-primary;
-    text-align: left;
-    position: relative;
+  .benefit-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: rgba(53, 52, 255, 0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(53, 52, 255, 0.1);
+    transition: all 0.3s ease;
 
-    .step-number {
-      position: absolute;
-      top: -20px;
-      left: -20px;
-      width: 40px;
-      height: 40px;
-      background: $color-primary;
-      color: white;
-      font-weight: bold;
-      border-radius: 50%;
+    &:hover {
+      background: rgba(53, 52, 255, 0.06);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(53, 52, 255, 0.1);
+    }
+
+    .benefit-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3534FF, #667eea);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(53, 52, 255, 0.3);
+
+      span {
+        font-size: 1.5rem;
+      }
     }
 
-    h3 {
-      font-size: 1.25rem;
+    .benefit-content {
+      h4 {
+        font-size: 1.1rem;
+        color: $color-dark;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+  }
+}
+
+// FAQ Preview Section
+.faq-preview {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f0f2f5 0%, #fafbfc 100%);
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .faq-content {
+    text-align: center;
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
       color: $color-dark;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
     }
 
     p {
-      font-size: 1rem;
-      color: $color-gray;
+      font-size: 1.1rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+    }
+
+    .quick-answers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      text-align: left;
 
       @include responsive(sm) {
-        font-size: 0.95rem;
+        grid-template-columns: 1fr;
+      }
+
+      .answer-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: $color-light;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+
+        .answer-icon {
+          font-size: 1.2rem;
+          width: 32px;
+          height: 32px;
+          background: rgba(53, 52, 255, 0.1);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          margin-top: 0.2rem;
+        }
+
+        div {
+          strong {
+            display: block;
+            color: $color-dark;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+          }
+
+          p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+            margin: 0;
+          }
+        }
       }
     }
-    .icon {
-      font-size: 2.2rem;
-      margin-bottom: 0.8rem;
-      color: $color-primary;
-    }
-    
   }
 }

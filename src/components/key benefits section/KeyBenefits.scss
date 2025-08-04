@@ -2,96 +2,209 @@
 @use '../../styles/base/mixins' as *;
 
 .key-benefits {
-  padding: $spacing-lg $spacing-md;
-  background-color: $color-accent-background;
+  padding: 6rem $spacing-md;
+  background: $color-secondary;
+  position: relative;
   overflow: hidden;
+
+  // Background decoration
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, rgba(53, 52, 255, 0.08), rgba(102, 126, 234, 0.03));
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -15%;
+    right: -15%;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+    border-radius: 50%;
+    filter: blur(100px);
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
 
   .section-title {
     text-align: center;
-    font-size: 1.9rem;
-    font-weight: 600;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
     color: $color-dark;
     margin-bottom: $spacing-sm;
-   
+    position: relative;
 
-    @include responsive(sm) {
-      font-size: 1.5rem;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, $color-primary, #FFD700);
+      border-radius: 2px;
     }
   }
 
   .section-subtitle {
     text-align: center;
-    font-size: 1rem;
-    color: $color-dark;
-    margin-bottom: $spacing-lg;
+    font-size: 1.2rem;
+    color: $color-gray;
+    margin-bottom: $spacing-xl;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
 
     @include responsive(sm) {
-      font-size: 0.95rem;
-      margin-bottom: $spacing-md;
+      font-size: 1rem;
+      margin-bottom: $spacing-lg;
     }
   }
 
   .benefits-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-md;
-  
-    @include responsive(md) {
+    gap: 2.5rem;
+
+    @include responsive(lg) {
       grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
     }
-  
-    @include responsive(sm) {
-      grid-template-columns: 1fr; 
-      gap: $spacing-sm;
+
+    @include responsive(md) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      max-width: 500px;
+      margin: 0 auto;
     }
   }
-  
 
   .benefit-card {
-    background-color: $color-primary-background;
-    padding: $spacing-md;
-    border-radius: 10px;
-    box-shadow: $shadow-primary;
+    background: $color-light;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
     text-align: center;
-    transition: transform 0.3s ease;
-    @include responsive(sm) {
-        padding: $spacing-sm $spacing-md;
+    transition: all 0.4s ease;
+    position: relative;
+    border: 1px solid rgba(53, 52, 255, 0.1);
+    overflow: hidden;
+
+    // Gradient border effect on hover
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      background: linear-gradient(135deg, $color-primary, #FFD700);
+      border-radius: 20px;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     &:hover {
-      transform: translateY(-4px);
+      transform: translateY(-12px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+
+      &::before {
+        opacity: 1;
+      }
+
+      .icon {
+        transform: scale(1.1) rotate(5deg);
+        color: $color-primary;
+      }
+    }
+
+    @include responsive(sm) {
+      padding: 2rem 1.5rem;
     }
 
     .icon {
-      font-size: 2rem;
+      font-size: 3rem;
       color: $color-primary;
-      margin-bottom: $spacing-xs;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      display: inline-block;
 
       @include responsive(sm) {
-        font-size: 1.6rem;
-        margin-bottom: 0.4rem;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
       }
     }
 
     h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: 1.3rem;
+      font-weight: 700;
       color: $color-dark;
-      margin-bottom: 0.3rem;
+      margin-bottom: 1rem;
+      line-height: 1.3;
 
       @include responsive(sm) {
-        font-size: 0.95rem;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
       }
     }
 
     p {
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: $color-gray;
-      line-height: 1.4;
+      line-height: 1.7;
+      margin: 0;
 
       @include responsive(sm) {
-        display: none; 
+        font-size: 0.9rem;
+        line-height: 1.6;
       }
     }
+
+    // Different icon colors for variety
+    &:nth-child(1) .icon { color: #4CAF50; }
+    &:nth-child(2) .icon { color: #FF9800; }
+    &:nth-child(3) .icon { color: #2196F3; }
+    &:nth-child(4) .icon { color: #9C27B0; }
+    &:nth-child(5) .icon { color: #F44336; }
+    &:nth-child(6) .icon { color: #00BCD4; }
+
+    &:nth-child(1):hover .icon { color: #45a049; }
+    &:nth-child(2):hover .icon { color: #F57C00; }
+    &:nth-child(3):hover .icon { color: #1976D2; }
+    &:nth-child(4):hover .icon { color: #7B1FA2; }
+    &:nth-child(5):hover .icon { color: #D32F2F; }
+    &:nth-child(6):hover .icon { color: #0097A7; }
+  }
+}
+
+// Animation for cards appearing on scroll (if you want to add intersection observer)
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive improvements
+@include responsive(sm) {
+  .key-benefits {
+    padding: 4rem $spacing-sm;
   }
 }

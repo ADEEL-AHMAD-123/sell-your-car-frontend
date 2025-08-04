@@ -2,27 +2,27 @@ import React, { useState, useEffect, useRef } from "react";
 import "./TestimonialsSection.scss";
 
 const testimonials = [
-    {
-      name: "Adeel R.",
-      rating: 5,
-      quote: "Quick, easy, and hassle-free. Got my payment instantly after pickup. Highly recommend!"
-    },
-    {
-      name: "Sarah W.",
-      rating: 4,
-      quote: "They gave me the best offer. Great communication and smooth collection process."
-    },
-    {
-      name: "Sarah W.",
-      rating: 4,
-      quote: "They gave me the best offer. Great communication and smooth collection process."
-    },
-    {
-      name: "John M.",
-      rating: 5,
-      quote: "Simple and fast! Sold my scrap car in minutes. Brilliant experience."
-    }
-  ];
+  {
+    name: "Adeel R.",
+    rating: 5,
+    quote: "Quick, easy, and hassle-free. Got my payment instantly after pickup. Highly recommend!"
+  },
+  {
+    name: "Sarah W.",
+    rating: 4,
+    quote: "They gave me the best offer. Great communication and smooth collection process."
+  },
+  {
+    name: "John M.",
+    rating: 5,
+    quote: "Simple and fast! Sold my scrap car in minutes. Brilliant experience."
+  },
+  {
+    name: "Mike T.",
+    rating: 5,
+    quote: "Professional service from start to finish. Would definitely use again!"
+  }
+];
 
 const TestimonialsSection = () => {
   const containerRef = useRef();
@@ -57,46 +57,60 @@ const TestimonialsSection = () => {
   const next = () => scrollTo(Math.min(index + 1, maxIndex));
 
   return (
-    <section className="testimonials-section">
-      <div className="container">
-        <h2>What Our Clients Say</h2>
-        <p className="subtitle">
-          Trusted by businesses worldwide for delivering exceptional digital
-          products.
+    <section className="client-testimonials">
+      <div className="client-testimonials__container">
+        <h2 className="client-testimonials__title">What Our Clients Say</h2>
+        <p className="client-testimonials__subtitle">
+          Trusted by businesses worldwide for delivering exceptional digital products.
         </p>
 
-        <div className="carousel-wrapper">
-          <div className="carousel" ref={containerRef}>
-            {testimonials.map((t, i) => (
-         <div
-         className="card"
-         key={i}
-         style={{ "--visible-cards": visibleCards }}
-       >
-         <p className="quote">“{t.quote}”</p>
-       
-         {/* ⭐️ Star Ratings */}
-         <div className="stars">
-           {Array.from({ length: 5 }, (_, i) => (
-             <span key={i} className={i < t.rating ? 'filled' : 'empty'}>
-               ★
-             </span>
-           ))}
-         </div>
-       
-         <p className="client-name">{t.name}</p>
-         <p className="client-role">{t.role}</p>
-       </div>
-       
+        <div className="client-testimonials__carousel-wrapper">
+          <div 
+            className="client-testimonials__carousel" 
+            ref={containerRef}
+          >
+            {testimonials.map((testimonial, i) => (
+              <div
+                className="client-testimonials__card"
+                key={i}
+                style={{ "--visible-cards": visibleCards }}
+              >
+                <p className="client-testimonials__quote">"{testimonial.quote}"</p>
+                
+                <div className="client-testimonials__stars">
+                  {Array.from({ length: 5 }, (_, starIndex) => (
+                    <span 
+                      key={starIndex} 
+                      className={`client-testimonials__star ${
+                        starIndex < testimonial.rating ? 'client-testimonials__star--filled' : 'client-testimonials__star--empty'
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                
+                <p className="client-testimonials__name">{testimonial.name}</p>
+              </div>
             ))}
           </div>
 
           {testimonials.length > visibleCards && (
-            <div className="arrows">
-              <button onClick={prev} disabled={index === 0}>
+            <div className="client-testimonials__controls">
+              <button 
+                className="client-testimonials__btn client-testimonials__btn--prev"
+                onClick={prev} 
+                disabled={index === 0}
+                aria-label="Previous testimonial"
+              >
                 ‹
               </button>
-              <button onClick={next} disabled={index === maxIndex}>
+              <button 
+                className="client-testimonials__btn client-testimonials__btn--next"
+                onClick={next} 
+                disabled={index === maxIndex}
+                aria-label="Next testimonial"
+              >
                 ›
               </button>
             </div>

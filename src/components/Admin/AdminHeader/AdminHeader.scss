@@ -1,109 +1,309 @@
-@import '../../../styles/base/admin-variables.scss';
+@import '../../../styles/base/admin-variables';
 
 .admin-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: $admin-bg-color;
-  color: $admin-text-color;
-  padding: 2.5rem 2.5rem;
-  height: 80px; 
-  box-shadow: 0 2px 8px $admin-header-shadow;
+  background: $admin-bg-secondary;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid $admin-border;
+  padding: 0 $admin-spacing-xl;
+  height: $admin-header-height;
   position: sticky;
   top: 0;
+  z-index: $admin-z-sticky;
+  box-shadow: $admin-shadow-sm;
 
-  
-  z-index: 100;
-  @media (max-width: 768px) {
-    padding: 1.5rem 2.5rem;
+  @media (max-width: $admin-breakpoint-lg) {
+    height: $admin-mobile-header-height;
+    padding: 0 $admin-spacing-lg;
   }
 
-  .left-section {
+  @media (max-width: $admin-breakpoint-sm) {
+    padding: 0 $admin-spacing-md;
+  }
+
+  // Left section
+  &__left {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-
-    .toggle-btn {
-      font-size: 2rem;
-      background: none;
-      border: none;
-      color: $admin-accent;
-      cursor: pointer;
-
-      // Hide toggle on large devices
-      @media (min-width: 769px) {
-        display: none;
-      }
-    }
-
-    .logo-text {
-
-      font-weight: 600;
-      color: $admin-accent;
-
-      display: none;
-    
-      @media (min-width: 769px) {
-        font-size: 1.8rem;
-        display: block;
-
-      }
-    }
-    
-  }
-
-  .search-bar {
+    gap: $admin-spacing-lg;
+    min-width: 0;
     flex: 1;
-    max-width: 600px;
+
+    @media (max-width: $admin-breakpoint-md) {
+      flex: 0;
+    }
+  }
+
+  &__toggle {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    background: $admin-search-bg;
-    padding: 0.8rem 1.2rem;
-    border-radius: 10px;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: $admin-radius-lg;
+    color: $admin-text-secondary;
+    cursor: pointer;
+    transition: all $admin-transition-fast;
 
-    input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: $admin-text-color;
-      flex: 1;
-      font-size: 1.1rem;
+    &:hover {
+      background: $admin-bg-hover;
+      color: $admin-primary-light;
+      transform: scale(1.05);
+    }
 
-      &::placeholder {
-        color: $admin-muted;
-      }
+    &:active {
+      transform: scale(0.95);
     }
 
     svg {
-      font-size: 1.2rem;
-      color: $admin-accent;
+      font-size: $admin-font-size-lg;
     }
+  }
 
-    @media (max-width: 768px) {
+  &__breadcrumb {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    @media (max-width: $admin-breakpoint-md) {
       display: none;
     }
   }
 
-  .header-actions {
+  &__title {
+    font-size: $admin-font-size-xl;
+    font-weight: 700;
+    color: $admin-text-primary;
+    margin: 0;
+    background: $admin-primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__subtitle {
+    font-size: $admin-font-size-sm;
+    font-weight: 500;
+    color: $admin-text-muted;
+    background: none;
+    -webkit-text-fill-color: $admin-text-muted;
+  }
+
+  // Center section
+  &__center {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    flex: 2;
+    max-width: 600px;
+    margin: 0 $admin-spacing-xl;
 
-    .icon {
-      font-size: 1.8rem;
-      color: $admin-muted;
-      cursor: pointer;
-      transition: color 0.2s;
+    @media (max-width: $admin-breakpoint-md) {
+      display: none;
+    }
+  }
 
-      &:hover {
-        color: $admin-accent;
+  &__search {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+
+    &.focused {
+      .admin-header__search-icon {
+        color: $admin-primary;
       }
     }
 
-    .avatar {
-      font-size: 2.2rem;
-      color: $admin-accent-light;
+    input {
+      width: 100%;
+      background: $admin-bg-primary;
+      border: 1px solid $admin-border;
+      border-radius: $admin-radius-xl;
+      padding: $admin-spacing-md $admin-spacing-lg;
+      padding-left: 48px;
+      padding-right: 80px;
+      color: $admin-text-primary;
+      font-size: $admin-font-size-base;
+      transition: all $admin-transition-base;
+
+      &::placeholder {
+        color: $admin-text-muted;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $admin-primary;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        background: $admin-bg-secondary;
+      }
     }
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: $admin-spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $admin-text-muted;
+    font-size: $admin-font-size-base;
+    transition: color $admin-transition-fast;
+  }
+
+  &__search-shortcut {
+    position: absolute;
+    right: $admin-spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    span {
+      background: $admin-bg-hover;
+      color: $admin-text-muted;
+      padding: 2px 8px;
+      border-radius: $admin-radius-sm;
+      font-size: $admin-font-size-xs;
+      font-weight: 500;
+    }
+  }
+
+  // Right section
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-lg;
+    flex: 1;
+    justify-content: flex-end;
+
+    @media (max-width: $admin-breakpoint-sm) {
+      gap: $admin-spacing-md;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+
+    @media (max-width: $admin-breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: $admin-radius-lg;
+    color: $admin-text-secondary;
+    cursor: pointer;
+    transition: all $admin-transition-fast;
+
+    &:hover {
+      background: $admin-bg-hover;
+      color: $admin-primary-light;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      font-size: $admin-font-size-base;
+    }
+  }
+
+  &__notification {
+    position: relative;
+  }
+
+  &__notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: $admin-error;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: $admin-radius-full;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+
+  &__profile {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-md;
+    padding: $admin-spacing-sm $admin-spacing-md;
+    border-radius: $admin-radius-xl;
+    cursor: pointer;
+    transition: all $admin-transition-fast;
+
+    &:hover {
+      background: $admin-bg-hover;
+    }
+
+    @media (max-width: $admin-breakpoint-sm) {
+      padding: $admin-spacing-sm;
+      gap: 0;
+    }
+  }
+
+  &__profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+
+    @media (max-width: $admin-breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  &__profile-name {
+    font-size: $admin-font-size-sm;
+    font-weight: 600;
+    color: $admin-text-primary;
+    line-height: 1.2;
+  }
+
+  &__profile-role {
+    font-size: $admin-font-size-xs;
+    color: $admin-text-muted;
+    line-height: 1.2;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: $admin-radius-full;
+    background: $admin-primary-gradient;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: $admin-font-size-xl;
+    box-shadow: $admin-shadow-md;
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }

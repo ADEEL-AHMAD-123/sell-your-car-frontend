@@ -13,7 +13,6 @@ import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
 import '../../../styles/AdminQuotesShared.scss';
 
-
 const AllManualQuotes = () => {
   const dispatch = useDispatch();
 
@@ -128,6 +127,150 @@ const AllManualQuotes = () => {
     return parts.length > 0 ? parts.join(' ') : 'N/A';
   };
 
+  const formatPrice = (price) => {
+    return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
+  };
+
+  const getQuoteType = (quote) => {
+    if (quote.isManualQuote) return 'Manual';
+    if (quote.isAutoQuote) return 'Auto';
+    return 'Standard';
+  };
+
+  const getPriorityLevel = (quote) => {
+    const createdAt = new Date(quote.createdAt);
+    const now = new Date();
+    const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
+    
+    if (hoursDiff > 48) return 'high';
+    if (hoursDiff > 24) return 'medium';
+    return 'low';
+  };
+
+  const renderDesktopTable = () => (
+    <div className="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Reg No</th>
+            <th>Vehicle</th>
+            <th>Client</th>
+            <th>Type</th>
+            <th>Reason</th>
+            <th>Client Offer</th>
+            <th>Priority</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {quotes.map((quote) => (
+            <tr key={quote._id}>
+              <td title={quote.regNumber || 'N/A'}>
+                {quote.regNumber || 'N/A'}
+              </td>
+              <td title={getVehicleString(quote)}>
+                {getVehicleString(quote)}
+              </td>
+              <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
+                {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
+              </td>
+              <td>
+                <span className={`type-badge ${getQuoteType(quote).toLowerCase()}`}>
+                  {getQuoteType(quote)}
+                </span>
+              </td>
+              <td title={quote.manualQuoteReason || 'N/A'}>
+                <span className="reason-text">
+                  {quote.manualQuoteReason || 'N/A'}
+                </span>
+              </td>
+              <td title={formatPrice(quote.userEstimatedPrice)}>
+                {formatPrice(quote.userEstimatedPrice)}
+              </td>
+              <td>
+                <span className={`priority-badge ${getPriorityLevel(quote)}`}>
+                  {getPriorityLevel(quote)}
+                </span>
+              </td>
+              <td>
+                <button 
+                  className="btn-view" 
+                  onClick={() => handleViewDetails(quote)}
+                  aria-label={`View details for ${quote.regNumber || 'quote'}`}
+                >
+                  View
+                </button>
+                <button 
+                  className="btn-review" 
+                  onClick={() => handleReview(quote)}
+                  aria-label={`Review quote for ${quote.regNumber || 'vehicle'}`}
+                >
+                  Review
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderMobileCards = () => (
+    <div className="mobile-cards">
+      {quotes.map((quote) => (
+        <div key={quote._id} className="quote-card">
+          <div className="card-header">
+            <h3 className="card-title">{quote.regNumber || 'N/A'}</h3>
+            <div className="card-badges">
+              <span className={`card-badge ${getQuoteType(quote).toLowerCase()}`}>
+                {getQuoteType(quote)}
+              </span>
+              <span className={`priority-badge ${getPriorityLevel(quote)}`}>
+                {getPriorityLevel(quote)}
+              </span>
+            </div>
+          </div>
+          
+          <div className="card-details">
+            <div className="detail-item">
+              <div className="label">Vehicle</div>
+              <div className="value">{getVehicleString(quote)}</div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Client</div>
+              <div className="value">
+                {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
+              </div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Reason</div>
+              <div className="value">{quote.manualQuoteReason || 'N/A'}</div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Client Offer</div>
+              <div className="value">{formatPrice(quote.userEstimatedPrice)}</div>
+            </div>
+          </div>
+          
+          <div className="card-actions">
+            <button
+              className="btn-view"
+              onClick={() => handleViewDetails(quote)}
+            >
+              View Details
+            </button>
+            <button
+              className="btn-review"
+              onClick={() => handleReview(quote)}
+            >
+              Review Quote
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderTableContent = () => {
     if (pendingLoading) {
       return (
@@ -147,58 +290,8 @@ const AllManualQuotes = () => {
 
     return (
       <>
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Reg No</th>
-                <th>Vehicle</th>
-                <th>Client</th>
-                <th>Reason</th>
-                <th>Client Offer</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotes.map((quote) => (
-                <tr key={quote._id}>
-                  <td title={quote.regNumber || 'N/A'}>
-                    {quote.regNumber || 'N/A'}
-                  </td>
-                  <td title={getVehicleString(quote)}>
-                    {getVehicleString(quote)}
-                  </td>
-                  <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
-                    {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
-                  </td>
-                  <td title={quote.manualQuoteReason || 'N/A'}>
-                    {quote.manualQuoteReason || 'N/A'}
-                  </td>
-                  <td>
-                    {quote.userEstimatedPrice ? `£${quote.userEstimatedPrice}` : 'N/A'}
-                  </td>
-                  <td>
-                    <button 
-                      className="btn-view" 
-                      onClick={() => handleViewDetails(quote)}
-                      aria-label={`View details for ${quote.regNumber || 'quote'}`}
-                    >
-                      View
-                    </button>
-                    <button 
-                      className="btn-review" 
-                      onClick={() => handleReview(quote)}
-                      aria-label={`Review quote for ${quote.regNumber || 'vehicle'}`}
-                    >
-                      Review
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+        {renderDesktopTable()}
+        {renderMobileCards()}
         <div className="pagination-controls">
           <button
             disabled={page <= 1}
@@ -207,7 +300,7 @@ const AllManualQuotes = () => {
           >
             Previous
           </button>
-          <span>Page {page} of {totalPages}</span>
+          <span className="page-info">Page {page} of {totalPages}</span>
           <button
             disabled={page >= totalPages}
             onClick={() => handlePageChange(page + 1)}
@@ -222,87 +315,93 @@ const AllManualQuotes = () => {
 
   return (
     <section className="admin-quotes-page">
-  <h1>Pending Manual Quotes</h1>
+      <div className="page-header">
+        <h1>Manual Quote Reviews</h1>
+        <p className="page-description">
+          Review and process manual quote requests that require admin attention.
+        </p>
+      </div>
 
-<div className="admin-info-banner">
-  <div className="admin-info-card highlight-blue">
-    <div className="icon">📄</div>
-    <div className="content">
-      <h3>What Is This Page?</h3>
-      <p>
-        Here you’ll manage <strong>manual quote requests</strong> that couldn’t be auto-processed. Each quote requires your review and action.
-      </p>
-    </div>
-  </div>
+      <div className="admin-info-banner">
+        <div className="admin-info-card highlight-blue">
+          <div className="icon">📄</div>
+          <div className="content">
+            <h3>What Is This Page?</h3>
+            <p>
+              Manage <strong>manual quote requests</strong> that couldn't be auto-processed and require your review and pricing decision.
+            </p>
+          </div>
+        </div>
 
-  <div className="admin-info-card highlight-green">
-    <div className="icon">🛠</div>
-    <div className="content">
-      <h3>What Can You Do?</h3>
-      <ul>
-        <li><strong>View:</strong> Inspect quote and vehicle details.</li>
-        <li><strong>Review:</strong> Set a price and message for the client. This sends them an email.</li>
-        <li><strong>Filter:</strong> Narrow results by customer, vehicle, or reg number.</li>
-      </ul>
-    </div>
-  </div>
+        <div className="admin-info-card highlight-green">
+          <div className="icon">🛠</div>
+          <div className="content">
+            <h3>What Can You Do?</h3>
+            <ul>
+              <li><strong>View:</strong> Inspect complete quote and vehicle details</li>
+              <li><strong>Review:</strong> Set final price and send response to client</li>
+              <li><strong>Filter:</strong> Search by customer, vehicle, or registration</li>
+            </ul>
+          </div>
+        </div>
 
-  <div className="admin-info-card highlight-purple">
-    <div className="icon">💡</div>
-    <div className="content">
-      <h3>Key Terms</h3>
-      <ul>
-        <li><strong>Reason:</strong> Why auto-quote was bypassed.</li>
-        <li><strong>Client Offer:</strong> User’s suggested price (if any).</li>
-        <li><strong>Review Action:</strong> Sends your reply to the client.</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
+        <div className="admin-info-card highlight-purple">
+          <div className="icon">💡</div>
+          <div className="content">
+            <h3>Key Information</h3>
+            <ul>
+              <li><strong>Reason:</strong> Why automatic processing failed</li>
+              <li><strong>Client Offer:</strong> Customer's estimated price</li>
+              <li><strong>Priority:</strong> Based on request age and urgency</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       {/* Filter Section */}
       <div className="filter-controls">
-  <div className="filter-grid">
-    {[
-      ['Customer Name', 'customerName'],
-      ['Customer Email', 'customerEmail'],
-      ['Customer Phone', 'customerPhone'],
-      ['Reg Number', 'regNumber'],
-      ['Make', 'make'],
-      ['Model', 'model'],
-    ].map(([label, field]) => (
-      <div key={field} className="filter-field">
-        <label htmlFor={field}>{label}</label>
-        <input
-          id={field}
-          type="text"
-          value={filters[field]}
-          onChange={updateFilter(field)}
-          placeholder={`Search ${label.toLowerCase()}`}
-        />
+        <div className="filter-header">
+          <h3>Search & Filter</h3>
+          <div className="results-count">
+            {total} pending review{total !== 1 ? 's' : ''}
+          </div>
+        </div>
+        <div className="filter-grid">
+          {[
+            ['Customer Name', 'customerName'],
+            ['Customer Email', 'customerEmail'],
+            ['Customer Phone', 'customerPhone'],
+            ['Reg Number', 'regNumber'],
+            ['Make', 'make'],
+            ['Model', 'model'],
+          ].map(([label, field]) => (
+            <div key={field} className="filter-field">
+              <label htmlFor={field}>{label}</label>
+              <input
+                id={field}
+                type="text"
+                value={filters[field]}
+                onChange={updateFilter(field)}
+                placeholder={`Search ${label.toLowerCase()}`}
+              />
+            </div>
+          ))}
+
+          <div className="filter-actions">
+            <button className="btn-reset" onClick={resetFilters}>
+              🔄 Reset Filters
+            </button>
+          </div>
+        </div>
       </div>
-    ))}
-
-    <div className="filter-actions">
-      <label>&nbsp;</label>
-      <button className="btn-reset" onClick={resetFilters}>
-        🔄 Reset Filters
-      </button>
-    </div>
-  </div>
-</div>
-
 
       {/* Table Section */}
       <div className="quote-table-container">
-  <div className="quote-table-header">
-    <p>Total Quotes: {total}</p>
-  </div>
-  {renderTableContent()}
-</div>
-
+        <div className="quote-table-header">
+          <p>Manual Quotes Pending Review: {total}</p>
+        </div>
+        {renderTableContent()}
+      </div>
 
       {/* Modals */}
       {modalViewQuote && (

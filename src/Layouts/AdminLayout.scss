@@ -1,59 +1,112 @@
+@import '../styles/base/admin-variables.scss';
+
 .admin-layout {
   display: flex;
   height: 100vh;
+  background: $admin-bg-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $admin-text-primary;
   overflow: hidden;
 
-  // Sidebar on the left for large devices
-  .admin-sidebar {
-    width: 250px;
-    height: 100vh;
-   
-    flex-shrink: 0;
-
-    @media (max-width: 768px) {
-
-      height: 100%;
-    }
+  // Mobile backdrop
+  .admin-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: $admin-z-modal-backdrop;
+    animation: fadeIn $admin-transition-fast;
   }
 
+  // Main content area
   .admin-main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
+    transition: margin-left $admin-transition-base;
+    margin-left: $admin-sidebar-width;
 
-    @media (max-width: 768px) {
-      height: auto;
+    &.sidebar-collapsed {
+      margin-left: $admin-sidebar-collapsed-width;
     }
 
-    .admin-header {
-      height: 60px;
-     
-     
+    @media (max-width: $admin-breakpoint-lg) {
+      margin-left: 0;
+    }
+  }
 
-      @media (min-width: 769px) {
-        width: calc(100% - 250px);
-        margin-left: 250px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
+  // Content wrapper
+  .admin-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: $admin-bg-primary;
+  }
+
+  .admin-content-wrapper {
+    flex: 1;
+    padding: $admin-spacing-xl;
+    overflow-y: auto;
+    background: $admin-bg-primary;
+    
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $admin-bg-secondary;
+      border-radius: $admin-radius-full;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $admin-border;
+      border-radius: $admin-radius-full;
+      
+      &:hover {
+        background: $admin-border-light;
       }
     }
 
-    .admin-content {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-
-      @media (min-width: 769px) {
-
-        margin-top: 60px;
-      }
-
-      @media (max-width: 768px) {
-        margin-top: 1rem;
-      }
+    @media (max-width: $admin-breakpoint-md) {
+      padding: $admin-spacing-lg;
     }
+
+    @media (max-width: $admin-breakpoint-sm) {
+      padding: $admin-spacing-md;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }

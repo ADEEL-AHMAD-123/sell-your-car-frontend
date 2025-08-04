@@ -5,33 +5,65 @@ import AdminHeader from '../components/Admin/AdminHeader/AdminHeader';
 import './AdminLayout.scss';
 
 const AdminLayout = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth <= 768;
+      const mobile = window.innerWidth <= 1024;
       setIsMobile(mobile);
-      setSidebarOpen(!mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+        setSidebarCollapsed(false);
+      } else {
+        setSidebarOpen(true);
+      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(prev => !prev);
+    } else {
+      setSidebarCollapsed(prev => !prev);
+    }
+  };
+
   return (
     <div className="admin-layout">
-      {/* For large: sidebar on left. For small: sidebar under header */}
-      {!isMobile && <AdminSidebar isOpen={sidebarOpen} />}
+      {/* Backdrop for mobile sidebar */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="admin-backdrop" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      <div className="admin-main">
-        <AdminHeader onToggle={() => setSidebarOpen(prev => !prev)} />
+      {/* Sidebar */}
+      <AdminSidebar 
+        isOpen={sidebarOpen} 
+        isCollapsed={sidebarCollapsed}
+        isMobile={isMobile}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        {isMobile && sidebarOpen && <AdminSidebar isOpen={sidebarOpen} />}
-
-        <div className="admin-content">
-          <Outlet />
-        </div>
+      {/* Main Content Area */}
+      <div className={`admin-main ${sidebarCollapsed && !isMobile ? 'sidebar-collapsed' : ''}`}>
+        <AdminHeader 
+          onToggle={toggleSidebar}
+          sidebarCollapsed={sidebarCollapsed}
+          isMobile={isMobile}
+        />
+        
+        <main className="admin-content">
+          <div className="admin-content-wrapper">
+            <Outlet />
+          </div>
+        </main>
       </div>
     </div>
   );

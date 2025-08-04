@@ -1,46 +1,336 @@
-/* src/components/common/ConfirmModal.scss */
-.confirm-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
+// QuoteDetailsModal.scss
+@import '../../../styles/base/admin-variables.scss';
+
+.quote-details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $admin-z-modal;
+  padding: $admin-spacing-md;
+  animation: fadeIn $admin-transition-base;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
-  
-  .confirm-modal {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-  
-    button {
-      margin-left: 1rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 5px;
+
+  .modal-content {
+    background: $admin-bg-card;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-xl;
+    box-shadow: $admin-shadow-xl;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp $admin-transition-base;
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $admin-bg-secondary;
+      border-radius: $admin-radius-sm;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $admin-border-light;
+      border-radius: $admin-radius-sm;
+      
+      &:hover {
+        background: $admin-text-muted;
+      }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: $admin-spacing-lg;
+      right: $admin-spacing-lg;
+      background: $admin-bg-hover;
+      border: 1px solid $admin-border;
+      color: $admin-text-secondary;
+      width: 40px;
+      height: 40px;
+      border-radius: $admin-radius-lg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: $admin-font-size-xl;
       cursor: pointer;
+      transition: all $admin-transition-fast;
+      z-index: 10;
+      
+      &:hover {
+        background: $admin-error;
+        color: white;
+        border-color: $admin-error;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
     }
-  
-    .btn-cancel {
-      background: #ccc;
+
+    h2 {
+      color: $admin-text-primary;
+      font-size: $admin-font-size-2xl;
+      font-weight: 700;
+      margin: 0 0 $admin-spacing-xl 0;
+      padding: $admin-spacing-xl $admin-spacing-xl 0;
+      background: $admin-primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
     }
-  
-    .btn-confirm {
-      background: #28a745;
-      color: white;
+
+    .details-section {
+      padding: 0 $admin-spacing-xl $admin-spacing-xl;
+      
+      &.top-summary {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+        border-radius: $admin-radius-lg;
+        margin: 0 $admin-spacing-xl $admin-spacing-lg;
+        padding: $admin-spacing-lg;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      h3 {
+        color: $admin-primary-light;
+        font-size: $admin-font-size-lg;
+        font-weight: 600;
+        margin: 0 0 $admin-spacing-md 0;
+        padding-bottom: $admin-spacing-sm;
+        border-bottom: 2px solid $admin-border;
+        display: flex;
+        align-items: center;
+        gap: $admin-spacing-sm;
+
+        &::before {
+          content: '';
+          width: 4px;
+          height: 20px;
+          background: $admin-primary-gradient;
+          border-radius: $admin-radius-full;
+        }
+      }
+
+      p {
+        color: $admin-text-secondary;
+        font-size: $admin-font-size-sm;
+        line-height: 1.6;
+        margin: 0 0 $admin-spacing-sm 0;
+        padding: $admin-spacing-sm $admin-spacing-md;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: $admin-radius-md;
+        border-left: 3px solid transparent;
+        transition: all $admin-transition-fast;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-left-color: $admin-primary;
+          transform: translateX(4px);
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        strong {
+          color: $admin-text-primary;
+          font-weight: 600;
+          display: inline-block;
+          min-width: 140px;
+        }
+      }
+    }
+
+    .images-section {
+      padding: 0 $admin-spacing-xl $admin-spacing-xl;
+
+      h3 {
+        color: $admin-primary-light;
+        font-size: $admin-font-size-lg;
+        font-weight: 600;
+        margin: 0 0 $admin-spacing-md 0;
+        padding-bottom: $admin-spacing-sm;
+        border-bottom: 2px solid $admin-border;
+        display: flex;
+        align-items: center;
+        gap: $admin-spacing-sm;
+
+        &::before {
+          content: '';
+          width: 4px;
+          height: 20px;
+          background: $admin-primary-gradient;
+          border-radius: $admin-radius-full;
+        }
+      }
+
+      p {
+        color: $admin-text-muted;
+        font-size: $admin-font-size-sm;
+        font-style: italic;
+        text-align: center;
+        padding: $admin-spacing-xl;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: $admin-radius-lg;
+        border: 2px dashed $admin-border;
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: $admin-spacing-md;
+
+        img {
+          width: 100%;
+          height: 150px;
+          object-fit: cover;
+          border-radius: $admin-radius-lg;
+          border: 2px solid $admin-border;
+          transition: all $admin-transition-base;
+          cursor: pointer;
+
+          &:hover {
+            border-color: $admin-primary;
+            transform: scale(1.05);
+            box-shadow: $admin-shadow-lg;
+          }
+        }
+      }
+    }
+
+    // Responsive design
+    @media (max-width: $admin-breakpoint-md) {
+      margin: $admin-spacing-sm;
+      border-radius: $admin-radius-lg;
+
+      h2 {
+        font-size: $admin-font-size-xl;
+        padding: $admin-spacing-lg $admin-spacing-lg 0;
+      }
+
+      .details-section,
+      .images-section {
+        padding: 0 $admin-spacing-lg $admin-spacing-lg;
+
+        &.top-summary {
+          margin: 0 $admin-spacing-lg $admin-spacing-lg;
+        }
+
+        h3 {
+          font-size: $admin-font-size-base;
+        }
+
+        p strong {
+          min-width: 120px;
+          font-size: $admin-font-size-xs;
+        }
+      }
+
+      .close-btn {
+        width: 36px;
+        height: 36px;
+        font-size: $admin-font-size-lg;
+      }
+
+      .image-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: $admin-spacing-sm;
+
+        img {
+          height: 120px;
+        }
+      }
+    }
+
+    @media (max-width: $admin-breakpoint-sm) {
+      .image-grid {
+        grid-template-columns: 1fr;
+        
+        img {
+          height: 180px;
+        }
+      }
+
+      .details-section p strong {
+        display: block;
+        margin-bottom: $admin-spacing-xs;
+        color: $admin-primary-light;
+      }
     }
   }
-  
+
+  // Loading animation for images
+  .image-grid img {
+    &:not([src]) {
+      background: linear-gradient(90deg, 
+        $admin-bg-secondary 25%, 
+        $admin-bg-hover 50%, 
+        $admin-bg-secondary 75%
+      );
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  // Special styling for specific fields
+  .details-section p {
+    &:has(strong:contains("Manual Quote Reason")) {
+      background: rgba(239, 68, 68, 0.1);
+      border-left-color: $admin-error;
+    }
+
+    &:has(strong:contains("Offered Price")) {
+      background: rgba(16, 185, 129, 0.1);
+      border-left-color: $admin-success;
+      
+      strong + * {
+        color: $admin-success-light;
+        font-weight: 600;
+      }
+    }
+
+    &:has(strong:contains("Revenue Weight")) {
+      background: rgba(59, 130, 246, 0.1);
+      border-left-color: $admin-info;
+    }
+  }
+}

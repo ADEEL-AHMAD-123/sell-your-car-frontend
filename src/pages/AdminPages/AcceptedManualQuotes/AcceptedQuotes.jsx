@@ -41,11 +41,11 @@ const AcceptedQuotes = () => {
       response: acceptedResponse = {},
       loading: acceptedLoading = false,
       error: acceptedError = null,
-    } = {}, // <== default fallback
+    } = {},
     collect: {
       loading: collectLoading = false,
       error: collectError = null,
-    } = {}, // <== default fallback
+    } = {},
   } = useSelector((state) => state.adminQuotes);
 
   const {
@@ -129,6 +129,135 @@ const AcceptedQuotes = () => {
     return parts.length > 0 ? parts.join(' ') : 'N/A';
   };
 
+  const formatPrice = (price) => {
+    return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
+  };
+
+  const formatWeight = (weight) => {
+    return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
+  };
+
+  const getQuoteType = (quote) => {
+    if (quote.isManualQuote) return 'Manual';
+    if (quote.isAutoQuote) return 'Auto';
+    return 'Standard';
+  };
+
+  const renderDesktopTable = () => (
+    <div className="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Reg No</th>
+            <th>Vehicle</th>
+            <th>Client</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Weight</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {quotes.map((quote) => (
+            <tr key={quote._id}>
+              <td title={quote.regNumber || 'N/A'}>
+                {quote.regNumber || 'N/A'}
+              </td>
+              <td title={getVehicleString(quote)}>
+                {getVehicleString(quote)}
+              </td>
+              <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
+                {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
+              </td>
+              <td>
+                <span className={`type-badge ${getQuoteType(quote).toLowerCase()}`}>
+                  {getQuoteType(quote)}
+                </span>
+              </td>
+              <td title={formatPrice(quote.finalPrice)}>
+                {formatPrice(quote.finalPrice)}
+              </td>
+              <td title={formatWeight(quote.revenueWeight)}>
+                {formatWeight(quote.revenueWeight)}
+              </td>
+              <td>
+                <button
+                  className="btn-view"
+                  onClick={() => handleViewDetails(quote)}
+                  aria-label={`View details for ${quote.regNumber || 'quote'}`}
+                >
+                  View
+                </button>
+                {!quote.isCollected && (
+                  <button
+                    className="btn-collected"
+                    onClick={() => handleMarkAsCollected(quote)}
+                    aria-label={`Mark as collected for ${quote.regNumber || 'vehicle'}`}
+                  >
+                    Mark Collected
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderMobileCards = () => (
+    <div className="mobile-cards">
+      {quotes.map((quote) => (
+        <div key={quote._id} className="quote-card">
+          <div className="card-header">
+            <h3 className="card-title">{quote.regNumber || 'N/A'}</h3>
+            <span className={`card-badge ${getQuoteType(quote).toLowerCase()}`}>
+              {getQuoteType(quote)}
+            </span>
+          </div>
+          
+          <div className="card-details">
+            <div className="detail-item">
+              <div className="label">Vehicle</div>
+              <div className="value">{getVehicleString(quote)}</div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Client</div>
+              <div className="value">
+                {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
+              </div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Price</div>
+              <div className="value">{formatPrice(quote.finalPrice)}</div>
+            </div>
+            <div className="detail-item">
+              <div className="label">Weight</div>
+              <div className="value">{formatWeight(quote.revenueWeight)}</div>
+            </div>
+          </div>
+          
+          <div className="card-actions">
+            <button
+              className="btn-view"
+              onClick={() => handleViewDetails(quote)}
+            >
+              View Details
+            </button>
+            {!quote.isCollected && (
+              <button
+                className="btn-collected"
+                onClick={() => handleMarkAsCollected(quote)}
+              >
+                Mark Collected
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderTableContent = () => {
     if (acceptedLoading) {
       return (
@@ -148,59 +277,8 @@ const AcceptedQuotes = () => {
 
     return (
       <>
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Reg No</th>
-                <th>Vehicle</th>
-                <th>Client</th>
-                <th>Reason</th>
-                <th>Collected</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotes.map((quote) => (
-                <tr key={quote._id}>
-                  <td title={quote.regNumber || 'N/A'}>
-                    {quote.regNumber || 'N/A'}
-                  </td>
-                  <td title={getVehicleString(quote)}>
-                    {getVehicleString(quote)}
-                  </td>
-                  <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
-                    {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
-                  </td>
-                  <td title={quote.manualQuoteReason || 'N/A'}>
-                    {quote.manualQuoteReason || 'N/A'}
-                  </td>
-                  <td>
-                    {quote.isCollected ? 'Yes' : 'No'}
-                  </td>
-                  <td>
-                    <button
-                      className="btn-view"
-                      onClick={() => handleViewDetails(quote)}
-                      aria-label={`View details for ${quote.regNumber || 'quote'}`}
-                    >
-                      View
-                    </button>
-                    {!quote.isCollected && (
-                      <button
-                        className="btn-collected"
-                        onClick={() => handleMarkAsCollected(quote)}
-                        aria-label={`Mark as collected for ${quote.regNumber || 'vehicle'}`}
-                      >
-                        Mark as Collected
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {renderDesktopTable()}
+        {renderMobileCards()}
         <div className="pagination-controls">
           <button
             disabled={page <= 1}
@@ -209,7 +287,7 @@ const AcceptedQuotes = () => {
           >
             Previous
           </button>
-          <span>Page {page} of {totalPages}</span>
+          <span className="page-info">Page {page} of {totalPages}</span>
           <button
             disabled={page >= totalPages}
             onClick={() => handlePageChange(page + 1)}
@@ -224,16 +302,21 @@ const AcceptedQuotes = () => {
 
   return (
     <section className="admin-quotes-page">
-      <h1>Accepted Quotes</h1>
+      <div className="page-header">
+        <h1>Accepted Quotes</h1>
+        <p className="page-description">
+          Manage quotes that have been accepted and are ready for collection.
+        </p>
+      </div>
 
-      {/* Info banners similar to manualPage.jsx */}
+      {/* Info banners */}
       <div className="admin-info-banner">
         <div className="admin-info-card highlight-blue">
           <div className="icon">📄</div>
           <div className="content">
             <h3>What Is This Page?</h3>
             <p>
-              Here you’ll see quotes that have been accepted and are ready for collection.
+              Here you'll see quotes that have been accepted by customers and are ready for vehicle collection.
             </p>
           </div>
         </div>
@@ -243,9 +326,9 @@ const AcceptedQuotes = () => {
           <div className="content">
             <h3>What Can You Do?</h3>
             <ul>
-              <li><strong>View:</strong> Inspect quote and vehicle details.</li>
-              <li><strong>Mark as Collected:</strong> Confirm the vehicle has been collected.</li>
-              <li><strong>Filter:</strong> Narrow results by customer, vehicle, or reg number.</li>
+              <li><strong>View:</strong> Inspect quote and vehicle details</li>
+              <li><strong>Mark as Collected:</strong> Confirm vehicle collection</li>
+              <li><strong>Filter:</strong> Search by customer, vehicle, or registration</li>
             </ul>
           </div>
         </div>
@@ -253,10 +336,11 @@ const AcceptedQuotes = () => {
         <div className="admin-info-card highlight-purple">
           <div className="icon">💡</div>
           <div className="content">
-            <h3>Key Terms</h3>
+            <h3>Key Information</h3>
             <ul>
-              <li><strong>Collected:</strong> Whether the vehicle has been collected.</li>
-              <li><strong>Actions:</strong> Confirm collection or view details.</li>
+              <li><strong>Price:</strong> Final agreed price for the vehicle</li>
+              <li><strong>Weight:</strong> Revenue weight in kilograms</li>
+              <li><strong>Type:</strong> Manual or auto-generated quote</li>
             </ul>
           </div>
         </div>
@@ -264,6 +348,12 @@ const AcceptedQuotes = () => {
 
       {/* Filters */}
       <div className="filter-controls">
+        <div className="filter-header">
+          <h3>Search & Filter</h3>
+          <div className="results-count">
+            {total} result{total !== 1 ? 's' : ''}
+          </div>
+        </div>
         <div className="filter-grid">
           {[
             ['Customer Name', 'customerName'],
@@ -285,7 +375,6 @@ const AcceptedQuotes = () => {
             </div>
           ))}
           <div className="filter-actions">
-            <label>&nbsp;</label>
             <button className="btn-reset" onClick={resetFilters}>
               🔄 Reset Filters
             </button>
@@ -296,7 +385,7 @@ const AcceptedQuotes = () => {
       {/* Table */}
       <div className="quote-table-container">
         <div className="quote-table-header">
-          <p>Total Quotes: {total}</p>
+          <p>Total Accepted Quotes: {total}</p>
         </div>
         {renderTableContent()}
       </div>
@@ -306,6 +395,7 @@ const AcceptedQuotes = () => {
         <QuoteDetailsModal
           quote={modalQuote}
           onClose={handleCloseDetailsModal}
+          pageType={"accepted"}
         />
       )}
 

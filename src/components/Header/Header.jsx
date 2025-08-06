@@ -121,7 +121,7 @@ const Header = () => {
       return (
         <div className="header__user-section">
           {user.role === 'admin' ? (
-            <Link to="/admin/dashboard" className="header__dashboard-btn">
+            <Link to="/dashboard" className="header__dashboard-btn">
               <FontAwesomeIcon icon={faTachometerAlt} /> 
               Dashboard
             </Link>
@@ -232,7 +232,7 @@ const Header = () => {
               )}
 
               {user.role === 'admin' && (
-                <Link to="/admin/dashboard" className="header__mobile-dashboard-btn" onClick={closeMobileMenu}>
+                <Link to="/dashboard" className="header__mobile-dashboard-btn" onClick={closeMobileMenu}>
                   <FontAwesomeIcon icon={faTachometerAlt} /> Dashboard
                 </Link>
               )}

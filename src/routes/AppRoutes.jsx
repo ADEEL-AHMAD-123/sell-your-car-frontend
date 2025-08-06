@@ -10,18 +10,17 @@ import FaqsPage from '../pages/FaqsPage/FaqsPage';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
 import QuoteResult from '../pages/QuoteResult/QuoteResult';
-import Dashboard from '../pages/Dashboard/Dashboard';
 import NotFound from '../pages/NotFound/NotFound';
 import ManualValuationPage from '../pages/ManualValuationPage/ManualValuationPage';
-import AdminDashboard from '../pages/AdminPages/AdminDashboard';
-import ManageUsers from '../pages/AdminPages/ManageUsers';
-import ManageQuotes from '../pages/AdminPages/ManageQuotes';
+import AdminDashboard from '../pages/AdminPages/AdminDashboard/AdminDashboard';
+import AdminUserManagement from '../pages/AdminPages/AdminUserManagement/AdminUserManagement';
 import QuoteConfirmation from '../pages/QuoteConfirmation/QuoteConfirmation'
 import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
 import AllManualQuotes from '../pages/AdminPages/AllManualQuotes/AllManualQuotes';
 import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedQuotes';
 import CollectedManualQuotes from '../pages/AdminPages/CollectedManualQuotes/CollectedManualQuotes';
+import AdminAnalyticsPage from '../pages/AdminPages/AdminAnalytics/AdminAnalyticsPage';
 
 const AppRoutes = () => (
   <Routes>
@@ -43,8 +42,8 @@ const AppRoutes = () => (
     {/* Admin routes with Admin Layout */}
     <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route path="/dashboard" element={<AdminDashboard />} />
-      <Route path="/dashboard/users" element={<ManageUsers />} />
-      <Route path="/dashboard/quotes" element={<ManageQuotes />} />
+      <Route path="/dashboard/analytics" element={<AdminAnalyticsPage />} />
+      <Route path="/dashboard/users" element={<AdminUserManagement />} />
       <Route path="/dashboard/manual-quotes" element={<AllManualQuotes />} />
       <Route path="/dashboard/accepted-quotes" element={<AcceptedManualQuotes />} />
       <Route path="/dashboard/collected-quotes" element={<CollectedManualQuotes />} />

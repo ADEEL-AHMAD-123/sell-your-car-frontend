@@ -1,24 +1,26 @@
-import './AdminSidebar.scss';
+import React, { useState } from 'react';
 import {
   FaUsers,
   FaQuoteRight,
   FaHome,
   FaCarCrash,
-  FaCheckCircle,
   FaFileAlt,
   FaEnvelope,
   FaToolbox,
   FaChartBar,
   FaTachometerAlt,
   FaTimes,
-  FaChevronDown
+  FaChevronDown,
+  FaInfoCircle
 } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import './AdminSidebar.scss';
 
 const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
   const { pathname } = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({});
+  const { firstName, lastName, role } = useSelector(state => state.auth.user); // Fetch user data from the Redux state
 
   const isActive = (path) => pathname === path;
   const isParentActive = (paths) => paths.some(path => pathname.startsWith(path));
@@ -29,6 +31,8 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       [menuKey]: !prev[menuKey]
     }));
   };
+
+  const futureFeatureTooltip = "This feature will be implemented in the future.";
 
   const menuItems = [
     {
@@ -49,11 +53,7 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       key: 'users',
       icon: FaUsers,
       label: 'User Management',
-      submenu: [
-        { label: 'All Users', path: '/dashboard/users' },
-        { label: 'Active Users', path: '/dashboard/users/active' },
-        { label: 'Blocked Users', path: '/dashboard/users/blocked' }
-      ]
+      path: '/dashboard/users' // Single path, no submenu
     },
     {
       key: 'quotes',
@@ -70,24 +70,19 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       key: 'vehicles',
       icon: FaCarCrash,
       label: 'Vehicle Management',
-      submenu: [
-        { label: 'All Vehicles', path: '/dashboard/vehicles' },
-        { label: 'Sold Vehicles', path: '/dashboard/vehicles/sold' },
-        { label: 'Pending Collection', path: '/dashboard/vehicles/pending' }
-      ]
+      isFutureFeature: true
     },
     {
       key: 'messages',
       icon: FaEnvelope,
       label: 'Messages',
-      path: '/dashboard/messages',
-      badge: '5'
+      isFutureFeature: true
     },
     {
       key: 'reports',
       icon: FaFileAlt,
       label: 'Reports',
-      path: '/dashboard/reports'
+      isFutureFeature: true
     },
     {
       key: 'settings',
@@ -96,6 +91,8 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       path: '/dashboard/settings'
     }
   ];
+
+  const adminName = `${firstName || 'Admin'} ${lastName || ''}`;
 
   return (
     <>
@@ -167,6 +164,21 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
                       </div>
                     )}
                   </div>
+                ) : item.isFutureFeature ? (
+                  <div
+                    className={`admin-sidebar__link admin-sidebar__future-feature ${isCollapsed ? 'collapsed' : ''}`}
+                    title={futureFeatureTooltip}
+                  >
+                    <div className="admin-sidebar__link-content">
+                      <item.icon className="admin-sidebar__icon" />
+                      {!isCollapsed && (
+                        <>
+                          <span className="admin-sidebar__label">{item.label}</span>
+                          <FaInfoCircle className="admin-sidebar__info-icon" />
+                        </>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   <Link
                     to={item.path}
@@ -205,11 +217,11 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
             <div className="admin-sidebar__footer-content">
               <div className="admin-sidebar__user-info">
                 <div className="admin-sidebar__user-avatar">
-                  <span>JD</span>
+                  <span>{(firstName?.[0] || 'A').toUpperCase()}{(lastName?.[0] || 'D').toUpperCase()}</span>
                 </div>
                 <div className="admin-sidebar__user-details">
-                  <span className="admin-sidebar__user-name">John Doe</span>
-                  <span className="admin-sidebar__user-role">Administrator</span>
+                  <span className="admin-sidebar__user-name">{adminName}</span>
+                  <span className="admin-sidebar__user-role">{role}</span>
                 </div>
               </div>
             </div>

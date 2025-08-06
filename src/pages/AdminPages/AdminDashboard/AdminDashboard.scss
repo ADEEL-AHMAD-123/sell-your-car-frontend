@@ -1,0 +1,693 @@
+// AdminDashboard.scss
+@import '../../../styles/base/admin-variables.scss';
+
+.admin-dashboard {
+  padding: $admin-spacing-xl;
+  min-height: 100vh;
+  background: $admin-bg-primary;
+  
+  // Dashboard Header
+  &__header {
+    margin-bottom: $admin-spacing-2xl;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: $admin-spacing-lg;
+      
+      .title-section {
+        flex: 1;
+        
+        h1 {
+          font-size: $admin-font-size-3xl;
+          font-weight: 800;
+          background: $admin-primary-gradient;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin: 0 0 $admin-spacing-sm 0;
+          line-height: 1.2;
+        }
+        
+        p {
+          color: $admin-text-secondary;
+          font-size: $admin-font-size-lg;
+          margin: 0;
+          max-width: 600px;
+          line-height: 1.6;
+        }
+      }
+      
+      .header-actions {
+        display: flex;
+        gap: $admin-spacing-md;
+        align-items: center;
+        
+        .refresh-btn {
+          padding: $admin-spacing-md $admin-spacing-lg;
+          background: $admin-bg-card;
+          border: 1px solid $admin-border;
+          border-radius: $admin-radius-lg;
+          color: $admin-text-primary;
+          cursor: pointer;
+          transition: all $admin-transition-fast;
+          display: flex;
+          align-items: center;
+          gap: $admin-spacing-sm;
+          font-weight: 500;
+          
+          &:hover {
+            background: $admin-bg-hover;
+            border-color: $admin-primary;
+            transform: translateY(-2px);
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+          }
+          
+          .refresh-icon {
+            transition: transform $admin-transition-base;
+          }
+          
+          &.loading .refresh-icon {
+            animation: spin 1s linear infinite;
+          }
+        }
+        
+        .last-updated {
+          color: $admin-text-muted;
+          font-size: $admin-font-size-sm;
+          display: flex;
+          align-items: center;
+          gap: $admin-spacing-xs;
+        }
+      }
+    }
+    
+    .quick-insights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: $admin-spacing-md;
+      padding: $admin-spacing-lg;
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: $admin-radius-xl;
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      
+      .insight {
+        text-align: center;
+        
+        .insight-value {
+          font-size: $admin-font-size-xl;
+          font-weight: 700;
+          color: $admin-primary-light;
+          margin-bottom: $admin-spacing-xs;
+        }
+        
+        .insight-label {
+          font-size: $admin-font-size-sm;
+          color: $admin-text-secondary;
+        }
+      }
+    }
+  }
+
+  // Loading States
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid $admin-border;
+      border-top: 4px solid $admin-primary;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: $admin-spacing-lg;
+    }
+    
+    .loading-text {
+      color: $admin-text-secondary;
+      font-size: $admin-font-size-lg;
+      font-weight: 500;
+    }
+  }
+
+  &__error {
+    padding: $admin-spacing-xl;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid $admin-error;
+    border-radius: $admin-radius-lg;
+    color: $admin-error-light;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  &__empty {
+    padding: $admin-spacing-2xl;
+    text-align: center;
+    color: $admin-text-muted;
+    font-size: $admin-font-size-lg;
+  }
+
+  // Grid Layouts
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: $admin-spacing-lg;
+    margin-bottom: $admin-spacing-2xl;
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: $admin-spacing-lg;
+    margin-bottom: $admin-spacing-2xl;
+  }
+
+  .full-width-chart {
+    margin-bottom: $admin-spacing-2xl;
+  }
+
+  // Stat Cards
+  .stat-card {
+    background: $admin-bg-card;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-xl;
+    padding: $admin-spacing-lg;
+    position: relative;
+    overflow: hidden;
+    transition: all $admin-transition-base;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $admin-shadow-xl;
+      border-color: $admin-primary;
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: $admin-primary-gradient;
+    }
+    
+    .stat-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: $admin-spacing-lg;
+      
+      .stat-card__icon {
+        width: 56px;
+        height: 56px;
+        background: $admin-primary-gradient;
+        border-radius: $admin-radius-lg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: $admin-font-size-xl;
+        box-shadow: $admin-shadow-md;
+      }
+      
+      .stat-card__trend {
+        padding: $admin-spacing-xs $admin-spacing-sm;
+        border-radius: $admin-radius-md;
+        font-size: $admin-font-size-xs;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: $admin-spacing-xs;
+        
+        &.positive {
+          background: rgba(16, 185, 129, 0.1);
+          color: $admin-success;
+        }
+        
+        &.negative {
+          background: rgba(239, 68, 68, 0.1);
+          color: $admin-error;
+        }
+        
+        &.neutral {
+          background: rgba(59, 130, 246, 0.1);
+          color: $admin-info;
+        }
+      }
+    }
+    
+    .stat-card__content {
+      .stat-card__value {
+        font-size: $admin-font-size-2xl;
+        font-weight: 800;
+        color: $admin-text-primary;
+        margin-bottom: $admin-spacing-xs;
+        display: flex;
+        align-items: baseline;
+        gap: $admin-spacing-xs;
+        
+        .stat-card__unit {
+          font-size: $admin-font-size-lg;
+          font-weight: 500;
+          color: $admin-text-secondary;
+        }
+      }
+      
+      .stat-card__title {
+        font-size: $admin-font-size-lg;
+        font-weight: 600;
+        color: $admin-text-primary;
+        margin-bottom: $admin-spacing-sm;
+      }
+      
+      .stat-card__description {
+        font-size: $admin-font-size-sm;
+        color: $admin-text-secondary;
+        line-height: 1.5;
+      }
+    }
+    
+    // Special styling for revenue card
+    &.revenue-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+      border-color: rgba(16, 185, 129, 0.3);
+      
+      .stat-card__value {
+        color: $admin-success-light;
+      }
+    }
+    
+    // Special styling for conversion cards
+    &.conversion-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+      border-color: rgba(59, 130, 246, 0.3);
+      
+      .stat-card__value {
+        color: $admin-info-light;
+      }
+    }
+  }
+
+  // Chart Cards
+  .chart-card {
+    background: $admin-bg-card;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-xl;
+    padding: $admin-spacing-xl;
+    transition: all $admin-transition-base;
+    overflow: hidden; // Prevent chart overflow
+    
+    &:hover {
+      box-shadow: $admin-shadow-lg;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    
+    .chart-card__header {
+      margin-bottom: $admin-spacing-lg;
+      
+      .chart-card__title {
+        font-size: $admin-font-size-xl;
+        font-weight: 700;
+        color: $admin-text-primary;
+        margin: 0 0 $admin-spacing-sm 0;
+        display: flex;
+        align-items: center;
+        gap: $admin-spacing-sm;
+        
+        &::before {
+          content: '';
+          width: 4px;
+          height: 20px;
+          background: $admin-primary-gradient;
+          border-radius: $admin-radius-full;
+        }
+      }
+      
+      .chart-card__description {
+        font-size: $admin-font-size-sm;
+        color: $admin-text-secondary;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+    
+    .chart-card__content {
+      position: relative;
+      min-height: 200px; // Ensure minimum height
+      overflow: visible; // Allow tooltips to show
+      
+      // Custom chart styling with proper dark theme colors
+      .recharts-wrapper {
+        // Grid lines
+        .recharts-cartesian-grid-horizontal line,
+        .recharts-cartesian-grid-vertical line {
+          stroke: $admin-border !important;
+          stroke-opacity: 0.5 !important;
+        }
+        
+        // All text elements
+        .recharts-text {
+          fill: $admin-text-secondary !important;
+          font-size: $admin-font-size-sm !important;
+          font-family: inherit !important;
+        }
+        
+        // Axis text
+        .recharts-xAxis .recharts-text,
+        .recharts-yAxis .recharts-text {
+          fill: $admin-text-muted !important;
+          font-size: 12px !important;
+        }
+        
+        // Legend text
+        .recharts-legend-wrapper {
+          .recharts-default-legend {
+            .recharts-legend-item {
+              .recharts-legend-item-text {
+                color: $admin-text-secondary !important;
+                fill: $admin-text-secondary !important;
+              }
+            }
+          }
+        }
+        
+        // Bar hover effects
+        .recharts-bar-rectangle {
+          &:hover {
+            opacity: 0.8 !important;
+          }
+        }
+        
+        // Line and area hover effects
+        .recharts-line .recharts-line-curve {
+          &:hover {
+            stroke-width: 4px !important;
+          }
+        }
+        
+        // Pie chart hover effects
+        .recharts-pie-sector {
+          &:hover {
+            opacity: 0.9 !important;
+          }
+        }
+        
+        // Active dot styling
+        .recharts-active-dot {
+          fill: $admin-primary !important;
+          stroke: $admin-bg-card !important;
+          stroke-width: 2px !important;
+        }
+      }
+    }
+    
+    // Full-width chart variant
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+  }
+
+  // Enhanced Custom Tooltip Styling
+  .custom-tooltip {
+    background: $admin-bg-card !important;
+    border: 1px solid $admin-border-light !important;
+    border-radius: $admin-radius-lg !important;
+    padding: $admin-spacing-md !important;
+    box-shadow: $admin-shadow-xl !important;
+    backdrop-filter: blur(10px);
+    min-width: 120px;
+    z-index: 1000;
+    
+    .tooltip-label {
+      font-weight: 600 !important;
+      color: $admin-text-primary !important;
+      margin-bottom: $admin-spacing-xs !important;
+      font-size: $admin-font-size-sm !important;
+      border-bottom: 1px solid $admin-border;
+      padding-bottom: $admin-spacing-xs;
+    }
+    
+    .tooltip-content {
+      color: $admin-text-secondary !important;
+      font-size: $admin-font-size-sm !important;
+      line-height: 1.4;
+      
+      div {
+        margin: 2px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: $admin-spacing-sm;
+      }
+      
+      .tooltip-value {
+        color: $admin-primary-light !important;
+        font-weight: 600 !important;
+        margin-left: auto;
+      }
+      
+      // Color indicators
+      span[style*="color"] {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: $admin-spacing-xs;
+      }
+    }
+  }
+
+  // Section Headers
+  .section-header {
+    margin: $admin-spacing-2xl 0 $admin-spacing-xl 0;
+    
+    h2 {
+      font-size: $admin-font-size-2xl;
+      font-weight: 700;
+      color: $admin-text-primary;
+      margin: 0 0 $admin-spacing-sm 0;
+      display: flex;
+      align-items: center;
+      gap: $admin-spacing-sm;
+      
+      &::before {
+        content: '';
+        width: 6px;
+        height: 30px;
+        background: $admin-primary-gradient;
+        border-radius: $admin-radius-full;
+      }
+    }
+    
+    p {
+      color: $admin-text-secondary;
+      font-size: $admin-font-size-base;
+      margin: 0;
+      line-height: 1.6;
+    }
+  }
+
+  // Animations
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: $admin-breakpoint-xl) {
+    padding: $admin-spacing-lg;
+    
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: $admin-spacing-md;
+    }
+    
+    .charts-grid {
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: $admin-spacing-md;
+    }
+    
+    .chart-card {
+      padding: $admin-spacing-lg;
+      
+      .chart-card__content {
+        .recharts-responsive-container {
+          min-height: 280px !important;
+        }
+      }
+    }
+  }
+
+  @media (max-width: $admin-breakpoint-lg) {
+    &__header {
+      .header-content {
+        flex-direction: column;
+        gap: $admin-spacing-lg;
+        
+        .header-actions {
+          align-self: stretch;
+          justify-content: space-between;
+        }
+      }
+      
+      .quick-insights {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .chart-card {
+      .chart-card__content {
+        overflow-x: auto; // Allow horizontal scroll on smaller screens
+        
+        .recharts-responsive-container {
+          min-width: 320px; // Prevent chart from becoming too narrow
+          min-height: 260px !important;
+        }
+      }
+    }
+  }
+
+  @media (max-width: $admin-breakpoint-md) {
+    padding: $admin-spacing-md;
+    
+    &__header {
+      margin-bottom: $admin-spacing-xl;
+      
+      .title-section h1 {
+        font-size: $admin-font-size-2xl;
+      }
+      
+      .quick-insights {
+        grid-template-columns: repeat(2, 1fr);
+        padding: $admin-spacing-md;
+      }
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+      padding: $admin-spacing-md;
+    }
+    
+    .chart-card {
+      padding: $admin-spacing-md;
+      
+      .chart-card__content {
+        .recharts-responsive-container {
+          min-height: 240px !important;
+        }
+        
+        // Adjust text sizes for mobile
+        .recharts-wrapper {
+          .recharts-text {
+            font-size: 10px !important;
+          }
+          
+          .recharts-xAxis .recharts-text,
+          .recharts-yAxis .recharts-text {
+            font-size: 10px !important;
+          }
+        }
+      }
+    }
+    
+    // Mobile-specific tooltip adjustments
+    .custom-tooltip {
+      max-width: 200px;
+      font-size: $admin-font-size-xs !important;
+      
+      .tooltip-label {
+        font-size: $admin-font-size-xs !important;
+      }
+      
+      .tooltip-content {
+        font-size: $admin-font-size-xs !important;
+      }
+    }
+  }
+
+  @media (max-width: $admin-breakpoint-sm) {
+    padding: $admin-spacing-sm;
+    
+    &__header {
+      .quick-insights {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .chart-card {
+      padding: $admin-spacing-sm;
+      
+      .chart-card__content {
+        .recharts-responsive-container {
+          min-height: 220px !important;
+          min-width: 280px; // Ensure minimum width for readability
+        }
+        
+        // Further adjust for very small screens
+        .recharts-wrapper {
+          .recharts-text {
+            font-size: 9px !important;
+          }
+          
+          .recharts-xAxis .recharts-text,
+          .recharts-yAxis .recharts-text {
+            font-size: 9px !important;
+          }
+          
+          // Hide some labels on very small screens to prevent overlap
+          .recharts-cartesian-axis-tick:nth-child(even) {
+            display: none;
+          }
+        }
+      }
+    }
+    
+    // Very small screen tooltip
+    .custom-tooltip {
+      max-width: 160px;
+      padding: $admin-spacing-sm !important;
+    }
+  }
+}

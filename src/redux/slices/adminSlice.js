@@ -9,84 +9,50 @@ export const fetchAllUsers = createApiAsyncThunk({
   typePrefix: 'admin',
 });
 
-export const fetchPaginatedUsers = createApiAsyncThunk({
-  name: 'fetchPaginatedUsers',
-  method: 'GET',
-  url: '/api/admin/users/paginated',
-  typePrefix: 'admin',
-});
-
-export const searchUsers = createApiAsyncThunk({
-  name: 'searchUsers',
-  method: 'GET',
-  url: (query) => `/api/admin/users/search?query=${query}`,
-  typePrefix: 'admin',
-});
-
 export const updateUser = createApiAsyncThunk({
   name: 'updateUser',
   method: 'PUT',
-  url: (id) => `/api/admin/user/${id}`,
+  url: ({ id }) => `/api/admin/users/${id}`,
   typePrefix: 'admin',
 });
 
 export const deleteUser = createApiAsyncThunk({
   name: 'deleteUser',
   method: 'DELETE',
-  url: (id) => `/api/admin/user/${id}`,
+  url: ({ id }) => `/api/admin/users/${id}`, 
+  typePrefix: 'admin',
+});
+
+// === New Thunk for Refilling Checks ===
+export const refillUserChecks = createApiAsyncThunk({
+  name: 'refillUserChecks',
+  method: 'PATCH', // Use PATCH for partial updates
+  url: ({ id }) => `/api/admin/users/${id}/refill-checks`, 
   typePrefix: 'admin',
 });
 
 // === Quote-related Thunks ===
-export const fetchUserQuotes = createApiAsyncThunk({
-  name: 'fetchUserQuotes',
+export const fetchAnalyticsOverview = createApiAsyncThunk({
+  name: 'fetchAnalyticsOverview',
   method: 'GET',
-  url: (userId) => `/api/admin/quotes/${userId}`,
-  typePrefix: 'admin',
-});
-
-export const fetchAdminStats = createApiAsyncThunk({
-  name: 'fetchAdminStats',
-  method: 'GET',
-  url: '/api/admin/stats',
-  typePrefix: 'admin',
-});
-
-export const fetchDailyQuoteAnalytics = createApiAsyncThunk({
-  name: 'fetchDailyQuoteAnalytics',
-  method: 'GET',
-  url: '/api/admin/analytics/daily-quotes',
-  typePrefix: 'admin',
-});
-
-// === Manual Quote Admin Thunks ===
-export const fetchPendingManualQuotes = createApiAsyncThunk({
-  name: 'fetchPendingManualQuotes',
-  method: 'GET',
-  url: '/api/admin/manual-quotes/pending',
-  typePrefix: 'admin',
-});
-
-export const reviewManualQuote = createApiAsyncThunk({
-  name: 'reviewManualQuote',
-  method: 'PUT',
-  url: (id) => `/api/admin/manual-quotes/review/${id}`,
+  url: '/api/admin/analytics/overview',
   typePrefix: 'admin',
 });
 
 // === Initial State ===
 const initialState = {
   users: [],
-  paginatedUsers: [],
-  userQuotes: [],
+  pagination: { 
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 10,
+  },
   quotes: [],
-  manualQuotes: [],
-  stats: null,
-  analytics: [],
+  analyticsOverview: null, 
   loading: false,
   error: null,
 };
-
 
 // === Utility Handlers ===
 const handlePending = (state) => {
@@ -112,26 +78,14 @@ const adminSlice = createSlice({
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.users = action.payload.data?.users || [];
+        state.pagination.currentPage = action.payload.data?.currentPage || 1;
+        state.pagination.totalPages = action.payload.data?.totalPages || 1;
+        state.pagination.totalUsers = action.payload.data?.totalUsers || 0;
+        state.pagination.limit = action.payload.data?.limit || 10;
       })
       .addCase(fetchAllUsers.rejected, handleRejected)
 
-      // === Paginated Users ===
-      .addCase(fetchPaginatedUsers.pending, handlePending)
-      .addCase(fetchPaginatedUsers.fulfilled, (state, action) => {
-        state.loading = false;
-        state.paginatedUsers = action.payload.data?.users || [];
-      })
-      .addCase(fetchPaginatedUsers.rejected, handleRejected)
-
-      // === Search Users ===
-      .addCase(searchUsers.pending, handlePending)
-      .addCase(searchUsers.fulfilled, (state, action) => {
-        state.loading = false;
-        state.users = action.payload.data?.users || [];
-      })
-      .addCase(searchUsers.rejected, handleRejected)
-
-      // === Update User ===
+      // === Update User (Role, First Name, Last Name) ===
       .addCase(updateUser.pending, handlePending)
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
@@ -151,50 +105,24 @@ const adminSlice = createSlice({
       })
       .addCase(deleteUser.rejected, handleRejected)
 
-      // === User Quotes ===
-      .addCase(fetchUserQuotes.pending, handlePending)
-      .addCase(fetchUserQuotes.fulfilled, (state, action) => {
+      // === Refill User Checks ===
+      .addCase(refillUserChecks.pending, handlePending)
+      .addCase(refillUserChecks.fulfilled, (state, action) => {
         state.loading = false;
-        state.userQuotes = action.payload.data?.quotes || [];
+        const refilledUser = action.payload.data?.user;
+        state.users = state.users.map((u) =>
+          u._id === refilledUser._id ? refilledUser : u
+        );
       })
-      .addCase(fetchUserQuotes.rejected, handleRejected)
+      .addCase(refillUserChecks.rejected, handleRejected)
 
-      // === Admin Stats ===
-      .addCase(fetchAdminStats.pending, handlePending)
-      .addCase(fetchAdminStats.fulfilled, (state, action) => {
+      // === Fetch Analytics Overview ===
+      .addCase(fetchAnalyticsOverview.pending, handlePending)
+      .addCase(fetchAnalyticsOverview.fulfilled, (state, action) => {
         state.loading = false;
-        state.stats = action.payload.data?.stats || null;
+        state.analyticsOverview = action.payload.data || null;
       })
-      .addCase(fetchAdminStats.rejected, handleRejected)
-
-      // === Daily Analytics ===
-      .addCase(fetchDailyQuoteAnalytics.pending, handlePending)
-      .addCase(fetchDailyQuoteAnalytics.fulfilled, (state, action) => {
-        state.loading = false;
-        state.analytics = action.payload.data?.analytics || [];
-      })
-      .addCase(fetchDailyQuoteAnalytics.rejected, handleRejected)
-
-      // === Pending Manual Quotes ===
-      .addCase(fetchPendingManualQuotes.pending, handlePending)
-      .addCase(fetchPendingManualQuotes.fulfilled, (state, action) => {
-        state.loading = false;
-        state.manualQuotes = action.payload.data?.quotes || [];
-      })
-      .addCase(fetchPendingManualQuotes.rejected, handleRejected)
-
-      // === Review Manual Quote ===
-      .addCase(reviewManualQuote.pending, handlePending)
-      .addCase(reviewManualQuote.fulfilled, (state, action) => {
-        state.loading = false;
-        const updated = action.payload.data?.manualQuote;
-        if (updated) {
-          state.manualQuotes = state.manualQuotes.map((quote) =>
-            quote._id === updated._id ? updated : quote
-          );
-        }
-      })
-      .addCase(reviewManualQuote.rejected, handleRejected);
+      .addCase(fetchAnalyticsOverview.rejected, handleRejected);
   },
 });
 

@@ -19,15 +19,14 @@ export const updateUser = createApiAsyncThunk({
 export const deleteUser = createApiAsyncThunk({
   name: 'deleteUser',
   method: 'DELETE',
-  url: ({ id }) => `/api/admin/users/${id}`, 
+  url: ({ id }) => `/api/admin/users/${id}`,
   typePrefix: 'admin',
 });
 
-// === New Thunk for Refilling Checks ===
 export const refillUserChecks = createApiAsyncThunk({
   name: 'refillUserChecks',
-  method: 'PATCH', // Use PATCH for partial updates
-  url: ({ id }) => `/api/admin/users/${id}/refill-checks`, 
+  method: 'PATCH',
+  url: ({ id }) => `/api/admin/users/${id}/refill-checks`,
   typePrefix: 'admin',
 });
 
@@ -39,19 +38,52 @@ export const fetchAnalyticsOverview = createApiAsyncThunk({
   typePrefix: 'admin',
 });
 
+export const fetchAdminSearchedQuotes = createApiAsyncThunk({
+  name: 'fetchAdminSearchedQuotes',
+  method: 'GET',
+  url: '/api/admin/quotes/search',
+  typePrefix: 'admin',
+});
+
+// === NEW: Settings Thunks ===
+export const fetchSettings = createApiAsyncThunk({
+  name: 'fetchSettings',
+  method: 'GET',
+  url: '/api/admin/settings',
+  typePrefix: 'admin',
+});
+
+export const updateSettings = createApiAsyncThunk({
+  name: 'updateSettings',
+  method: 'PUT',
+  url: '/api/admin/settings',
+  typePrefix: 'admin',
+});
+
+
 // === Initial State ===
 const initialState = {
   users: [],
-  pagination: { 
+  pagination: {
     currentPage: 1,
     totalPages: 1,
     totalUsers: 0,
     limit: 10,
   },
   quotes: [],
-  analyticsOverview: null, 
-  loading: false,
-  error: null,
+  analyticsOverview: null,
+  loading: false, 
+  error: null,    
+
+  // === STATE FOR SEARCHED QUOTES ===
+  searchedQuotes: null,
+  searchedQuotesLoading: false,
+  searchedQuotesError: null,
+
+  // === STATE FOR ADMIN SETTINGS ===
+  settings: null,
+  settingsLoading: false,
+  settingsError: null,
 };
 
 // === Utility Handlers ===
@@ -70,7 +102,15 @@ const handleRejected = (state, action) => {
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
-  reducers: {},
+  reducers: {
+    clearAdminSearchedQuotes: (state) => {
+      state.searchedQuotes = null;
+      state.searchedQuotesError = null;
+    },
+    setSettings: (state, action) => {
+      state.settings = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // === All Users ===
@@ -122,8 +162,54 @@ const adminSlice = createSlice({
         state.loading = false;
         state.analyticsOverview = action.payload.data || null;
       })
-      .addCase(fetchAnalyticsOverview.rejected, handleRejected);
+      .addCase(fetchAnalyticsOverview.rejected, handleRejected)
+
+      // === fetchAdminSearchedQuotes ===
+      .addCase(fetchAdminSearchedQuotes.pending, (state) => {
+        state.searchedQuotesLoading = true;
+        state.searchedQuotesError = null;
+        state.searchedQuotes = null;
+      })
+      .addCase(fetchAdminSearchedQuotes.fulfilled, (state, action) => {
+        state.searchedQuotesLoading = false;
+        state.searchedQuotes = action.payload.data?.quotes || [];
+      })
+      .addCase(fetchAdminSearchedQuotes.rejected, (state, action) => {
+        state.searchedQuotesLoading = false;
+        state.searchedQuotesError = action.payload?.message || "Failed to fetch quotes.";
+        state.searchedQuotes = null;
+      })
+
+      // === NEW: fetchSettings ===
+      .addCase(fetchSettings.pending, (state) => {
+        state.settingsLoading = true;
+        state.settingsError = null;
+      })
+      .addCase(fetchSettings.fulfilled, (state, action) => {
+        state.settingsLoading = false;
+        state.settings = action.payload.data;
+      })
+      .addCase(fetchSettings.rejected, (state, action) => {
+        state.settingsLoading = false;
+        state.settingsError = action.payload?.message || "Failed to fetch settings.";
+      })
+
+      // === NEW: updateSettings ===
+      .addCase(updateSettings.pending, (state) => {
+        state.settingsLoading = true;
+        state.settingsError = null;
+      })
+      .addCase(updateSettings.fulfilled, (state, action) => {
+        state.settingsLoading = false;
+        state.settings = action.payload.data; 
+      })
+      .addCase(updateSettings.rejected, (state, action) => {
+        state.settingsLoading = false;
+        state.settingsError = action.payload?.message || "Failed to update settings.";
+      });
   },
 });
+
+export const { clearAdminSearchedQuotes, setSettings } = adminSlice.actions;
 
 export default adminSlice.reducer;

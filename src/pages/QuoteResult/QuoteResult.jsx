@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -16,32 +15,91 @@ const QuoteResult = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [checked, setChecked] = useState(false);
-  const [allowed, setAllowed] = useState(false);
 
   const { quote, quoteStatus, confirmLoading, confirmError, confirmStatus } = useSelector(
     (state) => state.quote
   );
 
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pickupDate, setPickupDate] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [address, setAddress] = useState("");
+  const [hasAccess, setHasAccess] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
-  const hasPrice = !!quote?.estimatedScrapPrice;
-  const isManualReviewed = quoteStatus === "manual_reviewed";
-  const hasAdminOfferPrice = !!quote?.adminOfferPrice;
+  // Centralized state for all full-screen messages, now including a 'type'
+  const [messageCardState, setMessageCardState] = useState({
+    isVisible: false,
+    title: '',
+    message: '',
+    buttons: null,
+    type: 'error', // Default to error as all full-screen messages in this component are errors
+  });
 
-  // Reset confirmStatus only when modal opens
+  const [collectionDetails, setCollectionDetails] = useState({
+    pickupDate: "",
+    contactNumber: "",
+    address: "",
+  });
+
+  // Check if the user is coming from the quote flow using location state.
+  useEffect(() => {
+    const fromQuote = location.state?.fromQuote;
+    if (fromQuote && quote) {
+      setHasAccess(true);
+    } else {
+      setHasAccess(false);
+      setMessageCardState({
+        isVisible: true,
+        title: "Access Denied",
+        message: "You can't access the quote result page directly. Please go through the quote process first.",
+        buttons: [
+          { label: "Go to Home", onClick: () => navigate("/") },
+        ],
+        type: 'error',
+      });
+    }
+  }, [location.state, navigate, quote]);
+
+  // Handle successful confirmation and navigate to the confirmation page
+  useEffect(() => {
+    if (confirmStatus === "succeeded") {
+      const confirmationData = {
+        quote,
+        collectionDetails,
+      };
+
+      navigate("/quote-confirmation", {
+        state: { confirmationData },
+        replace: true,
+      });
+
+      // Reset the status to prevent re-navigation
+      dispatch(resetConfirmStatus());
+    }
+  }, [confirmStatus, navigate, dispatch, quote, collectionDetails]);
+
+  // Handle Redux state errors
+  useEffect(() => {
+    if (confirmError) {
+      setMessageCardState({
+        isVisible: true,
+        title: "Submission Failed",
+        message: confirmError,
+        buttons: [
+          { label: "Try Again", onClick: () => setMessageCardState(prev => ({ ...prev, isVisible: false })) },
+        ],
+        type: 'error',
+      });
+    }
+  }, [confirmError]);
+
   const handleOpenModal = () => {
     dispatch(resetConfirmStatus());
     setFormErrors({});
-    setShowConfirm(true);
+    setShowConfirmModal(true);
   };
-  
+
+  // Manage body scroll when modal is open
   useEffect(() => {
-    if (showConfirm) {
+    if (showConfirmModal) {
       document.body.classList.add('modal-open');
     } else {
       document.body.classList.remove('modal-open');
@@ -50,82 +108,22 @@ const QuoteResult = () => {
     return () => {
       document.body.classList.remove('modal-open');
     };
-  }, [showConfirm]);
-  
-  const trimmedData = {
-    pickupDate,
-    contactNumber: contactNumber.trim(),
-    address: address.trim(),
-  };
-  
-  useEffect(() => {
-    const fromQuote = location.state?.fromQuote;
-    const allow = sessionStorage.getItem("allowQuoteResultPage");
-
-    const navEntry = performance.getEntriesByType("navigation")[0];
-    const isReload = navEntry?.type === "reload";
-
-    if (fromQuote) {
-      // User is redirected from /quote — store a flag
-      sessionStorage.setItem("allowQuoteResultPage", "true");
-      sessionStorage.setItem("allowTime", Date.now().toString());
-      setAllowed(true);
-    } else if (allow === "true" && isReload) {
-      // Allow access on reload only if redirected earlier
-      setAllowed(true);
-    } else {
-      // Otherwise block (e.g., from back/forward)
-      setAllowed(false);
-    }
-
-    setChecked(true);
-  }, [location.state]);
-
-  useEffect(() => {
-    if (confirmStatus === "succeeded") {
-      const confirmationData = {
-        quote,
-        collectionDetails: {
-          pickupDate,
-          contactNumber,
-          address,
-        },
-      };
-
-      navigate("/quote-confirmation", {
-        state: { confirmationData },
-        replace: true,
-      });
-
-      setTimeout(() => {
-        dispatch(resetConfirmStatus());
-      }, 100);
-    }
-  }, [
-    confirmStatus,
-    navigate,
-    dispatch,
-    quote,
-    pickupDate,
-    contactNumber,
-    address,
-  ]);
+  }, [showConfirmModal]);
 
   const validateForm = () => {
     const errors = {};
     const today = new Date();
-    const minDate = new Date();
-    minDate.setDate(today.getDate() + 2);
+    const minDate = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000); // 2 days from today
     minDate.setHours(0, 0, 0, 0);
   
-    const trimmedPhone = contactNumber.trim();
-    const trimmedAddress = address.trim();
+    const trimmedPhone = collectionDetails.contactNumber.trim();
+    const trimmedAddress = collectionDetails.address.trim();
   
     // Validate pickup date
-    if (!pickupDate) {
+    if (!collectionDetails.pickupDate) {
       errors.pickupDate = "Please select a collection date.";
     } else {
-      const selectedDate = new Date(pickupDate);
+      const selectedDate = new Date(collectionDetails.pickupDate);
       if (isNaN(selectedDate.getTime())) {
         errors.pickupDate = "Invalid date format.";
       } else if (selectedDate < minDate) {
@@ -133,8 +131,8 @@ const QuoteResult = () => {
       }
     }
   
-    // Validate contact number with regex
-    const phoneRegex = /^[+]?[\d\s()-]{7,20}$/;
+    // Validate contact number
+    const phoneRegex = /^\+?[\d\s()-]{7,20}$/;
     if (!trimmedPhone) {
       errors.contactNumber = "Contact number is required.";
     } else if (!phoneRegex.test(trimmedPhone)) {
@@ -148,53 +146,46 @@ const QuoteResult = () => {
       errors.address = "Address is too short.";
     }
   
-    // Show general error if any field fails
-    if (Object.keys(errors).length > 0) {
-      errors.general = "Please correct the highlighted fields.";
-    }
-  
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
+
   const handleConfirm = async () => {
     if (!quote?._id) {
-      setFormErrors({ general: "Invalid quote ID" });
+      setMessageCardState({
+        isVisible: true,
+        title: "Invalid Quote",
+        message: "The quote ID is missing. Please try getting a new quote.",
+        buttons: [{ label: "Go to Home", onClick: () => navigate("/") }],
+        type: 'error',
+      });
       return;
     }
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return; 
+    }
 
     try {
-      const result = await dispatch(
+      await dispatch(
         confirmQuote({
           id: quote._id,
-          data: { pickupDate, contactNumber, address },
+          data: collectionDetails,
         })
       ).unwrap();
-
-      console.log("Confirm successful:", result);
     } catch (err) {
       console.error("Confirm failed:", err);
+      // The useEffect hook above will handle setting the message card state
+      // with the confirmError from the Redux state.
     }
   };
-
+  
+  // Handle case where quote data is missing
   if (!quote) {
     return (
-      <div className="quote-result no-data">
-        <p>No quote data found. Please go back and enter your details again.</p>
-        <Link to="/" className="back-link">
-          ← Go Back
-        </Link>
-      </div>
-    );
-  }
-
-  if (checked && !allowed) {
-    return (
       <MessageCard
-        title="Access Denied"
-        message="You can't access the quote result page directly."
+        title="No Quote Data Found"
+        message="Please go back and enter your details again to get a quote."
         buttons={[
           {
             label: "Go Back",
@@ -205,9 +196,78 @@ const QuoteResult = () => {
             onClick: () => navigate("/"),
           },
         ]}
+        type="error"
       />
     );
   }
+
+  // Handle all other full-screen messages from the centralized state
+  if (messageCardState.isVisible) {
+    return (
+      <MessageCard
+        title={messageCardState.title}
+        message={messageCardState.message}
+        buttons={messageCardState.buttons}
+        type={messageCardState.type}
+      />
+    );
+  }
+  
+  const hasPrice = !!quote?.estimatedScrapPrice;
+  const isManualReviewed = quoteStatus === "manual_reviewed";
+  const hasAdminOfferPrice = !!quote?.adminOfferPrice;
+
+  const renderManualOptions = () => (
+    <div className="manual-options">
+      <h4>{hasPrice ? "Think your vehicle is worth more?" : "We couldn't calculate a price automatically"}</h4>
+      <p>{hasPrice
+        ? "You can request a custom valuation or contact our team."
+        : "You can still continue by selecting one of the following options:"}</p>
+      <div className="option-buttons">
+        <Link
+          to="/manual-valuation"
+          state={{
+            reason: hasPrice ? "value-higher" : "no-auto-price",
+            regNumber: quote?.regNumber,
+            make: quote?.make,
+            model: quote?.model,
+            fuelType: quote?.fuelType,
+            wheelPlan: quote?.wheelPlan,
+            colour: quote?.colour,
+            fromQuote: true,
+            year: quote?.year,
+            weight: quote?.revenueWeight
+          }}
+          className="option-card"
+        >
+          <span className="emoji">🛠️</span>
+          <div>
+            <strong>Request a Manual Valuation</strong>
+            <p>Let us review your vehicle details manually.</p>
+          </div>
+        </Link>
+        <Link to="/contact" className="option-card">
+          <span className="emoji">📬</span>
+          <div>
+            <strong>Contact Us</strong>
+            <p>Speak to our team about your vehicle or this offer.</p>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+
+  const renderAcceptButton = () => (
+    <div className="accept-offer">
+      <button
+        onClick={handleOpenModal}
+        className="accept-btn"
+        disabled={confirmLoading}
+      >
+        ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
+      </button>
+    </div>
+  );
 
   return (
     <section className="quote-result">
@@ -225,90 +285,32 @@ const QuoteResult = () => {
           <div>
             <span>{isManualReviewed && hasAdminOfferPrice ? "Admin Offered Price" : "Estimated Price"}</span>
             <strong className="price">
-              {isManualReviewed && hasAdminOfferPrice 
-                ? `£${quote.adminOfferPrice}` 
-                : hasPrice 
-                ? `£${quote.estimatedScrapPrice}` 
+              {isManualReviewed && hasAdminOfferPrice
+                ? `£${quote.adminOfferPrice}`
+                : hasPrice
+                ? `£${quote.estimatedScrapPrice}`
                 : "Unavailable"
               }
             </strong>
           </div>
         </div>
 
-        {/* Manual Reviewed Case - Show Accept button only, hide manual options */}
         {isManualReviewed ? (
           hasAdminOfferPrice ? (
             <>
               <div className="manual-options">
                 <h4>✅ Manual Valuation Complete</h4>
                 <p>
-                  Great news! You requested a manual valuation on{' '}
-                  <strong>
-                    {quote?.createdAt 
-                      ? new Date(quote.createdAt).toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })
-                      : 'N/A'
-                    }
-                  </strong>
-                  {quote?.reviewedAt && (
-                    <span>
-                      , and our team completed the review on{' '}
-                      <strong>
-                        {new Date(quote.reviewedAt).toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </strong>
-                    </span>
-                  )}
-                  . Based on our detailed assessment, we're pleased to offer you the price shown above.
+                  Great news! Our team has completed the manual review of your vehicle and is pleased to offer you the price shown above.
                 </p>
-               
               </div>
-              
-              <div className="accept-offer">
-                <button
-                  onClick={handleOpenModal}
-                  className="accept-btn"
-                  disabled={confirmLoading}
-                >
-                  ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
-                </button>
-              </div>
+              {renderAcceptButton()}
             </>
           ) : (
             <div className="manual-options">
               <h4>Manual Review Completed</h4>
               <p>
-                Your manual valuation request from{' '}
-                <strong>
-                  {quote?.createdAt 
-                    ? new Date(quote.createdAt).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })
-                    : 'N/A'
-                  }
-                </strong>
-                {' '}has been reviewed by our team
-                {quote?.reviewedAt && (
-                  <span>
-                    {' '}on{' '}
-                    <strong>
-                      {new Date(quote.reviewedAt).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </strong>
-                  </span>
-                )}
-                . Please contact us for further details about your valuation.
+                Your manual valuation request has been reviewed by our team. Please contact us for further details.
               </p>
               {quote?.adminMessage && (
                 <div className="admin-message">
@@ -327,103 +329,13 @@ const QuoteResult = () => {
             </div>
           )
         ) : (
-          /* Original logic for non-manual reviewed quotes */
-          quote?.status !== 'manual_reviewed' && (
-            hasPrice ? (
-              <>
-                <div className="manual-options">
-                  <h4>{hasPrice ? "Think your vehicle is worth more?" : "We couldn't calculate a price automatically"}</h4>
-                  <p>{hasPrice
-                    ? "You can request a custom valuation or contact our team."
-                    : "You can still continue by selecting one of the following options:"}</p>
-
-                  <div className="option-buttons">
-                    <Link
-                      to="/manual-valuation"
-                      state={{
-                        reason: hasPrice ? "value-higher" : "no-auto-price",
-                        regNumber: quote?.regNumber,
-                        make: quote?.make,
-                        model: quote?.model,
-                        fuelType: quote?.fuelType,
-                        wheelPlan: quote?.wheelPlan,
-                        colour: quote?.colour,
-                        fromQuote: true,
-                        year: quote?.year,
-                        weight: quote?.revenueWeight
-                      }}
-                      className="option-card"
-                      onClick={() => {
-                        sessionStorage.setItem("allowManualPage", "true");
-                      }}
-                    >
-                      <span className="emoji">🛠️</span>
-                      <div>
-                        <strong>Request a Manual Valuation</strong>
-                        <p>Let us review your vehicle details manually.</p>
-                      </div>
-                    </Link>
-
-                    <Link to="/contact" className="option-card">
-                      <span className="emoji">📬</span>
-                      <div>
-                        <strong>Contact Us</strong>
-                        <p>Speak to our team about your vehicle or this offer.</p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="accept-offer">
-                  <button
-                    onClick={handleOpenModal}
-                    className="accept-btn"
-                    disabled={confirmLoading}
-                  >
-                    ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="manual-options">
-                <h4>We couldn't calculate a price automatically</h4>
-                <p>You can still continue by selecting one of the following:</p>
-                <div className="option-buttons">
-                  <Link
-                    to="/manual-valuation"
-                    state={{
-                      reason: "no-auto-price",
-                      regNumber: quote?.regNumber,
-                      make: quote?.make,
-                      model: quote?.model,
-                      fuelType: quote?.fuelType,
-                      wheelPlan: quote?.wheelPlan,
-                      colour: quote?.colour,
-                      fromQuote: true,
-                      year: quote?.year
-                    }}
-                    className="option-card"
-                    onClick={() => {
-                      sessionStorage.setItem("allowManualPage", "true");
-                    }}
-                  >
-                    <span className="emoji">📞</span>
-                    <div>
-                      <strong>Request a Manual Valuation</strong>
-                      <p>Let our team assess your vehicle details manually.</p>
-                    </div>
-                  </Link>
-
-                  <Link to="/contact" className="option-card">
-                    <span className="emoji">📬</span>
-                    <div>
-                      <strong>Contact Us</strong>
-                      <p>Speak to our team about your vehicle or this offer.</p>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-            )
+          hasPrice ? (
+            <>
+              {renderManualOptions()}
+              {renderAcceptButton()}
+            </>
+          ) : (
+            renderManualOptions()
           )
         )}
       </div>
@@ -475,33 +387,26 @@ const QuoteResult = () => {
       </Link>
 
       {/* Confirm + Collection Modal */}
-      {showConfirm && (
+      {showConfirmModal && (
         <div className="confirm-modal-overlay">
           <div className="confirm-modal-card">
             <h3>Confirm Quote & Collection</h3>
             <p>
               You are accepting the offer of{" "}
               <strong>
-                £{isManualReviewed && hasAdminOfferPrice 
-                  ? quote.adminOfferPrice 
+                £{isManualReviewed && hasAdminOfferPrice
+                  ? quote.adminOfferPrice
                   : quote?.estimatedScrapPrice || "0"}
               </strong>.
             </p>
-
-            {formErrors.general && (
-              <div className="error-text">❌ {formErrors.general}</div>
-            )}
-            {confirmError && (
-              <div className="error-text">❌ {confirmError}</div>
-            )}
 
             <div className="form">
               <label>
                 Available From <small>(Earliest Collection Date)</small>
                 <input
                   type="date"
-                  value={pickupDate}
-                  onChange={(e) => setPickupDate(e.target.value)}
+                  value={collectionDetails.pickupDate}
+                  onChange={(e) => setCollectionDetails(prev => ({ ...prev, pickupDate: e.target.value }))}
                   min={
                     new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
                       .toISOString()
@@ -522,8 +427,8 @@ const QuoteResult = () => {
                 Contact Number
                 <PhoneInput
                   country={'gb'}
-                  value={contactNumber}
-                  onChange={(value) => setContactNumber(value)}
+                  value={collectionDetails.contactNumber}
+                  onChange={(value) => setCollectionDetails(prev => ({ ...prev, contactNumber: value }))}
                   inputProps={{
                     name: 'phone',
                     required: true,
@@ -547,8 +452,8 @@ const QuoteResult = () => {
               <label>
                 Collection Address
                 <textarea
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  value={collectionDetails.address}
+                  onChange={(e) => setCollectionDetails(prev => ({ ...prev, address: e.target.value }))}
                   rows={3}
                   disabled={confirmLoading}
                   className={formErrors.address ? "field-error-border" : ""}
@@ -569,7 +474,7 @@ const QuoteResult = () => {
               </button>
               <button
                 className="no"
-                onClick={() => setShowConfirm(false)}
+                onClick={() => setShowConfirmModal(false)}
                 disabled={confirmLoading}
               >
                 Cancel

@@ -5,7 +5,6 @@ import {
   faUserCircle,
   faBars,
   faTimes,
-  faCar,
   faInfoCircle,
   faCheckCircle,
   faTachometerAlt // For dashboard icon
@@ -18,6 +17,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import Logo from '../../components/common/Logo/Logo';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -89,10 +89,10 @@ const Header = () => {
           These checks are limited and allow you to get quotes for new vehicle registration numbers.
         </li>
         <li className="header__tooltip-feature">
-          A check is used only when you search for a vehicle you haven’t searched before.
+          A check is used only when you search for a vehicle you haven't searched before.
         </li>
         <li className="header__tooltip-feature">
-          If you recheck a vehicle you’ve already searched recently, your check will not decrease.
+          If you recheck a vehicle you've already searched recently, your check will not decrease.
         </li>
         <li className="header__tooltip-feature">
           Each check provides detailed vehicle information used to calculate your quote instantly.
@@ -153,24 +153,15 @@ const Header = () => {
         <div className="header__container">
           <div className="header__content">
             {/* Logo */}
-            <div className="header__logo">
-              <Link to="/" className="header__logo-link">
-                <div className="header__logo-icon">
-                  <FontAwesomeIcon icon={faCar} />
-                </div>
-                <div className="header__logo-text">
-                  <span className="header__logo-main">SellYourCar</span>
-                  <span className="header__logo-tagline">Quick • Fair • Trusted</span>
-                </div>
-              </Link>
-            </div>
+            <Logo className="header__logo" />
 
             {/* Desktop Navigation */}
             <nav className="header__nav">
               <ul className="header__nav-list">
                 <li><Link to="/" className={`header__nav-link ${isActiveLink('/') ? 'header__nav-link--active' : ''}`}>Home</Link></li>
+                <li><Link to="/about" className={`header__nav-link ${isActiveLink('/about') ? 'header__nav-link--active' : ''}`}>About</Link></li>
                 <li><Link to="/how-it-works" className={`header__nav-link ${isActiveLink('/how-it-works') ? 'header__nav-link--active' : ''}`}>How It Works</Link></li>
-                <li><Link to="/instant-quote" className={`header__nav-link ${isActiveLink('/instant-quote') ? 'header__nav-link--active' : ''}`}>Get Quote</Link></li>
+                
                 <li><Link to="/faqs" className={`header__nav-link ${isActiveLink('/faqs') ? 'header__nav-link--active' : ''}`}>FAQs</Link></li>
                 <li><Link to="/contact" className={`header__nav-link ${isActiveLink('/contact') ? 'header__nav-link--active' : ''}`}>Contact</Link></li>
               </ul>
@@ -252,8 +243,8 @@ const Header = () => {
           <nav className="header__mobile-nav">
             <ul className="header__mobile-nav-list">
               <li><Link to="/" className={`header__mobile-nav-link ${isActiveLink('/') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>Home</Link></li>
+              <li><Link to="/about" className={`header__mobile-nav-link ${isActiveLink('/about') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>About</Link></li>
               <li><Link to="/how-it-works" className={`header__mobile-nav-link ${isActiveLink('/how-it-works') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>How It Works</Link></li>
-              <li><Link to="/instant-quote" className={`header__mobile-nav-link ${isActiveLink('/instant-quote') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>Get Quote</Link></li>
               <li><Link to="/faqs" className={`header__mobile-nav-link ${isActiveLink('/faqs') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>FAQs</Link></li>
               <li><Link to="/contact" className={`header__mobile-nav-link ${isActiveLink('/contact') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>Contact</Link></li>
             </ul>

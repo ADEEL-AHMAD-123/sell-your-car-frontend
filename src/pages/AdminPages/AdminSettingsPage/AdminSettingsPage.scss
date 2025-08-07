@@ -1,0 +1,307 @@
+// AdminSettingsPage.scss
+@import '../../../styles/base/admin-variables.scss';
+
+.admin-settings-page {
+  min-height: 100vh;
+  background: $admin-bg-primary;
+  color: $admin-text-primary;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: $admin-spacing-xl;
+
+  @media (max-width: $admin-breakpoint-lg) {
+    padding: $admin-spacing-lg;
+  }
+
+  @media (max-width: $admin-breakpoint-sm) {
+    padding: $admin-spacing-md;
+  }
+
+  .settings-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  // Header Section
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: between;
+    border-bottom: 1px solid $admin-border;
+    padding-bottom: $admin-spacing-lg;
+    margin-bottom: $admin-spacing-xl;
+
+    @media (max-width: $admin-breakpoint-sm) {
+      flex-direction: column;
+      gap: $admin-spacing-md;
+    }
+  }
+
+  .settings-title {
+    font-size: $admin-font-size-3xl;
+    font-weight: 700;
+    background: $admin-primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-md;
+    flex: 1;
+
+    svg {
+      color: $admin-primary;
+      -webkit-text-fill-color: $admin-primary;
+      font-size: $admin-font-size-2xl;
+    }
+
+    @media (max-width: $admin-breakpoint-md) {
+      font-size: $admin-font-size-2xl;
+    }
+  }
+
+  .refresh-button {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+    padding: $admin-spacing-sm $admin-spacing-lg;
+    background: $admin-bg-secondary;
+    border: 2px solid $admin-border;
+    border-radius: $admin-radius-md;
+    color: $admin-text-secondary;
+    font-size: $admin-font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $admin-transition-base;
+
+    &:hover:not(:disabled) {
+      background: $admin-bg-tertiary;
+      color: $admin-text-primary;
+      border-color: $admin-border-light;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Status Messages
+  .status-message {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+    padding: $admin-spacing-lg;
+    border-radius: $admin-radius-lg;
+    margin-bottom: $admin-spacing-xl;
+    font-weight: 500;
+
+    &--loading {
+      background: rgba($admin-primary, 0.1);
+      border: 1px solid rgba($admin-primary, 0.2);
+      color: $admin-primary-light;
+    }
+
+    &--error {
+      background: rgba($admin-error, 0.1);
+      border: 1px solid rgba($admin-error, 0.2);
+      color: $admin-error-light;
+    }
+
+    &--success {
+      background: rgba($admin-success, 0.1);
+      border: 1px solid rgba($admin-success, 0.2);
+      color: $admin-success-light;
+    }
+  }
+
+  // Settings Grid
+  .settings-grid {
+    display: grid;
+    gap: $admin-spacing-xl;
+  }
+
+  // Individual Setting Cards
+  .setting-card {
+    background: $admin-bg-card;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-lg;
+    padding: $admin-spacing-xl;
+    position: relative;
+    overflow: hidden;
+    transition: all $admin-transition-base;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: $admin-primary-gradient;
+      opacity: 0;
+      transition: opacity $admin-transition-base;
+    }
+
+    &:hover {
+      border-color: $admin-primary-light;
+      box-shadow: $admin-shadow-lg;
+
+      &::before {
+        opacity: 1;
+      }
+    }
+  }
+
+  .setting-content {
+    display: flex;
+    gap: $admin-spacing-xl;
+    align-items: flex-start;
+
+    @media (max-width: $admin-breakpoint-md) {
+      flex-direction: column;
+      gap: $admin-spacing-lg;
+    }
+  }
+
+  .setting-main {
+    flex: 1;
+  }
+
+  .setting-label {
+    display: block;
+    font-size: $admin-font-size-xl;
+    font-weight: 600;
+    color: $admin-text-primary;
+    margin-bottom: $admin-spacing-lg;
+  }
+
+  .setting-description {
+    margin-bottom: $admin-spacing-lg;
+    
+    .description-item {
+      background: $admin-bg-secondary;
+      border-left: 4px solid $admin-primary;
+      padding: $admin-spacing-md;
+      margin-bottom: $admin-spacing-sm;
+      border-radius: 0 $admin-radius-sm $admin-radius-sm 0;
+      font-size: $admin-font-size-sm;
+      line-height: 1.5;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: $admin-text-primary;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .setting-input {
+    width: 100%;
+    padding: $admin-spacing-md;
+    background: $admin-bg-secondary;
+    border: 2px solid $admin-border;
+    border-radius: $admin-radius-md;
+    color: $admin-text-primary;
+    font-size: $admin-font-size-base;
+    transition: all $admin-transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $admin-primary;
+      box-shadow: 0 0 0 3px rgba($admin-primary, 0.1);
+    }
+
+    &:hover {
+      border-color: $admin-border-light;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .setting-action {
+    display: flex;
+    align-items: flex-end;
+    
+    @media (max-width: $admin-breakpoint-md) {
+      align-items: flex-start;
+    }
+  }
+
+  .save-button {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+    padding: $admin-spacing-md $admin-spacing-xl;
+    background: $admin-primary;
+    border: 2px solid $admin-primary;
+    border-radius: $admin-radius-md;
+    color: white;
+    font-size: $admin-font-size-base;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $admin-transition-base;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: $admin-primary-light;
+      border-color: $admin-primary-light;
+      transform: translateY(-2px);
+      box-shadow: $admin-shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @media (max-width: $admin-breakpoint-md) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  // Field Messages
+  .field-message {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+    margin-top: $admin-spacing-sm;
+    padding: $admin-spacing-sm;
+    border-radius: $admin-radius-sm;
+    font-size: $admin-font-size-sm;
+    font-weight: 500;
+
+    &--error {
+      background: rgba($admin-error, 0.1);
+      border: 1px solid rgba($admin-error, 0.2);
+      color: $admin-error-light;
+    }
+
+    &--success {
+      background: rgba($admin-success, 0.1);
+      border: 1px solid rgba($admin-success, 0.2);
+      color: $admin-success-light;
+    }
+  }
+
+  // Animations
+  .spinning {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

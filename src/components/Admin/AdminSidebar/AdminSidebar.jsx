@@ -14,7 +14,7 @@ import {
   FaInfoCircle
 } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux state
+import { useSelector } from 'react-redux';
 import './AdminSidebar.scss';
 
 const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
@@ -53,7 +53,7 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       key: 'users',
       icon: FaUsers,
       label: 'User Management',
-      path: '/dashboard/users' // Single path, no submenu
+      path: '/dashboard/users' 
     },
     {
       key: 'quotes',

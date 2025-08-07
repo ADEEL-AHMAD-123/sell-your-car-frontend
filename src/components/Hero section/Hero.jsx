@@ -12,12 +12,19 @@ const HeroSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [quoteMessage, setQuoteMessage] = useState('');
+  const [messageCardState, setMessageCardState] = useState({
+    isVisible: false,
+    title: '',
+    message: '',
+    type: 'info',
+    buttons: [],
+  });
+
   const { isLoading, error } = useSelector((state) => state.quote);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const handleCloseMessage = () => {
-    setQuoteMessage('');
+    setMessageCardState(prev => ({ ...prev, isVisible: false }));
     dispatch(resetQuote());
   };
 
@@ -37,7 +44,8 @@ const HeroSection = () => {
         return;
       }
 
-      setQuoteMessage('');
+      setMessageCardState(prev => ({ ...prev, isVisible: false }));
+
       try {
         const resultAction = await dispatch(
           getQuote({
@@ -50,59 +58,105 @@ const HeroSection = () => {
         );
 
         if (getQuote.fulfilled.match(resultAction)) {
-          const { status, quote } = resultAction.payload.data;
-          const responseMessage=resultAction.payload.message
+          const { status } = resultAction.payload.data;
+          const responseMessage = resultAction.payload.message;
 
           switch (status) {
             case 'accepted_collected':
-              setQuoteMessage(
-                'This vehicle has already been collected after accepting a quote. If you want to get a new quote, please submit a new request.'
-              );
+              setMessageCardState({
+                isVisible: true,
+                title: 'Vehicle Already Processed',
+                message: 'This vehicle has already been collected after accepting a quote. If you want to get a new quote, please submit a new request.',
+                type: 'info',
+                buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+              });
               break;
-          
+
             case 'accepted_pending_collection':
-              setQuoteMessage(
-                'You have already accepted a quote for this vehicle. Collection is being arranged. Our team will contact you shortly with further details.'
-              );
+              setMessageCardState({
+                isVisible: true,
+                title: 'Quote Already Accepted',
+                message: 'You have already accepted a quote for this vehicle. Collection is being arranged. Our team will contact you shortly with further details.',
+                type: 'info',
+                buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+              });
               break;
-          
+
             case 'cached_quote':
               sessionStorage.setItem('allowQuoteResultPage', 'true');
               navigate('/quote-result', { state: { fromQuote: true } });
               break;
-          
+            
             case 'manual_pending_review':
-              setQuoteMessage(
-                'We’ve already received a manual quote request for this vehicle. Our team is reviewing it. We’ll contact you once the review is complete—please stay in touch.'
-              );
+              setMessageCardState({
+                isVisible: true,
+                title: 'Manual Review Pending',
+                message: 'We’ve already received a manual quote request for this vehicle. Our team is reviewing it. We’ll contact you once the review is complete—please stay in touch.',
+                type: 'info',
+                buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+              });
               break;
-          
+
             case 'manual_reviewed':
               sessionStorage.setItem('allowQuoteResultPage', 'true');
               navigate('/quote-result', { state: { fromQuote: true } });
               break;
-          
-           
-          
+
             case 'new_generated':
               sessionStorage.setItem('allowQuoteResultPage', 'true');
               navigate('/quote-result', { state: { fromQuote: true } });
               break;
-          
+
+            case 'dvla_checks_exhausted':
+              setMessageCardState({
+                isVisible: true,
+                title: 'DVLA Check Limit Reached',
+                message: 'You have exhausted your free DVLA checks. Please contact our support team to get more.',
+                type: 'error',
+                buttons: [
+                  { label: 'OK', onClick: handleCloseMessage },
+                  {
+                    label: 'Contact Support',
+                    onClick: () => {
+                      navigate('/contact');
+                      handleCloseMessage();
+                    },
+                  },
+                ],
+              });
+              break;
+
             default:
-              setQuoteMessage(responseMessage || 'Something went wrong. Please try again or contact support.');
+              setMessageCardState({
+                isVisible: true,
+                title: 'Quote Error',
+                message: responseMessage || 'Something went wrong. Please try again or contact support.',
+                type: 'error',
+                buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+              });
               break;
           }
-          
         } else {
           const errorMsg =
             resultAction?.payload?.message ||
             resultAction?.error?.message ||
             'Quote request failed.';
-          setQuoteMessage(errorMsg);
+          setMessageCardState({
+            isVisible: true,
+            title: 'Request Failed',
+            message: errorMsg,
+            type: 'error',
+            buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+          });
         }
       } catch (err) {
-        setQuoteMessage('Unexpected error occurred. Try again later.');
+        setMessageCardState({
+          isVisible: true,
+          title: 'Unexpected Error',
+          message: 'An unexpected error occurred. Please try again later.',
+          type: 'error',
+          buttons: [{ label: 'OK', onClick: handleCloseMessage }],
+        });
       }
     },
   });
@@ -129,7 +183,10 @@ const HeroSection = () => {
               disabled={isLoading}
               className={showInputError ? 'input-error' : ''}
             />
-            <button type="submit" disabled={isLoading || !formik.values.regNumber}>
+            <button
+              type="submit"
+              disabled={isLoading || !formik.values.regNumber}
+            >
               {isLoading ? 'Checking...' : 'Get Your Quote'}
             </button>
           </form>
@@ -137,27 +194,12 @@ const HeroSection = () => {
           {showInputError && <div className="hero__error">{formik.errors.regNumber}</div>}
           <p className="hero__note">Trusted by thousands across the UK.</p>
 
-          {quoteMessage && (
+          {messageCardState.isVisible && (
             <MessageCard
-              message={quoteMessage}
-              buttons={[
-                {
-                  label: 'OK',
-                  onClick: handleCloseMessage,
-                },
-              ]}
-            />
-          )}
-
-          {error && !quoteMessage && (
-            <MessageCard
-              message={error}
-              buttons={[
-                {
-                  label: 'OK',
-                  onClick: handleCloseMessage,
-                },
-              ]}
+              title={messageCardState.title}
+              message={messageCardState.message}
+              buttons={messageCardState.buttons}
+              type={messageCardState.type}
             />
           )}
         </div>

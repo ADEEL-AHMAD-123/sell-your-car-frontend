@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  FaChartLine, FaLightbulb, FaTrophy, FaRocket, FaBullseye, 
-  FaHandshake, FaExchangeAlt, FaSpinner, FaTimesCircle, 
-  FaCheckCircle, FaUsers, FaMoneyBillAlt, FaClock, FaArrowUp, // FaArrowUp is already here
+import {
+  FaChartLine, FaLightbulb, FaTrophy, FaRocket, FaBullseye,
+  FaHandshake, FaExchangeAlt, FaSpinner, FaTimesCircle,
+  FaCheckCircle, FaUsers, FaMoneyBillAlt, FaClock, FaArrowUp,
   FaGem, FaFire, FaShieldAlt, FaMagic, FaThumbsUp,
   FaQuoteRight, FaUserCog, FaBalanceScale, FaHeart, FaStar,
-  FaAward, FaUserCheck, FaClipboardCheck 
+  FaAward, FaUserCheck, FaClipboardCheck, FaCogs 
 } from 'react-icons/fa';
 import './AdminAnalyticsPage.scss';
 import { fetchAnalyticsOverview } from '../../../redux/slices/adminSlice';
@@ -35,18 +35,18 @@ const AdminAnalyticsPage = () => {
     const newUsersThisMonth = analyticsOverview.newUsersThisMonth || 0;
     const manualQuoteRequestConversion = parseFloat(analyticsOverview.manualQuoteRequestConversion) || 0;
     const manualQuoteAcceptedConversion = parseFloat(analyticsOverview.manualQuoteAcceptedConversion) || 0;
-    
+
     const quoteAcceptanceRate = totalQuotes > 0 ? (quotesAccepted / totalQuotes) * 100 : 0;
     const collectionRate = quotesAccepted > 0 ? (quotesCollected / quotesAccepted) * 100 : 0;
     const userEngagementRate = totalUsers > 0 ? (usersWithQuotes / totalUsers) * 100 : 0;
     const revenuePerUser = totalUsers > 0 ? totalRevenue / totalUsers : 0;
     const monthlyGrowthRate = totalUsers > 0 ? (newUsersThisMonth / totalUsers) * 100 : 0;
-    const averageManualReviewTime = analyticsOverview.averageManualReviewTime || 0; // Assuming this comes as a number
-    const averagePriceDifference = analyticsOverview.averageFinalPriceVsEstimatedDifference || 0; // Assuming this comes as a number
+    const averageManualReviewTime = analyticsOverview.averageManualReviewTime || 0;
+    const averagePriceDifference = analyticsOverview.averageFinalPriceVsEstimatedDifference || 0;
 
     // Strategic recommendations with improved logic
     const strategicRecommendations = [];
-    
+
     // Quote Conversion Strategy (High Priority)
     if (quoteAcceptanceRate < 50 && totalQuotes > 10) {
       strategicRecommendations.push({
@@ -60,7 +60,7 @@ const AdminAnalyticsPage = () => {
         systemBenefit: "The automated pricing algorithm and A/B testing features in your system can help identify optimal quote structures.",
         actionItems: [
           "Review pricing algorithm parameters",
-          "Enable A/B testing for quote presentations", 
+          "Enable A/B testing for quote presentations",
           "Implement urgency indicators",
           "Add competitive comparison features"
         ]
@@ -71,7 +71,7 @@ const AdminAnalyticsPage = () => {
         description: `At **${quoteAcceptanceRate.toFixed(1)}%** acceptance, you're performing well but have room for growth. Fine-tune your approach to reach industry-leading levels.`,
         impact: "High",
         effort: "Low",
-        icon: <FaBullseye />, 
+        icon: <FaBullseye />,
         category: "optimization",
         priority: 2,
         systemBenefit: "Your system's analytics dashboard provides detailed insights to identify exactly which quotes succeed and why.",
@@ -88,7 +88,7 @@ const AdminAnalyticsPage = () => {
       strategicRecommendations.push({
         title: "Maximize User Activation",
         description: `Only **${userEngagementRate.toFixed(1)}%** of users are requesting quotes. Your system's onboarding flow and engagement tools can dramatically improve this metric.`,
-        impact: "High", 
+        impact: "High",
         effort: "Medium",
         icon: <FaUserCheck />,
         category: "engagement",
@@ -109,7 +109,7 @@ const AdminAnalyticsPage = () => {
         title: "Streamline Collection Process",
         description: `Your **${collectionRate.toFixed(1)}%** collection rate indicates process friction. The system's logistics features can automate and improve this crucial step.`,
         impact: "High",
-        effort: "Low", 
+        effort: "Low",
         icon: <FaClipboardCheck />,
         category: "operations",
         priority: 2,
@@ -130,7 +130,7 @@ const AdminAnalyticsPage = () => {
         description: `At **£${revenuePerUser.toFixed(2)}** per user, there's opportunity for growth through upselling and service expansion using your system's capabilities.`,
         impact: "Medium",
         effort: "Medium",
-        icon: <FaArrowUp />, // Changed to FaArrowUp
+        icon: <FaArrowUp />,
         category: "revenue",
         priority: 4,
         systemBenefit: "The system's customer profile and history tracking enables targeted upselling and cross-selling opportunities.",
@@ -196,7 +196,7 @@ const AdminAnalyticsPage = () => {
         title: "Exceptional User Engagement",
         description: `**${userEngagementRate.toFixed(1)}%** engagement rate shows your system's user experience design is highly effective at converting visitors.`,
         icon: <FaUsers />,
-        metric: `${userEngagementRate.toFixed(1)}%`, 
+        metric: `${userEngagementRate.toFixed(1)}%`,
         benchmark: "Industry average: 15-25%",
         systemCredit: "Intuitive interface design and smart onboarding flows drive high engagement."
       });
@@ -206,7 +206,7 @@ const AdminAnalyticsPage = () => {
       businessAchievements.push({
         title: "Rapid Business Growth",
         description: `**${monthlyGrowthRate.toFixed(1)}%** monthly growth demonstrates your system's scalability and market appeal are driving impressive expansion.`,
-        icon: <FaArrowUp />, // Changed to FaArrowUp
+        icon: <FaArrowUp />,
         metric: `${monthlyGrowthRate.toFixed(1)}%`,
         benchmark: "Excellent growth rate",
         systemCredit: "Robust infrastructure and automated processes enable rapid scaling without quality loss."
@@ -215,7 +215,7 @@ const AdminAnalyticsPage = () => {
 
     if (totalRevenue > 10000) {
       businessAchievements.push({
-        title: "Strong Revenue Performance", 
+        title: "Strong Revenue Performance",
         description: `**£${totalRevenue.toFixed(2)}** in total revenue shows your system is delivering real business value and ROI.`,
         icon: <FaMoneyBillAlt />,
         metric: `£${totalRevenue.toFixed(2)}`,
@@ -224,38 +224,44 @@ const AdminAnalyticsPage = () => {
       });
     }
 
-    // System benefits and highlights (static for now, but could be dynamic)
+    // System benefits and highlights (STATIC CONTENT)
     const systemBenefitsArray = [
       {
-        title: "Intelligent Business Analytics",
-        description: "Your system continuously analyzes performance patterns and automatically suggests optimizations, giving you a competitive edge.",
+        title: "AI-Powered Strategic Insights",
+        description: "The system transforms raw data into actionable intelligence, automatically identifying trends, growth opportunities, and potential friction points in real-time.",
         icon: <FaChartLine />,
         benefit: "Real-time insights drive data-backed decisions for consistent growth."
       },
       {
-        title: "Automated Operations Excellence", 
-        description: "From quote generation to collection scheduling, automation reduces manual work while improving customer experience.",
+        title: "Flawless Automated Operations",
+        description: "From instant quote generation to automated collection scheduling and follow-ups, the system handles the entire quote lifecycle, reducing manual effort.",
         icon: <FaClock />,
-        benefit: "Save 15+ hours weekly while increasing operational efficiency by 40%."
+        benefit: "Drastically reduce your administrative workload, saving countless hours each week and ensuring a smooth, professional experience for every customer."
       },
       {
-        title: "Scalable Growth Platform",
-        description: "The system architecture automatically scales with your business, handling increased volume without performance degradation.",
+        title: "Built for Unstoppable Growth",
+        description: "The underlying architecture is designed to scale with your business. The system automatically adjusts to handle increased traffic and data volume without slowing down.",
         icon: <FaRocket />,
-        benefit: "Handle 10x more customers without hiring additional staff or compromising quality."
+        benefit: "Confidently handle a 10x increase in customer volume with no loss of performance or quality."
       },
       {
-        title: "Customer Experience Optimization",
-        description: "Advanced UX design and journey optimization features ensure customers have a smooth, professional experience.",
+        title: "Next-Generation Customer Experience",
+        description: "An intuitive interface and a seamless, guided process ensure every customer interaction is positive, professional, and friction-free.",
         icon: <FaHeart />,
-        benefit: "Higher customer satisfaction leads to more referrals and repeat business."
+        benefit: "Boost brand loyalty and word-of-mouth referrals by providing a five-star user experience from the very first click."
+      },
+      {
+        title: "Smart Hybrid Workflow",
+        description: "The system intelligently manages a mix of automated and manual quotes, providing instant valuations while flagging complex cases for your expert review.",
+        icon: <FaCogs />,
+        benefit: "Combine the speed of automation with the precision of human expertise, ensuring you never miss an opportunity and always deliver an accurate quote."
       }
     ];
 
     return {
       keyMetrics: {
         quoteAcceptanceRate: quoteAcceptanceRate.toFixed(1),
-        collectionRate: collectionRate.toFixed(1), 
+        collectionRate: collectionRate.toFixed(1),
         userEngagementRate: userEngagementRate.toFixed(1),
         revenuePerUser: revenuePerUser.toFixed(2),
         monthlyGrowthRate: monthlyGrowthRate.toFixed(1),
@@ -306,12 +312,12 @@ const AdminAnalyticsPage = () => {
         </div>
       </div>
       <p className="strategy-card__description">{strategy.description}</p>
-      
+
       <div className="strategy-card__system-benefit">
         <FaMagic />
         <span>{strategy.systemBenefit}</span>
       </div>
-      
+
       {strategy.actionItems && (
         <div className="strategy-card__actions">
           <h4>Recommended Actions:</h4>
@@ -395,25 +401,25 @@ const AdminAnalyticsPage = () => {
         </p>
         <div className="metrics-grid">
           {renderMetricCard(
-            "Quote Acceptance", 
+            "Quote Acceptance",
             `${keyMetrics.quoteAcceptanceRate}%`,
             <FaCheckCircle />,
             "Conversion rate from quotes to sales"
           )}
           {renderMetricCard(
-            "Collection Success", 
+            "Collection Success",
             `${keyMetrics.collectionRate}%`,
             <FaHandshake />,
             "Successfully completed collections"
           )}
           {renderMetricCard(
-            "User Engagement", 
+            "User Engagement",
             `${keyMetrics.userEngagementRate}%`,
             <FaUsers />,
             "Users who request quotes"
           )}
           {renderMetricCard(
-            "Revenue per User", 
+            "Revenue per User",
             `£${keyMetrics.revenuePerUser}`,
             <FaMoneyBillAlt />,
             "Average customer value"
@@ -470,7 +476,7 @@ const AdminAnalyticsPage = () => {
           <FaHeart className="cta-icon" />
           <h3>Ready to Implement These Strategies?</h3>
           <p>
-            Your comprehensive analytics dashboard contains all the detailed data and tools needed to execute these recommendations. 
+            Your comprehensive analytics dashboard contains all the detailed data and tools needed to execute these recommendations.
             The system is designed to grow with your success.
           </p>
           <Link to="/dashboard">

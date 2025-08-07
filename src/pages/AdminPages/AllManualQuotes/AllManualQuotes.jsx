@@ -30,19 +30,24 @@ const AllManualQuotes = () => {
   const debouncedFilters = useDebouncedValue(filters, 500);
   const [modalViewQuote, setModalViewQuote] = useState(null);
   const [modalReviewQuote, setModalReviewQuote] = useState(null);
-  const [initialRenderDone, setInitialRenderDone] = useState(false);
+  // Removed initialRenderDone state as it's no longer needed with the simplified useEffect
 
+  // Redux selectors
   const {
     pending: {
-      response: pendingResponse = {},
+      response: pendingResponseFromRedux, // Get the raw response from Redux
       loading: pendingLoading = false,
       error: pendingError = null,
-    },
+    } = {}, // Default for 'pending'
     review: {
       loading: reviewLoading = false,
       error: reviewError = null,
-    },
-  } = useSelector((state) => state.adminQuotes);
+    } = {},
+  } = useSelector((state) => state.adminQuotes || {}); // === NEW: Add default empty object for state.adminQuotes ===
+
+  // === Defensive check for pendingResponse ===
+  // Ensure pendingResponse is always an object, even if pendingResponseFromRedux is null
+  const pendingResponse = pendingResponseFromRedux || {};
 
   const {
     quotes = [],
@@ -51,13 +56,14 @@ const AllManualQuotes = () => {
     totalPages = 1,
   } = pendingResponse;
 
+  // Fetch data on filter change
+  // === SIMPLIFIED useEffect for data fetching ===
+  // This hook will now dispatch `fetchPendingManualQuotes` whenever `debouncedFilters` changes.
+  // The `useDebouncedValue` hook ensures this only happens after a short delay,
+  // preventing excessive API calls during rapid filter input.
   useEffect(() => {
-    if (initialRenderDone) {
-      dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
-    } else {
-      setInitialRenderDone(true);
-    }
-  }, [dispatch, debouncedFilters, initialRenderDone]);
+    dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
+  }, [dispatch, debouncedFilters]); // Removed initialRenderDone from dependencies
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
@@ -91,18 +97,21 @@ const AllManualQuotes = () => {
 
     if (reviewManualQuote.fulfilled.match(resultAction)) {
       handleCloseReviewModal();
+      // Re-fetch quotes after a successful review to update the list
       dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
     }
   };
 
   const updateFilter = (field) => (e) => {
     const value = e.target.value;
-    if (!/^[a-zA-Z0-9@.\s-]*$/.test(value)) return;
-    setFilters((prev) => ({
-      ...prev,
-      [field]: value,
-      page: 1,
-    }));
+    // Allow empty string to clear filter
+    if (value === '' || /^[a-zA-Z0-9@.\s-]*$/.test(value)) {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: value,
+        page: 1, // Reset to first page on filter change
+      }));
+    }
   };
 
   const resetFilters = () => {
@@ -132,9 +141,10 @@ const AllManualQuotes = () => {
   };
 
   const getQuoteType = (quote) => {
-    if (quote.isManualQuote) return 'Manual';
-    if (quote.isAutoQuote) return 'Auto';
-    return 'Standard';
+    // Assuming 'type' field exists on the quote object from the schema
+    if (quote.type === 'manual') return 'Manual';
+    if (quote.type === 'auto') return 'Auto';
+    return 'Standard'; // Fallback for other types or if type is missing
   };
 
   const getPriorityLevel = (quote) => {

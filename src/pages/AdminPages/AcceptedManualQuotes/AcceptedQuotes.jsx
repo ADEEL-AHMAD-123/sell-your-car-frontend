@@ -33,20 +33,23 @@ const AcceptedQuotes = () => {
   // State for modals
   const [modalQuote, setModalQuote] = useState(null);
   const [confirmCollect, setConfirmCollect] = useState(null);
-  const [initialRenderDone, setInitialRenderDone] = useState(false);
 
   // Redux selectors
   const {
     accepted: {
-      response: acceptedResponse = {},
+      response: acceptedResponseFromRedux, // Get the raw response from Redux
       loading: acceptedLoading = false,
       error: acceptedError = null,
-    } = {},
+    } = {}, // Default for 'accepted'
     collect: {
       loading: collectLoading = false,
       error: collectError = null,
     } = {},
-  } = useSelector((state) => state.adminQuotes);
+  } = useSelector((state) => state.adminQuotes || {}); // Default for 'adminQuotes'
+
+  // === Defensive check for acceptedResponse ===
+  // Ensure acceptedResponse is always an object, even if acceptedResponseFromRedux is null
+  const acceptedResponse = acceptedResponseFromRedux || {};
 
   const {
     quotes = [],
@@ -57,12 +60,8 @@ const AcceptedQuotes = () => {
 
   // Fetch data on filter change
   useEffect(() => {
-    if (initialRenderDone) {
-      dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
-    } else {
-      setInitialRenderDone(true);
-    }
-  }, [dispatch, debouncedFilters, initialRenderDone]);
+    dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
+  }, [dispatch, debouncedFilters]);
 
   // Handlers
   const handlePageChange = (newPage) => {
@@ -88,6 +87,7 @@ const AcceptedQuotes = () => {
       );
       if (resultAction.type.endsWith('/fulfilled')) {
         setConfirmCollect(null);
+        // Re-fetch quotes after a successful collection to update the list
         dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
       }
     }
@@ -99,12 +99,14 @@ const AcceptedQuotes = () => {
 
   const updateFilter = (field) => (e) => {
     const value = e.target.value;
-    if (!/^[a-zA-Z0-9@.\s-]*$/.test(value)) return;
-    setFilters((prev) => ({
-      ...prev,
-      [field]: value,
-      page: 1,
-    }));
+    // Allow empty string to clear filter
+    if (value === '' || /^[a-zA-Z0-9@.\s-]*$/.test(value)) {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: value,
+        page: 1, // Reset to first page on filter change
+      }));
+    }
   };
 
   const resetFilters = () => {
@@ -138,9 +140,10 @@ const AcceptedQuotes = () => {
   };
 
   const getQuoteType = (quote) => {
-    if (quote.isManualQuote) return 'Manual';
-    if (quote.isAutoQuote) return 'Auto';
-    return 'Standard';
+    // Assuming you have isManualQuote and isAutoQuote flags on the quote object
+    if (quote.type === 'manual') return 'Manual';
+    if (quote.type === 'auto') return 'Auto';
+    return 'Standard'; // Fallback for other types or if type is missing
   };
 
   const renderDesktopTable = () => (
@@ -188,7 +191,8 @@ const AcceptedQuotes = () => {
                 >
                   View
                 </button>
-                {!quote.isCollected && (
+                {/* Ensure isCollected is a boolean field on your quote model */}
+                {!quote.collectionDetails?.collected && ( // Check nested property
                   <button
                     className="btn-collected"
                     onClick={() => handleMarkAsCollected(quote)}
@@ -244,7 +248,7 @@ const AcceptedQuotes = () => {
             >
               View Details
             </button>
-            {!quote.isCollected && (
+            {!quote.collectionDetails?.collected && ( // Check nested property
               <button
                 className="btn-collected"
                 onClick={() => handleMarkAsCollected(quote)}
@@ -374,6 +378,7 @@ const AcceptedQuotes = () => {
               />
             </div>
           ))}
+
           <div className="filter-actions">
             <button className="btn-reset" onClick={resetFilters}>
               🔄 Reset Filters

@@ -1,15 +1,23 @@
+// src/Layouts/MainLayout.jsx
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import Footer from '../components/Footer/Footer';
-import { Outlet } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import './MainLayout.scss'; 
 
-const MainLayout = () => (
-  <>
-    <Header />
-    <Outlet />
-    <ToastContainer position="top-right" autoClose={3000} />
-    <Footer />
-  </>
-);
+const MainLayout = () => {
+  return (
+
+    <div className="main-layout-container">
+      <Header />
+      
+      <main className="main-content-wrapper">
+        <Outlet />
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
 
 export default MainLayout;

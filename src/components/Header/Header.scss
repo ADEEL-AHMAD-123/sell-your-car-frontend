@@ -35,75 +35,6 @@ $checks-low: #ef4444;
     }
   }
 
-  // Logo section
-  &__logo {
-    &-link {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      gap: 10px;
-    }
-  
-    &-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%);
-      border-radius: 10px;
-      @include flex-center;
-      color: $color-light;
-      font-size: 18px;
-      box-shadow: 0 4px 12px rgba($color-primary, 0.3);
-  
-      @include responsive(md) {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
-      }
-  
-      @include responsive(sm) {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-    }
-  
-    &-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-  
-      @include responsive(sm) {
-        gap: 1px;
-      }
-    }
-  
-    &-main {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: $color-primary;
-      line-height: 1;
-  
-      @include responsive(md) {
-        font-size: 1.2rem;
-      }
-  
-      @include responsive(sm) {
-        font-size: 1rem;
-      }
-    }
-  
-    &-tagline {
-      font-size: 0.7rem;
-      color: $color-gray;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-  
-      @include responsive(sm) {
-        font-size: 0.6rem;
-      }
-    }
-  }
-
   // Desktop Navigation
   &__nav {
     display: flex;
@@ -151,8 +82,20 @@ $checks-low: #ef4444;
         transition: width 0.3s ease;
       }
 
-      &:hover::after {
+      &:hover::after,
+      &--active::after {
         width: 100%;
+      }
+
+      // Active state styling
+      &--active {
+        color: $color-primary;
+        font-weight: 600;
+        
+        &::after {
+          width: 100%;
+          background-color: $color-primary;
+        }
       }
     }
   }
@@ -794,7 +737,7 @@ $checks-low: #ef4444;
     }
   }
 
-  // Mobile Navigation
+  // Mobile Navigation with Enhanced Active States
   &__mobile-nav {
     &-list {
       list-style: none;
@@ -804,17 +747,65 @@ $checks-low: #ef4444;
 
     &-link {
       display: block;
-      padding: 12px 10px;
+      padding: 12px 16px;
       color: $color-dark;
       text-decoration: none;
       font-weight: 500;
       font-size: 0.9rem;
-      border-radius: 6px;
-      transition: $transition;
-
-      &:hover {
+      border-radius: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 4px;
+      position: relative;
+      
+      // Enhanced mobile hover and tap effects
+      &:hover,
+      &:focus,
+      &:active {
         color: $color-primary;
-        background-color: rgba($color-primary, 0.05);
+        background: linear-gradient(135deg, rgba($color-primary, 0.08) 0%, rgba($color-primary, 0.12) 100%);
+        transform: translateX(8px);
+        box-shadow: 0 2px 8px rgba($color-primary, 0.1);
+      }
+
+      // Active state styling for mobile
+      &--active {
+        color: $color-primary;
+        background: linear-gradient(135deg, rgba($color-primary, 0.12) 0%, rgba($color-primary, 0.18) 100%);
+        font-weight: 600;
+        border-left: 4px solid $color-primary;
+        padding-left: 12px;
+        box-shadow: 0 2px 12px rgba($color-primary, 0.15);
+        
+        // Active state indicator
+        &::before {
+          content: '';
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 6px;
+          height: 6px;
+          background-color: $color-primary;
+          border-radius: 50%;
+          box-shadow: 0 0 8px rgba($color-primary, 0.5);
+        }
+        
+        &:hover {
+          transform: translateX(4px);
+          background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.22) 100%);
+        }
+      }
+
+      // Touch-friendly mobile interactions
+      @media (hover: none) and (pointer: coarse) {
+        &:active {
+          transform: scale(0.98) translateX(4px);
+          background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.2) 100%);
+        }
+        
+        &--active:active {
+          transform: scale(0.98) translateX(2px);
+        }
       }
     }
   }

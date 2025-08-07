@@ -1,13 +1,14 @@
+// Footer.js
 import './Footer.scss';
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
-
+import Logo from '../../components/common/Logo/Logo'; 
 const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer__top container">
         <div className="footer__col">
-          <h3>SellYourCar</h3>
+          <Logo className="logo--in-footer" />
           <p>Sell your scrap car with ease. Instant quotes, free collection, and fast payments nationwide.</p>
         </div>
 

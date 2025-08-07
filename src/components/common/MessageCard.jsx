@@ -1,26 +1,29 @@
 import React from 'react';
 import './MessageCard.scss';
 
-const MessageCard = ({ title, message, buttons = [], onClose }) => {
+// Add type prop to change card's visual style.
+const MessageCard = ({ title, message, buttons, type = 'info' }) => {
   return (
-    <div className="message-card-overlay" onClick={onClose}>
-      <div className="message-card-container" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose} aria-label="Close modal">×</button>
-        {title && <h2>{title}</h2>}
-        {message && <p>{message}</p>}
-
-        {buttons.length > 0 && (
-          <div className="button-group">
-            {buttons.map((btn, index) => (
+    <div className="message-card-overlay">
+      <div className={`message-card card-${type}`}>
+        <div className="card-header">
+          {type === 'error' && <span className="icon">⚠️</span>}
+          {type === 'success' && <span className="icon">✅</span>}
+          <h3>{title}</h3>
+        </div>
+        <p>{message}</p>
+        <div className="card-buttons">
+          {buttons &&
+            buttons.map((btn, index) => (
               <button key={index} onClick={btn.onClick}>
                 {btn.label}
               </button>
             ))}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default MessageCard;
+

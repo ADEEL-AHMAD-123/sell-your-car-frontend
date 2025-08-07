@@ -5,83 +5,328 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba($color-dark, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-in-out;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999; 
+  @include flex-center;
+  padding: $spacing-sm;
+  overflow: hidden;
+  
+  // Completely prevent any interactions
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: auto; // Allow interactions only within overlay
 }
 
-.message-card-container {
-  background-color: $color-light;
-  border-radius: 1.25rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 12px 32px rgba($color-dark, 0.25);
-  animation: scaleUp 0.3s ease;
-
-  h2 {
-    font-size: 1.8rem;
-    color: $color-primary;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1rem;
-    color: $color-gray;
-    margin-bottom: 2rem;
-    line-height: 1.5;
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: $color-gray;
-    cursor: pointer;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: $color-primary;
-    }
-  }
-
-  .button-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-
-    button {
-      background-color: $color-primary;
-      color: #fff;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.7rem 1.5rem;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: darken($color-primary, 10%);
+// Global styles for blurring background content
+:global(.message-card-blur-background) {
+  > * {
+    filter: blur(8px) brightness(0.7);
+    pointer-events: none !important;
+    user-select: none !important;
+    
+    // Ensure header and all its children are also blurred and non-interactive
+    &.header,
+    .header {
+      filter: blur(8px) brightness(0.7) !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      
+      * {
+        pointer-events: none !important;
+        user-select: none !important;
       }
     }
+  }
+  
+  // Exception for the message card overlay
+  .message-card-overlay {
+    filter: none !important;
+    pointer-events: auto !important;
+    user-select: auto !important;
+    
+    * {
+      pointer-events: auto !important;
+      user-select: auto !important;
+    }
+  }
+}
+
+// Prevent all interactions when modal is open
+:global(body.message-card-open) {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  
+  .message-card-overlay {
+    pointer-events: auto !important;
+    
+    * {
+      pointer-events: auto !important;
+    }
+  }
+}
+
+// Enhanced backdrop blur for better visual separation
+.message-card-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba($color-dark, 0.92);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  animation: backdropFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none; // Prevent clicks on backdrop
+}
+
+.message-card {
+  position: relative;
+  background: $color-light;
+  border-radius: 24px;
+  padding: 2.5rem 2rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 
+    0 25px 50px -12px rgba($color-dark, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: cardSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+
+  // Different styles based on type
+  &.card-error {
+    border-top: 4px solid #ef4444;
+    
+    .card-icon {
+      color: #ef4444;
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      border: 2px solid #fecaca;
+    }
+    
+    .card-title {
+      color: #dc2626;
+    }
+    
+    .decoration-1 { background: rgba(239, 68, 68, 0.1); }
+    .decoration-2 { background: rgba(239, 68, 68, 0.05); }
+    .decoration-3 { background: rgba(239, 68, 68, 0.03); }
+  }
+
+  &.card-success {
+    border-top: 4px solid #22c55e;
+    
+    .card-icon {
+      color: #22c55e;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #bbf7d0;
+    }
+    
+    .card-title {
+      color: #16a34a;
+    }
+    
+    .decoration-1 { background: rgba(34, 197, 94, 0.1); }
+    .decoration-2 { background: rgba(34, 197, 94, 0.05); }
+    .decoration-3 { background: rgba(34, 197, 94, 0.03); }
+  }
+
+  &.card-warning {
+    border-top: 4px solid #f59e0b;
+    
+    .card-icon {
+      color: #f59e0b;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 2px solid #fed7aa;
+    }
+    
+    .card-title {
+      color: #d97706;
+    }
+    
+    .decoration-1 { background: rgba(245, 158, 11, 0.1); }
+    .decoration-2 { background: rgba(245, 158, 11, 0.05); }
+    .decoration-3 { background: rgba(245, 158, 11, 0.03); }
+  }
+
+  &.card-info {
+    border-top: 4px solid $color-primary;
+    
+    .card-icon {
+      color: $color-primary;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 2px solid #cbd5e1;
+    }
+    
+    .card-title {
+      color: $color-primary;
+    }
+    
+    .decoration-1 { background: rgba($color-primary, 0.1); }
+    .decoration-2 { background: rgba($color-primary, 0.05); }
+    .decoration-3 { background: rgba($color-primary, 0.03); }
+  }
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.card-logo {
+  opacity: 0.8;
+  transform: scale(0.9);
+}
+
+.card-icon-container {
+  display: flex;
+  justify-content: center;
+}
+
+.card-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  @include flex-center;
+  
+  svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.card-content {
+  margin-bottom: 2rem;
+}
+
+.card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.card-message {
+  font-size: 1rem;
+  color: $color-gray;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.card-actions {
+  margin-top: 2rem;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.card-button {
+  min-width: 120px;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba($color-primary, 0.4);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.secondary {
+    background: $color-light;
+    color: $color-gray;
+    border: 2px solid #e5e7eb;
+    
+    &:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: $color-dark;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.card-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  
+  &.decoration-1 {
+    width: 120px;
+    height: 120px;
+    top: -60px;
+    right: -60px;
+  }
+  
+  &.decoration-2 {
+    width: 80px;
+    height: 80px;
+    bottom: -40px;
+    left: -40px;
+  }
+  
+  &.decoration-3 {
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    right: -30px;
   }
 }
 
 // Animations
-@keyframes fadeIn {
+@keyframes backdropFadeIn {
   from {
     opacity: 0;
   }
@@ -90,33 +335,144 @@
   }
 }
 
-@keyframes scaleUp {
+@keyframes cardSlideIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.8) translateY(40px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
-// Responsive tweaks
-@media (max-width: 480px) {
-  .message-card-container {
-    padding: 1.5rem;
-
-    h2 {
+// Responsive Design
+@include responsive(md) {
+  .message-card {
+    padding: 2rem 1.5rem 1.5rem;
+    margin: $spacing-sm;
+    
+    .card-title {
       font-size: 1.5rem;
     }
-
-    p {
-      font-size: 0.95rem;
+    
+    .card-icon {
+      width: 70px;
+      height: 70px;
+      
+      svg {
+        width: 35px;
+        height: 35px;
+      }
     }
+  }
+  
+  .card-button {
+    min-width: 110px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
 
-    .button-group button {
-      font-size: 0.95rem;
-      padding: 0.6rem 1.2rem;
+@include responsive(sm) {
+  .message-card-overlay {
+    padding: $spacing-xs;
+  }
+  
+  .message-card {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border-radius: 20px;
+    
+    .card-title {
+      font-size: 1.25rem;
     }
+    
+    .card-message {
+      font-size: 0.9rem;
+    }
+    
+    .card-icon {
+      width: 60px;
+      height: 60px;
+      
+      svg {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+  
+  .button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .card-button {
+    width: 100%;
+    min-width: unset;
+    padding: 0.875rem 1rem;
+  }
+  
+  .decoration-circle {
+    &.decoration-1 {
+      width: 80px;
+      height: 80px;
+      top: -40px;
+      right: -40px;
+    }
+    
+    &.decoration-2 {
+      width: 60px;
+      height: 60px;
+      bottom: -30px;
+      left: -30px;
+    }
+    
+    &.decoration-3 {
+      display: none;
+    }
+  }
+}
+
+// Extra small devices
+@media (max-width: 380px) {
+  .message-card {
+    .card-title {
+      font-size: 1.1rem;
+    }
+    
+    .card-message {
+      font-size: 0.85rem;
+    }
+    
+    .card-button {
+      padding: 0.75rem 0.875rem;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .message-card {
+    border: 2px solid $color-dark;
+    
+    .card-button.secondary {
+      border: 2px solid $color-dark;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .message-card-backdrop,
+  .message-card,
+  .card-button {
+    animation: none;
+    transition: none;
+  }
+  
+  .card-button:hover {
+    transform: none;
   }
 }

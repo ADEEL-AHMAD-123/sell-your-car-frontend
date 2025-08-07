@@ -61,9 +61,9 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       label: 'Quote Management',
       submenu: [
         { label: 'All Quotes', path: '/dashboard/quotes' },
-        { label: 'Manual Quotes', path: '/dashboard/manual-quotes' },
+        { label: 'Pending Manual Quotes', path: '/dashboard/manual-quotes' },
         { label: 'Accepted Quotes', path: '/dashboard/accepted-quotes' },
-        { label: 'Pending Review', path: '/dashboard/quotes/pending' }
+
       ]
     },
     {

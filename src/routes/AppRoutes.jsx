@@ -39,7 +39,7 @@ const AppRoutes = () => (
       <Route path="/manual-valuation" element={<ManualValuationPage />} />
 
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/signup" element={<Register />} />
     </Route>
 
     {/* Admin routes with Admin Layout */}

@@ -51,35 +51,28 @@ const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false); // New state for profile dropdown
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // New state for modal
   
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch(); // --- CHANGE: Add the useDispatch hook here ---
+  const { isAuthenticated, user } = useSelector((state) => state.auth); 
+  const dispatch = useDispatch();
   const checksLeft = user?.checksLeft ?? 0;
   const location = useLocation();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // --- CHANGE: Update the handleLogout function to be async and dispatch the actions ---
   const handleLogout = async () => {
     setIsLogoutModalOpen(false);
 
     try {
-      // 1. Call the logout API to clear the backend cookie
       await dispatch(logoutUser());
-      
-      // 2. Clear all local Redux-Persist data
       await persistor.purge();
       
       console.log('Successfully logged out and cleared all data.');
 
     } catch (error) {
       console.error('Logout failed:', error);
-      // Handle logout failure if needed
     }
   };
-  // -------------------------------------------------------------------------------------
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -91,7 +84,6 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu on route change
   useEffect(() => {
     closeMobileMenu();
   }, [location.pathname]);
@@ -107,6 +99,7 @@ const Header = () => {
   };
 
   const renderChecksIndicator = () => {
+    // Check for isAuthenticated and user
     if (!isAuthenticated || !user || user.role === 'admin') return null;
 
     return (
@@ -162,10 +155,12 @@ const Header = () => {
   };
 
   const renderUserSection = () => {
-    if (isAuthenticated && user) {
+    // 💡 CHANGE: Use only isAuthenticated for the main check
+    if (isAuthenticated) {
       return (
         <div className="header__user-section">
-          {user.role === 'admin' ? (
+          {/* We must check if user exists before accessing user.role, as it could be null for a brief moment */}
+          {user?.role === 'admin' ? ( 
             <Link to="/dashboard" className="header__dashboard-btn">
               <FontAwesomeIcon icon={faTachometerAlt} /> 
               Dashboard
@@ -178,8 +173,9 @@ const Header = () => {
           <div className="header__profile-menu-container">
             <span className="header__user-profile">
               <FontAwesomeIcon icon={faUserCircle} className="header__user-avatar" />
+              {/* Use optional chaining to safely access user properties */}
               <span className="header__user-name">
-                {user.firstName} {user.lastName}
+                {user?.firstName} {user?.lastName}
               </span>
             </span>
             <div className="header__profile-dropdown">
@@ -223,7 +219,8 @@ const Header = () => {
               {renderUserSection()}
             </div>
             <div className="header__mobile-controls">
-              {isAuthenticated && user && user.role !== 'admin' && (
+              {/* 💡 CHANGE: Use isAuthenticated and optional chaining for the checks */}
+              {isAuthenticated && user?.role !== 'admin' && (
                 <div className="header__mobile-checks">
                   {renderChecksIndicator()}
                 </div>
@@ -248,19 +245,23 @@ const Header = () => {
 
       <div className={`header__mobile-menu ${isMobileMenuOpen ? 'header__mobile-menu--open' : ''}`}>
         <div className="header__mobile-content">
-          {isAuthenticated && user ? (
+          {/* 💡 CHANGE: Use only isAuthenticated for the main check */}
+          {isAuthenticated ? (
             <div className="header__mobile-user">
               <div className="header__mobile-user-info">
                 <FontAwesomeIcon icon={faUserCircle} className="header__mobile-user-avatar" />
                 <div>
-                  <p className="header__mobile-user-name">Welcome, {user.firstName} {user.lastName}!</p>
+                  {/* Use optional chaining */}
+                  <p className="header__mobile-user-name">Welcome, {user?.firstName} {user?.lastName}!</p>
                   <p className="header__mobile-user-subtitle">
-                    {user.role === 'admin' ? 'Admin Access' : 'Manage your account'}
+                    {/* Use optional chaining */}
+                    {user?.role === 'admin' ? 'Admin Access' : 'Manage your account'}
                   </p>
                 </div>
               </div>
 
-              {user.role === 'admin' && (
+              {/* Use optional chaining */}
+              {user?.role === 'admin' && (
                 <Link to="/dashboard" className="header__mobile-dashboard-btn" onClick={closeMobileMenu}>
                   <FontAwesomeIcon icon={faTachometerAlt} /> Dashboard
                 </Link>

@@ -1,7 +1,15 @@
-import './KeyBenefits.scss';
-import { FaMoneyBillWave, FaCarCrash, FaRecycle, FaHandsHelping, FaClock, FaMapMarkedAlt } from 'react-icons/fa';
+import React from 'react';
+import './KeyBenefits.scss'; 
+import {
+  FaMoneyBillWave,
+  FaCarCrash,
+  FaRecycle,
+  FaHandsHelping,
+  FaClock,
+  FaMapMarkedAlt,
+} from 'react-icons/fa';
 
-const benefits = [
+const benefitsData = [
   {
     icon: <FaMoneyBillWave />,
     title: 'Best Price Guaranteed',
@@ -36,16 +44,18 @@ const benefits = [
 
 const KeyBenefits = () => {
   return (
-    <section className="key-benefits">
+    <section className="benefits-section">
       <div className="container">
-        <h2 className="section-title">Why Choose Us?</h2>
-        <p className="section-subtitle">Discover the key benefits of using our scrap car service</p>
-        <div className="benefits-grid">
-          {benefits.map((item, index) => (
+        <h2 className="benefits-section__title">Why Choose Us?</h2>
+        <p className="benefits-section__subtitle">
+          Discover the key benefits of using our scrap car service
+        </p>
+        <div className="benefits-section__grid">
+          {benefitsData.map((item, index) => (
             <div className="benefit-card" key={index}>
-              <div className="icon">{item.icon}</div>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
+              <div className="benefit-card__icon">{item.icon}</div>
+              <h3 className="benefit-card__title">{item.title}</h3>
+              <p className="benefit-card__description">{item.description}</p>
             </div>
           ))}
         </div>

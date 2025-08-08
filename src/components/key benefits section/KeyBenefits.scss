@@ -1,43 +1,49 @@
 @use '../../styles/base/variables' as *;
 @use '../../styles/base/mixins' as *;
 
-.key-benefits {
-  padding: 6rem $spacing-md;
-  background: $color-secondary;
+.benefits-section {
+  padding: 6rem $spacing-lg;
+
   position: relative;
   overflow: hidden;
 
-  // Background decoration
-  &::before {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+
+  &::before {
     top: -10%;
     left: -10%;
     width: 300px;
     height: 300px;
     background: linear-gradient(135deg, rgba(53, 52, 255, 0.08), rgba(102, 126, 234, 0.03));
-    border-radius: 50%;
-    filter: blur(80px);
   }
 
   &::after {
-    content: '';
-    position: absolute;
     bottom: -15%;
     right: -15%;
     width: 400px;
     height: 400px;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
-    border-radius: 50%;
     filter: blur(100px);
+  }
+
+  @include responsive(sm) {
+    padding: 4rem $spacing-sm;
   }
 
   .container {
     position: relative;
     z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
-  .section-title {
+  .benefits-section__title {
     text-align: center;
     font-size: clamp(2rem, 5vw, 2.8rem);
     font-weight: 800;
@@ -58,14 +64,13 @@
     }
   }
 
-  .section-subtitle {
+  .benefits-section__subtitle {
     text-align: center;
     font-size: 1.2rem;
     color: $color-gray;
     margin-bottom: $spacing-xl;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
     line-height: 1.6;
 
     @include responsive(sm) {
@@ -74,10 +79,11 @@
     }
   }
 
-  .benefits-grid {
+  .benefits-section__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2.5rem;
+    justify-items: center;
 
     @include responsive(lg) {
       grid-template-columns: repeat(2, 1fr);
@@ -102,8 +108,12 @@
     position: relative;
     border: 1px solid rgba(53, 52, 255, 0.1);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 280px;
 
-    // Gradient border effect on hover
     &::before {
       content: '';
       position: absolute;
@@ -113,6 +123,7 @@
       border-radius: 20px;
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
+      -webkit-mask-composite: xor;
       opacity: 0;
       transition: opacity 0.3s ease;
     }
@@ -125,22 +136,23 @@
         opacity: 1;
       }
 
-      .icon {
+      .benefit-card__icon {
         transform: scale(1.1) rotate(5deg);
-        color: $color-primary;
       }
     }
 
     @include responsive(sm) {
       padding: 2rem 1.5rem;
+      min-height: 240px;
     }
 
-    .icon {
+    .benefit-card__icon {
       font-size: 3rem;
-      color: $color-primary;
       margin-bottom: 1.5rem;
       transition: all 0.3s ease;
       display: inline-block;
+      flex-shrink: 0;
+      align-self: center;
 
       @include responsive(sm) {
         font-size: 2.5rem;
@@ -148,7 +160,7 @@
       }
     }
 
-    h3 {
+    .benefit-card__title {
       font-size: 1.3rem;
       font-weight: 700;
       color: $color-dark;
@@ -161,11 +173,14 @@
       }
     }
 
-    p {
+    .benefit-card__description {
       font-size: 1rem;
       color: $color-gray;
       line-height: 1.7;
       margin: 0;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
 
       @include responsive(sm) {
         font-size: 0.9rem;
@@ -173,38 +188,30 @@
       }
     }
 
-    // Different icon colors for variety
-    &:nth-child(1) .icon { color: #4CAF50; }
-    &:nth-child(2) .icon { color: #FF9800; }
-    &:nth-child(3) .icon { color: #2196F3; }
-    &:nth-child(4) .icon { color: #9C27B0; }
-    &:nth-child(5) .icon { color: #F44336; }
-    &:nth-child(6) .icon { color: #00BCD4; }
-
-    &:nth-child(1):hover .icon { color: #45a049; }
-    &:nth-child(2):hover .icon { color: #F57C00; }
-    &:nth-child(3):hover .icon { color: #1976D2; }
-    &:nth-child(4):hover .icon { color: #7B1FA2; }
-    &:nth-child(5):hover .icon { color: #D32F2F; }
-    &:nth-child(6):hover .icon { color: #0097A7; }
-  }
-}
-
-// Animation for cards appearing on scroll (if you want to add intersection observer)
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Responsive improvements
-@include responsive(sm) {
-  .key-benefits {
-    padding: 4rem $spacing-sm;
+    // Icon colors
+    &:nth-child(1) .benefit-card__icon { 
+      color: #4CAF50;
+      &:hover { color: #45a049; }
+    }
+    &:nth-child(2) .benefit-card__icon { 
+      color: #FF9800;
+      &:hover { color: #F57C00; }
+    }
+    &:nth-child(3) .benefit-card__icon { 
+      color: #2196F3;
+      &:hover { color: #1976D2; }
+    }
+    &:nth-child(4) .benefit-card__icon { 
+      color: #9C27B0;
+      &:hover { color: #7B1FA2; }
+    }
+    &:nth-child(5) .benefit-card__icon { 
+      color: #F44336;
+      &:hover { color: #D32F2F; }
+    }
+    &:nth-child(6) .benefit-card__icon { 
+      color: #00BCD4;
+      &:hover { color: #0097A7; }
+    }
   }
 }

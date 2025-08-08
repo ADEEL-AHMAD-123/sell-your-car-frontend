@@ -7,7 +7,8 @@ import {
   faTimes,
   faInfoCircle,
   faCheckCircle,
-  faTachometerAlt // For dashboard icon
+  faTachometerAlt,
+  faSignOutAlt // Added logout icon
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFacebookF,
@@ -15,19 +16,68 @@ import {
   faInstagram,
   faLinkedinIn,
 } from '@fortawesome/free-brands-svg-icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from '../../components/common/Logo/Logo';
+import { logoutUser } from '../../redux/slices/authSlice';
+import { persistor } from '../../redux/store';
+
+// New Modal Component - No changes needed here, as it correctly uses props.
+const LogoutModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3 className="modal-title">Confirm Logout</h3>
+        <p className="modal-message">Are you sure you want to log out?</p>
+        <div className="modal-actions">
+          <button onClick={onClose} className="modal-btn modal-btn--cancel">
+            Cancel
+          </button>
+          <button onClick={onConfirm} className="modal-btn modal-btn--confirm">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showChecksTooltip, setShowChecksTooltip] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false); // New state for profile dropdown
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // New state for modal
+  
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch(); // --- CHANGE: Add the useDispatch hook here ---
   const checksLeft = user?.checksLeft ?? 0;
   const location = useLocation();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  // --- CHANGE: Update the handleLogout function to be async and dispatch the actions ---
+  const handleLogout = async () => {
+    setIsLogoutModalOpen(false);
+
+    try {
+      // 1. Call the logout API to clear the backend cookie
+      await dispatch(logoutUser());
+      
+      // 2. Clear all local Redux-Persist data
+      await persistor.purge();
+      
+      console.log('Successfully logged out and cleared all data.');
+
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Handle logout failure if needed
+    }
+  };
+  // -------------------------------------------------------------------------------------
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -57,7 +107,7 @@ const Header = () => {
   };
 
   const renderChecksIndicator = () => {
-    if (!isAuthenticated || !user || user.role === 'admin') return null; // Admins don't see checks
+    if (!isAuthenticated || !user || user.role === 'admin') return null;
 
     return (
       <div className="header__checks-wrapper">
@@ -65,7 +115,7 @@ const Header = () => {
           className={`header__checks ${getChecksStatusClass(checksLeft)}`}
           onMouseEnter={() => setShowChecksTooltip(true)}
           onMouseLeave={() => setShowChecksTooltip(false)}
-          onClick={() => setShowChecksTooltip(!showChecksTooltip)} // Toggle on click for mobile
+          onClick={() => setShowChecksTooltip(!showChecksTooltip)}
         >
           <FontAwesomeIcon icon={faCheckCircle} className="header__checks-icon" />
           <span className="header__checks-count">{checksLeft}</span>
@@ -113,7 +163,6 @@ const Header = () => {
 
   const renderUserSection = () => {
     if (isAuthenticated && user) {
-      // Profile link is now always a non-clickable span
       return (
         <div className="header__user-section">
           {user.role === 'admin' ? (
@@ -124,13 +173,25 @@ const Header = () => {
           ) : (
             renderChecksIndicator()
           )}
-
-          <span className="header__user-profile header__user-profile--non-clickable">
-            <FontAwesomeIcon icon={faUserCircle} className="header__user-avatar" />
-            <span className="header__user-name">
-              {user.firstName} {user.lastName}
+  
+          {/* This is the new wrapper for the CSS-only hover effect */}
+          <div className="header__profile-menu-container">
+            <span className="header__user-profile">
+              <FontAwesomeIcon icon={faUserCircle} className="header__user-avatar" />
+              <span className="header__user-name">
+                {user.firstName} {user.lastName}
+              </span>
             </span>
-          </span>
+            <div className="header__profile-dropdown">
+              <button 
+                onClick={() => setIsLogoutModalOpen(true)} 
+                className="header__logout-btn"
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
         </div>
       );
     } else {
@@ -148,29 +209,21 @@ const Header = () => {
       <header className="header">
         <div className="header__container">
           <div className="header__content">
-            {/* Logo */}
             <Logo className="header__logo" />
-
-            {/* Desktop Navigation */}
             <nav className="header__nav">
               <ul className="header__nav-list">
                 <li><Link to="/" className={`header__nav-link ${isActiveLink('/') ? 'header__nav-link--active' : ''}`}>Home</Link></li>
                 <li><Link to="/about" className={`header__nav-link ${isActiveLink('/about') ? 'header__nav-link--active' : ''}`}>About</Link></li>
                 <li><Link to="/how-it-works" className={`header__nav-link ${isActiveLink('/how-it-works') ? 'header__nav-link--active' : ''}`}>How It Works</Link></li>
-                
                 <li><Link to="/faqs" className={`header__nav-link ${isActiveLink('/faqs') ? 'header__nav-link--active' : ''}`}>FAQs</Link></li>
                 <li><Link to="/contact" className={`header__nav-link ${isActiveLink('/contact') ? 'header__nav-link--active' : ''}`}>Contact</Link></li>
               </ul>
             </nav>
-
-            {/* Desktop User Section */}
             <div className="header__auth-area">
               {renderUserSection()}
             </div>
-
-            {/* Mobile: Checks + Menu Button */}
             <div className="header__mobile-controls">
-              {isAuthenticated && user && user.role !== 'admin' && ( // Only show checks for non-admins
+              {isAuthenticated && user && user.role !== 'admin' && (
                 <div className="header__mobile-checks">
                   {renderChecksIndicator()}
                 </div>
@@ -189,18 +242,15 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="header__overlay" onClick={closeMobileMenu} />
       )}
 
-      {/* Mobile Menu */}
       <div className={`header__mobile-menu ${isMobileMenuOpen ? 'header__mobile-menu--open' : ''}`}>
         <div className="header__mobile-content">
-          {/* Mobile User Section */}
           {isAuthenticated && user ? (
             <div className="header__mobile-user">
-              <span className="header__mobile-user-info header__mobile-user-info--non-clickable">
+              <div className="header__mobile-user-info">
                 <FontAwesomeIcon icon={faUserCircle} className="header__mobile-user-avatar" />
                 <div>
                   <p className="header__mobile-user-name">Welcome, {user.firstName} {user.lastName}!</p>
@@ -208,13 +258,24 @@ const Header = () => {
                     {user.role === 'admin' ? 'Admin Access' : 'Manage your account'}
                   </p>
                 </div>
-              </span>
+              </div>
 
               {user.role === 'admin' && (
                 <Link to="/dashboard" className="header__mobile-dashboard-btn" onClick={closeMobileMenu}>
                   <FontAwesomeIcon icon={faTachometerAlt} /> Dashboard
                 </Link>
               )}
+              
+              <button 
+                onClick={() => {
+                  closeMobileMenu();
+                  setIsLogoutModalOpen(true);
+                }} 
+                className="header__mobile-logout-btn"
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <span>Logout</span>
+              </button>
             </div>
           ) : (
             <div className="header__mobile-auth">
@@ -226,8 +287,6 @@ const Header = () => {
               </Link>
             </div>
           )}
-
-          {/* Mobile Navigation */}
           <nav className="header__mobile-nav">
             <ul className="header__mobile-nav-list">
               <li><Link to="/" className={`header__mobile-nav-link ${isActiveLink('/') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>Home</Link></li>
@@ -237,24 +296,20 @@ const Header = () => {
               <li><Link to="/contact" className={`header__mobile-nav-link ${isActiveLink('/contact') ? 'header__mobile-nav-link--active' : ''}`} onClick={closeMobileMenu}>Contact</Link></li>
             </ul>
           </nav>
-
-          {/* Social Icons */}
           <div className="header__social-icons">
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faFacebookF} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faTwitter} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faInstagram} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faLinkedinIn} />
-            </a>
+            <a href="#" className="header__social-icon"><FontAwesomeIcon icon={faFacebookF} /></a>
+            <a href="#" className="header__social-icon"><FontAwesomeIcon icon={faTwitter} /></a>
+            <a href="#" className="header__social-icon"><FontAwesomeIcon icon={faInstagram} /></a>
+            <a href="#" className="header__social-icon"><FontAwesomeIcon icon={faLinkedinIn} /></a>
           </div>
         </div>
       </div>
+
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };

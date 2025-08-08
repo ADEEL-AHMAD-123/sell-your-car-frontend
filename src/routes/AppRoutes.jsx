@@ -24,6 +24,8 @@ import CollectedManualQuotes from '../pages/AdminPages/CollectedManualQuotes/Col
 import AdminAnalyticsPage from '../pages/AdminPages/AdminAnalytics/AdminAnalyticsPage';
 import AdminQuoteSearchPage from '../pages/AdminPages/AdminQuoteSearchPage/AdminQuoteSearchPage';
 import AdminSettingsPage from '../pages/AdminPages/AdminSettingsPage/AdminSettingsPage';
+import TermsOfService from '../pages/TermsOfService/TermsOfService';
+import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 
 const AppRoutes = () => (
   <Routes>
@@ -34,6 +36,8 @@ const AppRoutes = () => (
       <Route path="/contact" element={<Contact />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/faqs" element={<FaqsPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
       <Route path="/quote-result" element={<ProtectedRoute><QuoteResult /></ProtectedRoute>} />
       <Route path="/quote-confirmation" element={<ProtectedRoute><QuoteConfirmation /></ProtectedRoute>} />
       <Route path="/manual-valuation" element={<ManualValuationPage />} />

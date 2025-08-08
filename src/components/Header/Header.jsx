@@ -113,11 +113,7 @@ const Header = () => {
 
   const renderUserSection = () => {
     if (isAuthenticated && user) {
-      const ProfileComponent = user.role === 'admin' ? 'span' : Link;
-      const profileProps = user.role === 'admin' 
-        ? { className: "header__user-profile header__user-profile--non-clickable" } 
-        : { to: "/profile", className: "header__user-profile" };
-
+      // Profile link is now always a non-clickable span
       return (
         <div className="header__user-section">
           {user.role === 'admin' ? (
@@ -129,12 +125,12 @@ const Header = () => {
             renderChecksIndicator()
           )}
 
-          <ProfileComponent {...profileProps}>
+          <span className="header__user-profile header__user-profile--non-clickable">
             <FontAwesomeIcon icon={faUserCircle} className="header__user-avatar" />
             <span className="header__user-name">
               {user.firstName} {user.lastName}
             </span>
-          </ProfileComponent>
+          </span>
         </div>
       );
     } else {
@@ -204,23 +200,15 @@ const Header = () => {
           {/* Mobile User Section */}
           {isAuthenticated && user ? (
             <div className="header__mobile-user">
-              {user.role === 'admin' ? (
-                <span className="header__mobile-user-info header__mobile-user-info--non-clickable">
-                  <FontAwesomeIcon icon={faUserCircle} className="header__mobile-user-avatar" />
-                  <div>
-                    <p className="header__mobile-user-name">Welcome, {user.firstName} {user.lastName}!</p>
-                    <p className="header__mobile-user-subtitle">Admin Access</p>
-                  </div>
-                </span>
-              ) : (
-                <Link to="/profile" className="header__mobile-user-info" onClick={closeMobileMenu}>
-                  <FontAwesomeIcon icon={faUserCircle} className="header__mobile-user-avatar" />
-                  <div>
-                    <p className="header__mobile-user-name">Welcome, {user.firstName} {user.lastName}!</p>
-                    <p className="header__mobile-user-subtitle">Manage your account</p>
-                  </div>
-                </Link>
-              )}
+              <span className="header__mobile-user-info header__mobile-user-info--non-clickable">
+                <FontAwesomeIcon icon={faUserCircle} className="header__mobile-user-avatar" />
+                <div>
+                  <p className="header__mobile-user-name">Welcome, {user.firstName} {user.lastName}!</p>
+                  <p className="header__mobile-user-subtitle">
+                    {user.role === 'admin' ? 'Admin Access' : 'Manage your account'}
+                  </p>
+                </div>
+              </span>
 
               {user.role === 'admin' && (
                 <Link to="/dashboard" className="header__mobile-dashboard-btn" onClick={closeMobileMenu}>

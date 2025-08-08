@@ -1,0 +1,756 @@
+// src/styles/LegalPages.scss
+
+// Retaining the original color variables and mixins for consistency.
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+// A slightly softer, more readable palette based on the original request.
+// The base colors are kept, but their usage has been adjusted for better contrast.
+$color-primary: #3b82f6; // A professional blue
+$color-secondary-background: #f8f9fb; // Very light off-white
+$color-light: #ffffff; // Pure white
+$color-dark: #1f2937; // Dark charcoal
+$color-gray: #4b5563; // Medium gray
+$color-success: #10b981; // Green for success
+$color-warning: #f59e0b; // Orange for warnings
+$color-danger: #ef4444; // Red for liability
+
+$spacing-xxs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 48px;
+$spacing-xxl: 64px;
+
+$shadow-primary: 0 4px 16px rgba(0, 0, 0, 0.05);
+
+$font-family: 'Inter', sans-serif;
+
+@mixin container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+
+  @media (min-width: 768px) {
+    padding: 0 $spacing-lg;
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: 576px) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: 768px) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: 992px) {
+      @content;
+    }
+  }
+}
+
+.legal-page {
+  min-height: 100vh;
+  // Kept the light background but removed the `lighten()` for a consistent look.
+  background: linear-gradient(135deg, $color-secondary-background 0%, $color-secondary-background 100%);
+  font-family: $font-family;
+
+  // Header Section
+  .legal-header {
+    // Adjusted the darken value for a slightly lighter gradient.
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 5%) 100%);
+    color: $color-light;
+    padding: $spacing-xl 0;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      // Increased opacity of the subtle pattern for more visibility.
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .container {
+      @include container;
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      // Increased opacity for better visibility.
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: $color-light;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-bottom: $spacing-md;
+      backdrop-filter: blur(10px);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      svg {
+        font-size: 0.9rem;
+      }
+    }
+
+    .header-content {
+      text-align: center;
+      animation: slideInUp 0.8s ease-out;
+
+      .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        // Increased opacity for better visibility.
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        @include flex-center;
+        margin: 0 auto $spacing-sm;
+        font-size: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: $spacing-xs;
+        letter-spacing: -0.02em;
+
+        @include responsive(md) {
+          font-size: 2.5rem;
+        }
+
+        @include responsive(sm) {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+
+  // Content Section
+  .legal-content {
+    padding: $spacing-xl 0;
+
+    .container {
+      @include container;
+    }
+
+    .content-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+  }
+
+  // Introduction Section
+  .intro-section {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+
+    .intro-text {
+      font-size: 1.2rem;
+      line-height: 1.7;
+      color: $color-gray;
+      background: $color-light;
+      padding: $spacing-lg;
+      border-radius: 16px;
+      box-shadow: $shadow-primary;
+      border-left: 4px solid $color-primary;
+
+      @include responsive(sm) {
+        font-size: 1rem;
+        padding: $spacing-md;
+      }
+
+      strong {
+        color: $color-primary;
+        font-weight: 700;
+      }
+    }
+  }
+
+  // Terms Grid
+  .terms-grid {
+    display: grid;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  // Term Section
+  .term-section {
+    background: $color-light;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: $shadow-primary;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba($color-primary, 0.1);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-header {
+      // Adjusted the darken value for a slightly lighter gradient.
+      background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 5%) 100%);
+      color: $color-light;
+      padding: $spacing-md $spacing-lg;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      .section-icon {
+        font-size: 1.5rem;
+        opacity: 0.9;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
+
+        @include responsive(sm) {
+          font-size: 1.2rem;
+        }
+      }
+    }
+
+    .section-content {
+      padding: $spacing-lg;
+
+      p {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: $color-dark;
+        margin-bottom: $spacing-md;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: $spacing-sm 0;
+
+        li {
+          padding: $spacing-xs 0;
+          padding-left: $spacing-lg;
+          position: relative;
+
+          color: $color-dark;
+          line-height: 1.6;
+
+          &::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+justify-content: center;
+            color: $color-primary;
+            font-weight: bold;
+          }
+        }
+      }
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $color-primary;
+        margin: $spacing-md 0 $spacing-sm;
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+
+        svg {
+          font-size: 1rem;
+        }
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $color-dark;
+        margin: $spacing-sm 0 $spacing-xs;
+      }
+    }
+  }
+
+  // Special Content Boxes
+  .highlight-box,
+  .warning-box,
+  .liability-box,
+  .no-sharing-box,
+  .security-notice,
+  .response-time,
+  .update-notice {
+    padding: $spacing-sm $spacing-md;
+    border-radius: 12px;
+    margin: $spacing-md 0;
+    border-left: 4px solid;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: $color-dark;
+  }
+
+  .highlight-box {
+    // Increased opacity for better visibility
+    background: rgba($color-primary, 0.15);
+    border-left-color: $color-primary;
+  }
+
+  .warning-box {
+    // Increased opacity for better visibility
+    background: rgba($color-warning, 0.15);
+    border-left-color: $color-warning;
+  }
+
+  .liability-box {
+    // Increased opacity for better visibility
+    background: rgba($color-danger, 0.15);
+    border-left-color: $color-danger;
+    font-weight: 500;
+  }
+
+  .no-sharing-box {
+    // Increased opacity for better visibility
+    background: rgba($color-success, 0.15);
+    border-left-color: $color-success;
+
+    ul {
+      margin: $spacing-xs 0 0;
+    }
+  }
+
+  .security-notice,
+  .response-time,
+  .update-notice {
+    // Increased opacity for better visibility
+    background: rgba($color-gray, 0.15);
+    border-left-color: $color-gray;
+  }
+
+  // Requirements List
+  .requirements-list {
+    display: grid;
+    gap: $spacing-xs;
+
+    li {
+      // Increased opacity for better visibility
+      background: rgba($color-primary, 0.1);
+      padding: $spacing-sm;
+      border-radius: 8px;
+      border-left: 3px solid $color-primary;
+      color: $color-dark;
+
+      &::before {
+        content: '✓';
+        color: $color-success;
+        font-weight: bold;
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+
+  // Content Rules
+  .content-rules {
+    h3 {
+      border-bottom: 2px solid rgba($color-primary, 0.2); // Increased opacity
+      padding-bottom: $spacing-xs;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  // Platform Details
+  .platform-details {
+    display: grid;
+    gap: $spacing-md;
+
+    @include responsive(md) {
+      gap: $spacing-sm;
+    }
+
+    h3 {
+      color: $color-primary;
+      border-bottom: 1px solid rgba($color-primary, 0.3); // Increased opacity
+      padding-bottom: $spacing-xs;
+    }
+  }
+
+  // Data Categories
+  .data-categories {
+    display: grid;
+    gap: $spacing-md;
+
+    @include responsive(lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include responsive(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .data-category {
+    // Increased opacity for better visibility
+    background: rgba($color-primary, 0.05);
+    padding: $spacing-md;
+    border-radius: 12px;
+    border: 1px solid rgba($color-primary, 0.2); // Increased opacity
+
+    h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      color: $color-primary;
+    }
+
+    ul {
+      margin-bottom: 0;
+
+      li {
+        font-size: 0.9rem;
+        padding: 4px 0 4px $spacing-sm;
+        color: $color-dark;
+
+        &::before {
+          content: '•';
+          font-size: 1.2rem;
+          color: $color-primary;
+        }
+      }
+    }
+  }
+
+  // Third Party Info
+  .third-party-info {
+    .data-fetched {
+      // Increased opacity for better visibility.
+      background: rgba($color-secondary, 0.6);
+      padding: $spacing-md;
+      border-radius: 12px;
+      margin: $spacing-md 0;
+
+      h4 {
+        color: $color-primary;
+        margin-bottom: $spacing-sm;
+      }
+    }
+  }
+
+  // Usage Purposes
+  .usage-purposes {
+    h3 {
+      // Increased opacity for better visibility
+      background: rgba($color-primary, 0.15);
+      padding: $spacing-sm $spacing-md;
+      border-radius: 8px;
+      margin: $spacing-md 0 $spacing-sm;
+    }
+  }
+
+  // Sharing Scenarios
+  .sharing-scenarios {
+    display: grid;
+    gap: $spacing-md;
+  }
+
+  .sharing-category {
+    border: 1px solid rgba($color-primary, 0.2); // Increased opacity
+    padding: $spacing-md;
+    border-radius: 12px;
+    background: rgba($color-primary, 0.05); // Increased opacity
+
+    h3 {
+      margin-top: 0;
+      color: $color-primary;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+  }
+
+  // Security Measures
+  .security-measures {
+    h3 {
+      // Adjusted the darken value for a slightly lighter gradient.
+      background: linear-gradient(135deg, $color-success, darken($color-success, 5%));
+      color: white;
+      padding: $spacing-sm $spacing-md;
+      border-radius: 8px;
+      margin: $spacing-md 0 $spacing-sm;
+    }
+  }
+
+  // User Rights
+  .user-rights {
+    h3 {
+      // Adjusted the darken value for a slightly lighter gradient.
+      background: linear-gradient(135deg, $color-primary, darken($color-primary, 5%));
+      color: white;
+      padding: $spacing-sm $spacing-md;
+      border-radius: 8px;
+      margin: $spacing-md 0 $spacing-sm;
+    }
+  }
+
+  // Retention Info
+  .retention-info {
+    h3 {
+      color: $color-primary;
+      border-bottom: 2px solid rgba($color-primary, 0.3); // Increased opacity
+      padding-bottom: $spacing-xs;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  // Contact Section
+  .contact-section {
+    margin-top: $spacing-xl;
+    text-align: center;
+  }
+
+  .contact-card {
+    background: linear-gradient(135deg, $color-light 0%, darken($color-secondary-background, 3%) 100%);
+    padding: $spacing-xl;
+    border-radius: 24px;
+    box-shadow: $shadow-primary;
+    border: 1px solid rgba($color-primary, 0.2); // Increased opacity
+    max-width: 500px;
+    margin: 0 auto;
+
+    .contact-icon {
+      font-size: 3rem;
+      color: $color-primary;
+      margin-bottom: $spacing-md;
+      animation: pulse 2s infinite;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      color: $color-primary;
+      margin-bottom: $spacing-sm;
+      font-weight: 700;
+    }
+
+    p {
+      color: $color-gray;
+      margin-bottom: $spacing-md;
+      line-height: 1.6;
+    }
+
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      // Adjusted the darken value for a slightly lighter gradient.
+      background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 5%) 100%);
+      color: $color-light;
+      text-decoration: none;
+      padding: $spacing-sm $spacing-lg;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba($color-primary, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba($color-primary, 0.4);
+      }
+
+      svg {
+        font-size: 1rem;
+      }
+    }
+
+    .contact-note {
+      margin-top: $spacing-sm;
+      font-size: 0.85rem;
+      color: $color-gray;
+      font-style: italic;
+    }
+  }
+
+  // Link Styles
+  .link {
+    color: $color-primary;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-bottom-color: $color-primary;
+    }
+  }
+
+  // Animations
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  // Responsive Adjustments
+  @include responsive(md) {
+    .legal-header {
+      padding: $spacing-lg 0;
+
+      .header-content {
+        .icon-wrapper {
+          width: 70px;
+          height: 70px;
+          font-size: 1.8rem;
+        }
+      }
+    }
+
+    .legal-content {
+      padding: $spacing-lg 0;
+    }
+
+    .terms-grid {
+      gap: $spacing-md;
+    }
+
+    .term-section {
+      .section-content {
+        padding: $spacing-md;
+      }
+    }
+
+    .contact-card {
+      padding: $spacing-lg;
+    }
+  }
+
+  @include responsive(sm) {
+    .legal-header {
+      padding: $spacing-md 0;
+
+      .back-button {
+        margin-bottom: $spacing-sm;
+      }
+
+      .header-content {
+        .icon-wrapper {
+          width: 60px;
+          height: 60px;
+          font-size: 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+      }
+    }
+
+    .legal-content {
+      padding: $spacing-md 0;
+    }
+
+    .intro-section {
+      margin-bottom: $spacing-lg;
+    }
+
+    .terms-grid {
+      gap: $spacing-sm;
+      margin-bottom: $spacing-lg;
+    }
+
+    .term-section {
+      border-radius: 16px;
+
+      .section-header {
+        padding: $spacing-sm $spacing-md;
+        flex-direction: column;
+        text-align: center;
+        gap: $spacing-xs;
+
+        .section-icon {
+          font-size: 1.3rem;
+        }
+      }
+
+      .section-content {
+        padding: $spacing-sm;
+      }
+    }
+
+    .data-categories {
+      gap: $spacing-sm;
+    }
+
+    .contact-section {
+      margin-top: $spacing-lg;
+    }
+
+    .contact-card {
+      padding: $spacing-md;
+      border-radius: 20px;
+
+      .contact-icon {
+        font-size: 2.5rem;
+      }
+
+      h3 {
+        font-size: 1.3rem;
+      }
+
+      .contact-button {
+        padding: $spacing-sm $spacing-md;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

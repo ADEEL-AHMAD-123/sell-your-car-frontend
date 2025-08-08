@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import MessageCard from '../../components/common/MessageCard';
+import { getLoggedInUser } from '../../redux/slices/authSlice';
 
 const HeroSection = () => {
   const dispatch = useDispatch();
@@ -58,6 +59,9 @@ const HeroSection = () => {
         );
 
         if (getQuote.fulfilled.match(resultAction)) {
+
+          await dispatch(getLoggedInUser());
+
           const { status } = resultAction.payload.data;
           const responseMessage = resultAction.payload.message;
 

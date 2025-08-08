@@ -17,6 +17,13 @@ export const loginUser = createApiAsyncThunk({
   typePrefix: "auth",
 });
 
+export const getLoggedInUser = createApiAsyncThunk({
+  name: "getLoggedInUser",
+  method: "GET",
+  url: "/api/auth/me", 
+  typePrefix: "auth",
+});
+
 export const logoutUser = createApiAsyncThunk({
   name: "logout",
   method: "POST",
@@ -75,6 +82,20 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.isLoading = false;
         state.error = null;
+      })
+      
+      // Get Logged-in User
+      .addCase(getLoggedInUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getLoggedInUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+      })
+      .addCase(getLoggedInUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Failed to fetch user data";
       });
   },
 });

@@ -5,7 +5,7 @@
   background: $admin-bg-primary;
   color: $admin-text-primary;
   min-height: 100vh;
-
+overflow-y: hidden;
   // Page Header
   .page-header {
     margin-bottom: $admin-spacing-2xl;

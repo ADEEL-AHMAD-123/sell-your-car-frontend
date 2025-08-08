@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaCog, FaSave, FaSyncAlt, FaExclamationTriangle, FaCheckCircle, FaSpinner, FaInfoCircle } from 'react-icons/fa';
 import { fetchSettings, updateSettings } from '../../../redux/slices/adminSlice';
-import './AdminSettingsPage.scss'; 
+import './AdminSettingsPage.scss';
 
 const AdminSettingsPage = () => {
   const dispatch = useDispatch();
@@ -62,7 +62,8 @@ const AdminSettingsPage = () => {
       defaultChecks: Number(defaultChecksValue),
     };
 
-    const result = await dispatch(updateSettings({ payload }));
+    // Correctly passing data under the 'data' key
+    const result = await dispatch(updateSettings({ data: payload }));
 
     if (result.meta.requestStatus === 'fulfilled') {
       setDefaultChecksStatus({ loading: false, error: null, success: 'Updated!' });
@@ -96,7 +97,8 @@ const AdminSettingsPage = () => {
       scrapRatePerKg: Number(scrapRatePerKgValue),
     };
 
-    const result = await dispatch(updateSettings({ payload }));
+    // THIS IS THE CORRECTED LINE:
+    const result = await dispatch(updateSettings({ data: payload }));
 
     if (result.meta.requestStatus === 'fulfilled') {
       setScrapRateStatus({ loading: false, error: null, success: 'Updated!' });

@@ -1,7 +1,6 @@
-// QuoteDetailsModal.scss
 @import '../../../styles/base/admin-variables.scss';
 
-.quote-details-modal {
+.confirm-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -25,17 +24,16 @@
     }
   }
 
-  .modal-content {
+  .confirm-modal {
     background: $admin-bg-card;
     border: 1px solid $admin-border;
     border-radius: $admin-radius-xl;
     box-shadow: $admin-shadow-xl;
     width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 500px;
     position: relative;
     animation: slideUp $admin-transition-base;
+    overflow: hidden;
 
     @keyframes slideUp {
       from {
@@ -48,44 +46,24 @@
       }
     }
 
-    // Custom scrollbar
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: $admin-bg-secondary;
-      border-radius: $admin-radius-sm;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $admin-border-light;
-      border-radius: $admin-radius-sm;
-      
-      &:hover {
-        background: $admin-text-muted;
-      }
-    }
-
-    .close-btn {
+    .modal-close {
       position: absolute;
       top: $admin-spacing-lg;
       right: $admin-spacing-lg;
       background: $admin-bg-hover;
       border: 1px solid $admin-border;
       color: $admin-text-secondary;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: $admin-radius-lg;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: $admin-font-size-xl;
       cursor: pointer;
       transition: all $admin-transition-fast;
       z-index: 10;
       
-      &:hover {
+      &:hover:not(:disabled) {
         background: $admin-error;
         color: white;
         border-color: $admin-error;
@@ -95,242 +73,299 @@
       &:active {
         transform: scale(0.95);
       }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
-    h2 {
-      color: $admin-text-primary;
-      font-size: $admin-font-size-2xl;
-      font-weight: 700;
-      margin: 0 0 $admin-spacing-xl 0;
-      padding: $admin-spacing-xl $admin-spacing-xl 0;
-      background: $admin-primary-gradient;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .modal-header {
+      padding: $admin-spacing-xl $admin-spacing-xl $admin-spacing-lg;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border-bottom: 1px solid $admin-border;
       position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: $admin-primary-gradient;
+      }
+
+      .modal-icon {
+        margin-bottom: $admin-spacing-md;
+        padding: $admin-spacing-md;
+        border-radius: $admin-radius-full;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        animation: bounceIn 0.6s ease-out;
+
+        @keyframes bounceIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.3);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+          70% {
+            transform: scale(0.9);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        &.default {
+          background: rgba(99, 102, 241, 0.1);
+          color: $admin-primary;
+          border: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        &.success {
+          background: rgba(16, 185, 129, 0.1);
+          color: $admin-success;
+          border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+
+        &.danger {
+          background: rgba(239, 68, 68, 0.1);
+          color: $admin-error;
+          border: 2px solid rgba(239, 68, 68, 0.2);
+          animation: pulse 2s infinite;
+        }
+      }
+
+      .modal-title {
+        margin: 0;
+        color: $admin-text-primary;
+        font-size: $admin-font-size-xl;
+        font-weight: 700;
+        background: $admin-primary-gradient;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
     }
 
-    .details-section {
-      padding: 0 $admin-spacing-xl $admin-spacing-xl;
-      
-      &.top-summary {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-        border-radius: $admin-radius-lg;
-        margin: 0 $admin-spacing-xl $admin-spacing-lg;
-        padding: $admin-spacing-lg;
-        border: 1px solid rgba(99, 102, 241, 0.2);
-      }
+    .modal-body {
+      padding: $admin-spacing-xl;
 
-      h3 {
-        color: $admin-primary-light;
-        font-size: $admin-font-size-lg;
-        font-weight: 600;
-        margin: 0 0 $admin-spacing-md 0;
-        padding-bottom: $admin-spacing-sm;
-        border-bottom: 2px solid $admin-border;
-        display: flex;
-        align-items: center;
-        gap: $admin-spacing-sm;
-
-        &::before {
-          content: '';
-          width: 4px;
-          height: 20px;
-          background: $admin-primary-gradient;
-          border-radius: $admin-radius-full;
-        }
-      }
-
-      p {
+      .modal-message {
+        margin: 0 0 $admin-spacing-lg 0;
         color: $admin-text-secondary;
-        font-size: $admin-font-size-sm;
+        font-size: $admin-font-size-base;
         line-height: 1.6;
-        margin: 0 0 $admin-spacing-sm 0;
-        padding: $admin-spacing-sm $admin-spacing-md;
+        text-align: center;
         background: rgba(255, 255, 255, 0.02);
-        border-radius: $admin-radius-md;
-        border-left: 3px solid transparent;
-        transition: all $admin-transition-fast;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-left-color: $admin-primary;
-          transform: translateX(4px);
-        }
-
-        &:last-child {
-          margin-bottom: 0;
-        }
+        padding: $admin-spacing-lg;
+        border-radius: $admin-radius-lg;
+        border: 1px solid rgba(255, 255, 255, 0.1);
 
         strong {
           color: $admin-text-primary;
           font-weight: 600;
-          display: inline-block;
-          min-width: 140px;
+        }
+      }
+
+      .modal-error {
+        display: flex;
+        align-items: center;
+        gap: $admin-spacing-sm;
+        background: rgba(239, 68, 68, 0.1);
+        color: $admin-error;
+        padding: $admin-spacing-md $admin-spacing-lg;
+        border-radius: $admin-radius-lg;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        font-size: $admin-font-size-sm;
+        margin-top: $admin-spacing-md;
+        animation: slideDown 0.3s ease-out;
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        svg {
+          flex-shrink: 0;
         }
       }
     }
 
-    .images-section {
-      padding: 0 $admin-spacing-xl $admin-spacing-xl;
+    .modal-footer {
+      padding: $admin-spacing-lg $admin-spacing-xl $admin-spacing-xl;
+      display: flex;
+      gap: $admin-spacing-md;
+      justify-content: flex-end;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid $admin-border;
 
-      h3 {
-        color: $admin-primary-light;
-        font-size: $admin-font-size-lg;
+      .btn {
+        padding: $admin-spacing-md $admin-spacing-xl;
+        border-radius: $admin-radius-lg;
+        font-size: $admin-font-size-sm;
         font-weight: 600;
-        margin: 0 0 $admin-spacing-md 0;
-        padding-bottom: $admin-spacing-sm;
-        border-bottom: 2px solid $admin-border;
+        cursor: pointer;
+        transition: all $admin-transition-fast;
+        min-width: 120px;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: $admin-spacing-sm;
+        position: relative;
+        border: 2px solid transparent;
 
-        &::before {
-          content: '';
-          width: 4px;
-          height: 20px;
-          background: $admin-primary-gradient;
-          border-radius: $admin-radius-full;
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none !important;
         }
-      }
 
-      p {
-        color: $admin-text-muted;
-        font-size: $admin-font-size-sm;
-        font-style: italic;
-        text-align: center;
-        padding: $admin-spacing-xl;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: $admin-radius-lg;
-        border: 2px dashed $admin-border;
-      }
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: $admin-shadow-md;
+        }
 
-      .image-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: $admin-spacing-md;
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
 
-        img {
-          width: 100%;
-          height: 150px;
-          object-fit: cover;
-          border-radius: $admin-radius-lg;
-          border: 2px solid $admin-border;
-          transition: all $admin-transition-base;
-          cursor: pointer;
+        &.btn-cancel {
+          background: $admin-bg-secondary;
+          color: $admin-text-secondary;
+          border-color: $admin-border;
 
-          &:hover {
+          &:hover:not(:disabled) {
+            background: $admin-bg-hover;
+            color: $admin-text-primary;
             border-color: $admin-primary;
-            transform: scale(1.05);
-            box-shadow: $admin-shadow-lg;
           }
+        }
+
+        &.btn-confirm {
+          color: white;
+          font-weight: 700;
+
+          &.default {
+            background: $admin-primary-gradient;
+            border-color: $admin-primary;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(135deg, darken($admin-primary, 5%) 0%, darken($admin-primary-light, 5%) 100%);
+              border-color: darken($admin-primary, 10%);
+            }
+          }
+
+          &.success {
+            background: linear-gradient(135deg, $admin-success 0%, lighten($admin-success, 10%) 100%);
+            border-color: $admin-success;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(135deg, darken($admin-success, 5%) 0%, $admin-success 100%);
+              border-color: darken($admin-success, 10%);
+            }
+          }
+
+          &.danger {
+            background: linear-gradient(135deg, $admin-error 0%, lighten($admin-error, 10%) 100%);
+            border-color: $admin-error;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(135deg, darken($admin-error, 5%) 0%, $admin-error 100%);
+              border-color: darken($admin-error, 10%);
+            }
+          }
+        }
+
+        .btn-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid transparent;
+          border-top: 2px solid currentColor;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       }
     }
 
     // Responsive design
-    @media (max-width: $admin-breakpoint-md) {
-      margin: $admin-spacing-sm;
-      border-radius: $admin-radius-lg;
-
-      h2 {
-        font-size: $admin-font-size-xl;
-        padding: $admin-spacing-lg $admin-spacing-lg 0;
-      }
-
-      .details-section,
-      .images-section {
-        padding: 0 $admin-spacing-lg $admin-spacing-lg;
-
-        &.top-summary {
-          margin: 0 $admin-spacing-lg $admin-spacing-lg;
-        }
-
-        h3 {
-          font-size: $admin-font-size-base;
-        }
-
-        p strong {
-          min-width: 120px;
-          font-size: $admin-font-size-xs;
-        }
-      }
-
-      .close-btn {
-        width: 36px;
-        height: 36px;
-        font-size: $admin-font-size-lg;
-      }
-
-      .image-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: $admin-spacing-sm;
-
-        img {
-          height: 120px;
-        }
-      }
-    }
-
     @media (max-width: $admin-breakpoint-sm) {
-      .image-grid {
-        grid-template-columns: 1fr;
-        
-        img {
-          height: 180px;
+      margin: $admin-spacing-md;
+      max-width: none;
+
+      .modal-header {
+        padding: $admin-spacing-lg;
+
+        .modal-title {
+          font-size: $admin-font-size-lg;
+        }
+
+        .modal-icon {
+          padding: $admin-spacing-sm;
+          
+          svg {
+            width: 24px;
+            height: 24px;
+          }
         }
       }
 
-      .details-section p strong {
-        display: block;
-        margin-bottom: $admin-spacing-xs;
-        color: $admin-primary-light;
+      .modal-body {
+        padding: $admin-spacing-lg;
+
+        .modal-message {
+          font-size: $admin-font-size-sm;
+          padding: $admin-spacing-md;
+        }
+      }
+
+      .modal-footer {
+        padding: $admin-spacing-md $admin-spacing-lg;
+        flex-direction: column-reverse;
+
+        .btn {
+          width: 100%;
+          min-width: auto;
+        }
+      }
+
+      .modal-close {
+        width: 32px;
+        height: 32px;
+        top: $admin-spacing-md;
+        right: $admin-spacing-md;
       }
     }
   }
+}
 
-  // Loading animation for images
-  .image-grid img {
-    &:not([src]) {
-      background: linear-gradient(90deg, 
-        $admin-bg-secondary 25%, 
-        $admin-bg-hover 50%, 
-        $admin-bg-secondary 75%
-      );
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-    }
+// Enhanced animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
-
-  @keyframes loading {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  // Special styling for specific fields
-  .details-section p {
-    &:has(strong:contains("Manual Quote Reason")) {
-      background: rgba(239, 68, 68, 0.1);
-      border-left-color: $admin-error;
-    }
-
-    &:has(strong:contains("Offered Price")) {
-      background: rgba(16, 185, 129, 0.1);
-      border-left-color: $admin-success;
-      
-      strong + * {
-        color: $admin-success-light;
-        font-weight: 600;
-      }
-    }
-
-    &:has(strong:contains("Revenue Weight")) {
-      background: rgba(59, 130, 246, 0.1);
-      border-left-color: $admin-info;
-    }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }

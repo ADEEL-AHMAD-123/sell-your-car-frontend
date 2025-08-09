@@ -30,23 +30,20 @@ const AllManualQuotes = () => {
   const debouncedFilters = useDebouncedValue(filters, 500);
   const [modalViewQuote, setModalViewQuote] = useState(null);
   const [modalReviewQuote, setModalReviewQuote] = useState(null);
-  // Removed initialRenderDone state as it's no longer needed with the simplified useEffect
 
   // Redux selectors
   const {
     pending: {
-      response: pendingResponseFromRedux, // Get the raw response from Redux
+      response: pendingResponseFromRedux,
       loading: pendingLoading = false,
       error: pendingError = null,
-    } = {}, // Default for 'pending'
+    } = {},
     review: {
       loading: reviewLoading = false,
       error: reviewError = null,
     } = {},
-  } = useSelector((state) => state.adminQuotes || {}); // === NEW: Add default empty object for state.adminQuotes ===
+  } = useSelector((state) => state.adminQuotes || {});
 
-  // === Defensive check for pendingResponse ===
-  // Ensure pendingResponse is always an object, even if pendingResponseFromRedux is null
   const pendingResponse = pendingResponseFromRedux || {};
 
   const {
@@ -57,13 +54,9 @@ const AllManualQuotes = () => {
   } = pendingResponse;
 
   // Fetch data on filter change
-  // === SIMPLIFIED useEffect for data fetching ===
-  // This hook will now dispatch `fetchPendingManualQuotes` whenever `debouncedFilters` changes.
-  // The `useDebouncedValue` hook ensures this only happens after a short delay,
-  // preventing excessive API calls during rapid filter input.
   useEffect(() => {
     dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
-  }, [dispatch, debouncedFilters]); // Removed initialRenderDone from dependencies
+  }, [dispatch, debouncedFilters]);
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
@@ -140,22 +133,9 @@ const AllManualQuotes = () => {
     return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
   };
 
-  const getQuoteType = (quote) => {
-    // Assuming 'type' field exists on the quote object from the schema
-    if (quote.type === 'manual') return 'Manual';
-    if (quote.type === 'auto') return 'Auto';
-    return 'Standard'; // Fallback for other types or if type is missing
-  };
+  // Removed the getQuoteType function
 
-  const getPriorityLevel = (quote) => {
-    const createdAt = new Date(quote.createdAt);
-    const now = new Date();
-    const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
-    
-    if (hoursDiff > 48) return 'high';
-    if (hoursDiff > 24) return 'medium';
-    return 'low';
-  };
+  // Removed the getPriorityLevel function
 
   const renderDesktopTable = () => (
     <div className="table-wrapper">
@@ -165,10 +145,10 @@ const AllManualQuotes = () => {
             <th>Reg No</th>
             <th>Vehicle</th>
             <th>Client</th>
-            <th>Type</th>
+            {/* Removed the 'Type' column header */}
             <th>Reason</th>
             <th>Client Offer</th>
-            <th>Priority</th>
+            {/* Removed the 'Priority' column header */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -184,11 +164,7 @@ const AllManualQuotes = () => {
               <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </td>
-              <td>
-                <span className={`type-badge ${getQuoteType(quote).toLowerCase()}`}>
-                  {getQuoteType(quote)}
-                </span>
-              </td>
+              {/* Removed the 'Type' data cell */}
               <td title={quote.manualQuoteReason || 'N/A'}>
                 <span className="reason-text">
                   {quote.manualQuoteReason || 'N/A'}
@@ -197,26 +173,24 @@ const AllManualQuotes = () => {
               <td title={formatPrice(quote.userEstimatedPrice)}>
                 {formatPrice(quote.userEstimatedPrice)}
               </td>
+              {/* Removed the 'Priority' data cell */}
               <td>
-                <span className={`priority-badge ${getPriorityLevel(quote)}`}>
-                  {getPriorityLevel(quote)}
-                </span>
-              </td>
-              <td>
-                <button 
-                  className="btn-view" 
-                  onClick={() => handleViewDetails(quote)}
-                  aria-label={`View details for ${quote.regNumber || 'quote'}`}
-                >
-                  View
-                </button>
-                <button 
-                  className="btn-review" 
-                  onClick={() => handleReview(quote)}
-                  aria-label={`Review quote for ${quote.regNumber || 'vehicle'}`}
-                >
-                  Review
-                </button>
+                <div className="actions-container">
+                  <button
+                    className="btn-view"
+                    onClick={() => handleViewDetails(quote)}
+                    aria-label={`View details for ${quote.regNumber || 'quote'}`}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="btn-review"
+                    onClick={() => handleReview(quote)}
+                    aria-label={`Review quote for ${quote.regNumber || 'vehicle'}`}
+                  >
+                    Review
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -232,15 +206,10 @@ const AllManualQuotes = () => {
           <div className="card-header">
             <h3 className="card-title">{quote.regNumber || 'N/A'}</h3>
             <div className="card-badges">
-              <span className={`card-badge ${getQuoteType(quote).toLowerCase()}`}>
-                {getQuoteType(quote)}
-              </span>
-              <span className={`priority-badge ${getPriorityLevel(quote)}`}>
-                {getPriorityLevel(quote)}
-              </span>
+              {/* Removed the type and priority badges */}
             </div>
           </div>
-          
+
           <div className="card-details">
             <div className="detail-item">
               <div className="label">Vehicle</div>
@@ -261,7 +230,7 @@ const AllManualQuotes = () => {
               <div className="value">{formatPrice(quote.userEstimatedPrice)}</div>
             </div>
           </div>
-          
+
           <div className="card-actions">
             <button
               className="btn-view"
@@ -362,7 +331,7 @@ const AllManualQuotes = () => {
             <ul>
               <li><strong>Reason:</strong> Why automatic processing failed</li>
               <li><strong>Client Offer:</strong> Customer's estimated price</li>
-              <li><strong>Priority:</strong> Based on request age and urgency</li>
+              {/* Removed the 'Priority' list item */}
             </ul>
           </div>
         </div>

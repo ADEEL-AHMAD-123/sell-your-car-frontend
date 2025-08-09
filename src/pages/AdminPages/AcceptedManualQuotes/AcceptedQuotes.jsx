@@ -184,23 +184,25 @@ const AcceptedQuotes = () => {
                 {formatWeight(quote.revenueWeight)}
               </td>
               <td>
-                <button
-                  className="btn-view"
-                  onClick={() => handleViewDetails(quote)}
-                  aria-label={`View details for ${quote.regNumber || 'quote'}`}
-                >
-                  View
-                </button>
-                {/* Ensure isCollected is a boolean field on your quote model */}
-                {!quote.collectionDetails?.collected && ( // Check nested property
+                <div className="actions-container">
                   <button
-                    className="btn-collected"
-                    onClick={() => handleMarkAsCollected(quote)}
-                    aria-label={`Mark as collected for ${quote.regNumber || 'vehicle'}`}
+                    className="btn-view"
+                    onClick={() => handleViewDetails(quote)}
+                    aria-label={`View details for ${quote.regNumber || 'quote'}`}
                   >
-                    Mark Collected
+                    View
                   </button>
-                )}
+                  {/* Ensure isCollected is a boolean field on your quote model */}
+                  {!quote.collectionDetails?.collected && ( // Check nested property
+                    <button
+                      className="btn-collected"
+                      onClick={() => handleMarkAsCollected(quote)}
+                      aria-label={`Mark as collected for ${quote.regNumber || 'vehicle'}`}
+                    >
+                      Mark Collected
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -407,7 +409,10 @@ const AcceptedQuotes = () => {
       {/* Confirm Mark as Collected Modal */}
       {confirmCollect && (
         <ConfirmModal
+          isOpen={true}
           message={`Are you sure you want to mark vehicle ${confirmCollect.regNumber || 'this vehicle'} as collected?`}
+          title="Confirm Collection"
+          type="success"
           onConfirm={handleConfirmCollected}
           onCancel={handleCloseConfirmModal}
           loading={collectLoading}

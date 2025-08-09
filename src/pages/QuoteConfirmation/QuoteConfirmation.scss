@@ -378,6 +378,8 @@
     // Support Section
     .support-section {
       text-align: center;
+      background: linear-gradient(135deg, rgba($color-primary, 0.5) 0%, rgba($color-gray, 0.12) 100%);
+      border-radius: 20px;
       
       p {
         color: rgba(255,255,255,0.9);

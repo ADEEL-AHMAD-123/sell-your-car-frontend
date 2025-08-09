@@ -29,6 +29,7 @@
     min-height: 100vh;
     transition: margin-left $admin-transition-base;
     margin-left: $admin-sidebar-width;
+    overflow: hidden;
 
     &.sidebar-collapsed {
       margin-left: $admin-sidebar-collapsed-width;

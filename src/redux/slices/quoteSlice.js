@@ -36,6 +36,18 @@ export const confirmQuote = createApiAsyncThunk({
 });
 
 /**
+ * ❌ Client rejects quote with reason
+ * Backend route: PATCH /api/quote/:id/reject
+ */
+export const rejectQuote = createApiAsyncThunk({
+  name: "rejectQuote",
+  method: "PATCH",
+  url: ({ id }) => `/api/quote/${id}/reject`,
+  typePrefix: "rejectQuote",
+  prepareHeaders: true,
+});
+
+/**
  * 🚚 Admin updates collection status (mark collected)
  */
 export const updateCollectionStatus = createApiAsyncThunk({
@@ -57,18 +69,21 @@ const initialState = {
   error: null,
   quoteStatus: null,
 
-
   // manual quote
   manualLoading: false,
   manualStatus: "idle",
   manualError: null,
   manualQuoteStatus: null, 
 
-
   // client confirm (accept + collection)
   confirmLoading: false,
   confirmStatus: "idle",
   confirmError: null,
+
+  // client reject
+  rejectLoading: false,
+  rejectStatus: "idle",
+  rejectError: null,
 
   // admin collection mark
   collectionLoading: false,
@@ -86,13 +101,17 @@ const quoteSlice = createSlice({
       state.confirmError = null;
       state.confirmLoading = false;
     },
+    resetRejectStatus: (state) => {
+      state.rejectStatus = "idle";
+      state.rejectError = null;
+      state.rejectLoading = false;
+    },
     resetManualState: (state) => {
       state.manualLoading = false;
       state.manualError = null;
       state.manualStatus = "idle";
       state.manualQuote = null; 
       state.manualQuoteStatus = null;
-
     },
   },
   extraReducers: (builder) => {
@@ -102,6 +121,13 @@ const quoteSlice = createSlice({
         state.isLoading = true;
         state.status = "loading";
         state.error = null;
+        // Resetting confirm/reject states on a new quote request
+        state.confirmStatus = "idle";
+        state.confirmError = null;
+        state.confirmLoading = false;
+        state.rejectStatus = "idle";
+        state.rejectError = null;
+        state.rejectLoading = false;
       })
       .addCase(getQuote.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -109,11 +135,25 @@ const quoteSlice = createSlice({
         state.quote = action.payload?.data?.quote || null;
         state.quoteStatus = action.payload?.data?.status || null;
         state.error=null;
+        // Resetting confirm/reject states on a new successful quote
+        state.confirmStatus = "idle";
+        state.confirmError = null;
+        state.confirmLoading = false;
+        state.rejectStatus = "idle";
+        state.rejectError = null;
+        state.rejectLoading = false;
       })
       .addCase(getQuote.rejected, (state, action) => {
         state.isLoading = false;
         state.status = "failed";
         state.error = action.payload?.message || "Auto quote failed";
+        // Resetting confirm/reject states even if the new quote failed
+        state.confirmStatus = "idle";
+        state.confirmError = null;
+        state.confirmLoading = false;
+        state.rejectStatus = "idle";
+        state.rejectError = null;
+        state.rejectLoading = false;
       })
 
       // === Manual Quote ===
@@ -162,6 +202,33 @@ const quoteSlice = createSlice({
         state.confirmError = action.payload?.message || "Confirmation failed";
       })
 
+      // === Client: reject quote ===
+      .addCase(rejectQuote.pending, (state) => {
+        state.rejectLoading = true;
+        state.rejectStatus = "loading";
+        state.rejectError = null;
+      })
+      .addCase(rejectQuote.fulfilled, (state, action) => {
+        state.rejectLoading = false;
+        state.rejectStatus = "succeeded";
+        const updated = action.payload?.data?.quote;
+        if (updated) {
+          // Update main quote if it's the same one
+          if (state.quote && state.quote._id === updated._id) {
+            state.quote = updated;
+          }
+          // Also update manualQuote if needed
+          if (state.manualQuote && state.manualQuote._id === updated._id) {
+            state.manualQuote = updated;
+          }
+        }
+      })
+      .addCase(rejectQuote.rejected, (state, action) => {
+        state.rejectLoading = false;
+        state.rejectStatus = "failed";
+        state.rejectError = action.payload?.message || "Rejection failed";
+      })
+
       // === Admin: Collection Status ===
       .addCase(updateCollectionStatus.pending, (state) => {
         state.collectionLoading = true;
@@ -185,5 +252,5 @@ const quoteSlice = createSlice({
   },
 });
 
-export const { resetQuote,resetConfirmStatus,resetManualState } = quoteSlice.actions;
+export const { resetQuote, resetConfirmStatus, resetRejectStatus, resetManualState } = quoteSlice.actions;
 export default quoteSlice.reducer;

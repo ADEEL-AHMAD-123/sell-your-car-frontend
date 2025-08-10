@@ -7,7 +7,10 @@ import 'react-phone-input-2/lib/style.css';
 import MessageCard from "../../components/common/MessageCard";
 import {
   confirmQuote,
+  rejectQuote,
+  // Using the actions to clear the state
   resetConfirmStatus,
+  resetRejectStatus,
 } from "../../redux/slices/quoteSlice";
 import "./QuoteResult.scss";
 
@@ -16,21 +19,30 @@ const QuoteResult = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { quote, quoteStatus, confirmLoading, confirmError, confirmStatus } = useSelector(
-    (state) => state.quote
-  );
+  const { 
+    quote, 
+    quoteStatus, 
+    confirmLoading, 
+    confirmError, 
+    confirmStatus,
+    rejectLoading,
+    rejectError,
+    rejectStatus
+  } = useSelector((state) => state.quote);
 
   const [hasAccess, setHasAccess] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectFormError, setRejectFormError] = useState("");
 
-  // Centralized state for all full-screen messages, now including a 'type'
   const [messageCardState, setMessageCardState] = useState({
     isVisible: false,
     title: '',
     message: '',
     buttons: null,
-    type: 'error', // Default to error as all full-screen messages in this component are errors
+    type: 'error',
   });
 
   const [collectionDetails, setCollectionDetails] = useState({
@@ -39,7 +51,6 @@ const QuoteResult = () => {
     address: "",
   });
 
-  // Check if the user is coming from the quote flow using location state.
   useEffect(() => {
     const fromQuote = location.state?.fromQuote;
     if (fromQuote && quote) {
@@ -58,7 +69,6 @@ const QuoteResult = () => {
     }
   }, [location.state, navigate, quote]);
 
-  // Handle successful confirmation and navigate to the confirmation page
   useEffect(() => {
     if (confirmStatus === "succeeded") {
       const confirmationData = {
@@ -70,13 +80,24 @@ const QuoteResult = () => {
         state: { confirmationData },
         replace: true,
       });
-
-      // Reset the status to prevent re-navigation
       dispatch(resetConfirmStatus());
     }
   }, [confirmStatus, navigate, dispatch, quote, collectionDetails]);
 
-  // Handle Redux state errors
+  useEffect(() => {
+    if (rejectStatus === "succeeded") {
+      if (window.showToast) {
+        window.showToast("Quote rejected successfully", "success");
+      }
+      setShowRejectModal(false);
+      setRejectionReason("");
+      setRejectFormError("");
+      dispatch(resetRejectStatus());
+      navigate("/", { replace: true });
+    }
+  }, [rejectStatus, dispatch, navigate]);
+
+  // Handle confirm error and show MessageCard with an "OK" button
   useEffect(() => {
     if (confirmError) {
       setMessageCardState({
@@ -84,12 +105,42 @@ const QuoteResult = () => {
         title: "Submission Failed",
         message: confirmError,
         buttons: [
-          { label: "Try Again", onClick: () => setMessageCardState(prev => ({ ...prev, isVisible: false })) },
+          {
+            label: "OK",
+            onClick: () => {
+              setMessageCardState(prev => ({ ...prev, isVisible: false }));
+              // Dispatch the existing action to clear the error and status
+              dispatch(resetConfirmStatus());
+            }
+          },
         ],
         type: 'error',
       });
     }
-  }, [confirmError]);
+  }, [confirmError, dispatch]);
+
+  // Handle reject error and show MessageCard with an "OK" button
+  useEffect(() => {
+    if (rejectError) {
+      setMessageCardState({
+        isVisible: true,
+        title: "Rejection Failed",
+        message: rejectError,
+        buttons: [
+          {
+            label: "OK",
+            onClick: () => {
+              setMessageCardState(prev => ({ ...prev, isVisible: false }));
+              // Dispatch the existing action to clear the error and status
+              dispatch(resetRejectStatus());
+            }
+          },
+        ],
+        type: 'error',
+      });
+      setShowRejectModal(false);
+    }
+  }, [rejectError, dispatch]);
 
   const handleOpenModal = () => {
     dispatch(resetConfirmStatus());
@@ -97,29 +148,32 @@ const QuoteResult = () => {
     setShowConfirmModal(true);
   };
 
-  // Manage body scroll when modal is open
+  const handleOpenRejectModal = () => {
+    dispatch(resetRejectStatus());
+    setRejectionReason("");
+    setShowRejectModal(true);
+  };
+
   useEffect(() => {
-    if (showConfirmModal) {
+    if (showConfirmModal || showRejectModal) {
       document.body.classList.add('modal-open');
     } else {
       document.body.classList.remove('modal-open');
     }
-  
     return () => {
       document.body.classList.remove('modal-open');
     };
-  }, [showConfirmModal]);
+  }, [showConfirmModal, showRejectModal]);
 
   const validateForm = () => {
     const errors = {};
     const today = new Date();
-    const minDate = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000); // 2 days from today
+    const minDate = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
     minDate.setHours(0, 0, 0, 0);
   
     const trimmedPhone = collectionDetails.contactNumber.trim();
     const trimmedAddress = collectionDetails.address.trim();
   
-    // Validate pickup date
     if (!collectionDetails.pickupDate) {
       errors.pickupDate = "Please select a collection date.";
     } else {
@@ -131,7 +185,6 @@ const QuoteResult = () => {
       }
     }
   
-    // Validate contact number
     const phoneRegex = /^\+?[\d\s()-]{7,20}$/;
     if (!trimmedPhone) {
       errors.contactNumber = "Contact number is required.";
@@ -139,7 +192,6 @@ const QuoteResult = () => {
       errors.contactNumber = "Invalid contact number format.";
     }
   
-    // Validate address
     if (!trimmedAddress) {
       errors.address = "Collection address is required.";
     } else if (trimmedAddress.length < 10) {
@@ -148,6 +200,23 @@ const QuoteResult = () => {
   
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const validateRejectForm = () => {
+    const trimmedReason = rejectionReason.trim();
+    
+    if (!trimmedReason) {
+      setRejectFormError("Please provide a reason for rejection.");
+      return false;
+    }
+    
+    if (trimmedReason.length < 10) {
+      setRejectFormError("Rejection reason must be at least 10 characters long.");
+      return false;
+    }
+
+    setRejectFormError("");
+    return true;
   };
 
   const handleConfirm = async () => {
@@ -175,12 +244,38 @@ const QuoteResult = () => {
       ).unwrap();
     } catch (err) {
       console.error("Confirm failed:", err);
-      // The useEffect hook above will handle setting the message card state
-      // with the confirmError from the Redux state.
+    }
+  };
+
+  const handleReject = async () => {
+    if (!quote?._id) {
+      setMessageCardState({
+        isVisible: true,
+        title: "Invalid Quote",
+        message: "The quote ID is missing. Please try getting a new quote.",
+        buttons: [{ label: "Go to Home", onClick: () => navigate("/") }],
+        type: 'error',
+      });
+      setShowRejectModal(false);
+      return;
+    }
+
+    if (!validateRejectForm()) {
+      return;
+    }
+
+    try {
+      await dispatch(
+        rejectQuote({
+          id: quote._id,
+          data: { rejectionReason: rejectionReason.trim() },
+        })
+      ).unwrap();
+    } catch (err) {
+      console.error("Reject failed:", err);
     }
   };
   
-  // Handle case where quote data is missing
   if (!quote) {
     return (
       <MessageCard
@@ -201,7 +296,6 @@ const QuoteResult = () => {
     );
   }
 
-  // Handle all other full-screen messages from the centralized state
   if (messageCardState.isVisible) {
     return (
       <MessageCard
@@ -216,6 +310,17 @@ const QuoteResult = () => {
   const hasPrice = !!quote?.estimatedScrapPrice;
   const isManualReviewed = quoteStatus === "manual_reviewed";
   const hasAdminOfferPrice = !!quote?.adminOfferPrice;
+  const isManualPreviouslyRejected = quoteStatus === "manual_previously_rejected";
+
+  const priceToDisplay = (isManualReviewed || isManualPreviouslyRejected) && hasAdminOfferPrice
+    ? quote.adminOfferPrice
+    : hasPrice
+    ? quote.estimatedScrapPrice
+    : null;
+
+  const priceLabel = isManualPreviouslyRejected ? "Offered Price"
+    : isManualReviewed && hasAdminOfferPrice ? "Admin Offered Price"
+    : "Estimated Price";
 
   const renderManualOptions = () => (
     <div className="manual-options">
@@ -257,6 +362,25 @@ const QuoteResult = () => {
     </div>
   );
 
+  const renderAcceptRejectButtons = () => (
+    <div className="accept-reject-buttons">
+      <button
+        onClick={handleOpenModal}
+        className="accept-btn"
+        disabled={confirmLoading || rejectLoading}
+      >
+        ✅ {confirmLoading ? "Processing..." : "Accept & Arrange Collection"}
+      </button>
+      <button
+        onClick={handleOpenRejectModal}
+        className="reject-btn"
+        disabled={confirmLoading || rejectLoading}
+      >
+        ❌ {rejectLoading ? "Processing..." : "Reject Offer"}
+      </button>
+    </div>
+  );
+
   const renderAcceptButton = () => (
     <div className="accept-offer">
       <button
@@ -283,19 +407,24 @@ const QuoteResult = () => {
             <strong>{quote?.revenueWeight ?? "N/A"} kg</strong>
           </div>
           <div>
-            <span>{isManualReviewed && hasAdminOfferPrice ? "Admin Offered Price" : "Estimated Price"}</span>
+            <span>{priceLabel}</span>
             <strong className="price">
-              {isManualReviewed && hasAdminOfferPrice
-                ? `£${quote.adminOfferPrice}`
-                : hasPrice
-                ? `£${quote.estimatedScrapPrice}`
-                : "Unavailable"
-              }
+              {priceToDisplay ? `£${priceToDisplay}` : "Unavailable"}
             </strong>
           </div>
         </div>
 
-        {isManualReviewed ? (
+        {isManualPreviouslyRejected && hasAdminOfferPrice ? (
+          <>
+            <div className="manual-options">
+              <h4>Offer Still Available</h4>
+              <p>
+                Our team previously offered a price for your vehicle, which you rejected. However, if you've changed your mind, this offer is still available for you to accept.
+              </p>
+            </div>
+            {renderAcceptButton()}
+          </>
+        ) : isManualReviewed ? (
           hasAdminOfferPrice ? (
             <>
               <div className="manual-options">
@@ -304,7 +433,7 @@ const QuoteResult = () => {
                   Great news! Our team has completed the manual review of your vehicle and is pleased to offer you the price shown above.
                 </p>
               </div>
-              {renderAcceptButton()}
+              {renderAcceptRejectButtons()}
             </>
           ) : (
             <div className="manual-options">
@@ -394,9 +523,7 @@ const QuoteResult = () => {
             <p>
               You are accepting the offer of{" "}
               <strong>
-                £{isManualReviewed && hasAdminOfferPrice
-                  ? quote.adminOfferPrice
-                  : quote?.estimatedScrapPrice || "0"}
+                £{priceToDisplay || "0"}
               </strong>.
             </p>
 
@@ -411,7 +538,7 @@ const QuoteResult = () => {
                     new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
                       .toISOString()
                       .split("T")[0]
-                  } // min = 2 days ahead
+                  }
                   disabled={confirmLoading}
                   className={formErrors.pickupDate ? "field-error-border" : ""}
                 />
@@ -476,6 +603,61 @@ const QuoteResult = () => {
                 className="no"
                 onClick={() => setShowConfirmModal(false)}
                 disabled={confirmLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {showRejectModal && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal-card">
+            <h3>Reject Quote</h3>
+            <p>
+              Please provide a reason for rejecting the offer of{" "}
+              <strong>
+                £{priceToDisplay || "0"}
+              </strong>.
+            </p>
+
+            {rejectFormError && (
+              <div className="error-text">
+                {rejectFormError}
+              </div>
+            )}
+
+            <div className="form">
+              <label>
+                Rejection Reason
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  rows={4}
+                  disabled={rejectLoading}
+                  placeholder="Please explain why you're rejecting this offer..."
+                  className={rejectFormError ? "field-error-border" : ""}
+                />
+                <small className="helper-text">
+                  Minimum 10 characters required.
+                </small>
+              </label>
+            </div>
+
+            <div className="confirm-buttons">
+              <button
+                className="reject-confirm"
+                onClick={handleReject}
+                disabled={rejectLoading}
+              >
+                {rejectLoading ? "Submitting..." : "Submit Rejection"}
+              </button>
+              <button
+                className="no"
+                onClick={() => setShowRejectModal(false)}
+                disabled={rejectLoading}
               >
                 Cancel
               </button>

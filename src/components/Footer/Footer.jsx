@@ -17,7 +17,7 @@ const Footer = () => {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/how-it-works">How It Works</Link></li>
-            <li><Link to="/faq">FAQs</Link></li>
+            <li><Link to="/faqs">FAQs</Link></li>
             <li><Link to="/contact">Contact</Link></li>
           </ul>
         </div>
@@ -27,8 +27,8 @@ const Footer = () => {
           <ul>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/privacy">Privacy Policy</Link></li>
-            <li><Link to="/terms">Terms & Conditions</Link></li>
-            <li><Link to="/blog">Blog</Link></li>
+            <li><Link to="/terms">Terms of Service </Link></li>
+            <li><Link to="#">Blog</Link></li>
           </ul>
         </div>
 

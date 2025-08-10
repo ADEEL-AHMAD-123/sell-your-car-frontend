@@ -86,10 +86,6 @@ const HeroSection = () => {
               });
               break;
 
-            case 'cached_quote':
-              sessionStorage.setItem('allowQuoteResultPage', 'true');
-              navigate('/quote-result', { state: { fromQuote: true } });
-              break;
             
             case 'manual_pending_review':
               setMessageCardState({
@@ -100,13 +96,12 @@ const HeroSection = () => {
                 buttons: [{ label: 'OK', onClick: handleCloseMessage }],
               });
               break;
+            
 
+            case 'manual_previously_rejected':
             case 'manual_reviewed':
-              sessionStorage.setItem('allowQuoteResultPage', 'true');
-              navigate('/quote-result', { state: { fromQuote: true } });
-              break;
-
             case 'new_generated':
+            case 'cached_quote':  
               sessionStorage.setItem('allowQuoteResultPage', 'true');
               navigate('/quote-result', { state: { fromQuote: true } });
               break;

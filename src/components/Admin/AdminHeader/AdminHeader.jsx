@@ -10,11 +10,14 @@ import {
   FaCog
 } from 'react-icons/fa';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const AdminHeader = ({ onToggle, sidebarCollapsed, isMobile }) => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [notificationCount] = useState(3);
   const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const { firstName, lastName, role } = useSelector(state => state.auth.user); // Fetch user data from the Redux state
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -103,8 +106,8 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, isMobile }) => {
 
         <div className="admin-header__profile">
           <div className="admin-header__profile-info">
-            <span className="admin-header__profile-name">John Doe</span>
-            <span className="admin-header__profile-role">Administrator</span>
+            <span className="admin-header__profile-name">{`${firstName}`}</span>
+            <span className="admin-header__profile-role">{role}</span>
           </div>
           <div className="admin-header__avatar">
             <FaUserCircle />

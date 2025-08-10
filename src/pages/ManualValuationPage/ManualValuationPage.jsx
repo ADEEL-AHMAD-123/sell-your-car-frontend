@@ -79,7 +79,7 @@ const ManualValuationPage = () => {
         message: "You can't access the manual valuation page directly. Please go through the quote process first.",
         type: 'error', // Set type to 'error' for access issues
         buttons: [
-          { label: 'Go Back', onClick: () => navigate(-1) },
+
           { label: 'Go to Home', onClick: () => navigate('/') },
         ],
       });
@@ -173,8 +173,8 @@ const ManualValuationPage = () => {
                 message: 'Your manual quote request has been submitted successfully. Our team will review it and contact you shortly.',
                 type: 'info', // Informational message
                 buttons: [
-                  { label: 'Go Back', onClick: () => navigate(-1) },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -187,7 +187,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Informational message
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -200,7 +200,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Informational message
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -213,7 +213,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Informational message
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -226,7 +226,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Informational message
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -239,7 +239,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Informational message
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;
@@ -265,7 +265,7 @@ const ManualValuationPage = () => {
                 type: 'info', // Fallback to 'info'
                 buttons: [
                   { label: 'OK', onClick: handleCloseMessage },
-                  { label: 'Go to Home', onClick: () => navigate('/') },
+                  { label: 'Go to Home Page', onClick: () => navigate('/') },
                 ],
               });
               break;

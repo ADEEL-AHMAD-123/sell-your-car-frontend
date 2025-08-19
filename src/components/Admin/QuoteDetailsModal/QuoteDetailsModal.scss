@@ -189,7 +189,7 @@
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
       border: 1px solid rgba(16, 185, 129, 0.2);
       border-radius: $admin-radius-lg;
-      margin: 0 $admin-spacing-xl $admin-spacing-lg $admin-spacing-xl;
+      margin: $admin-spacing-lg $admin-spacing-xl $admin-spacing-lg $admin-spacing-xl;
 
       h3 {
         color: $admin-success-light;

@@ -1,4 +1,3 @@
-// routes/AppRoutes.jsx 
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../Layouts/MainLayout';
 import AdminLayout from '../Layouts/AdminLayout';
@@ -26,6 +25,9 @@ import AdminQuoteSearchPage from '../pages/AdminPages/AdminQuoteSearchPage/Admin
 import AdminSettingsPage from '../pages/AdminPages/AdminSettingsPage/AdminSettingsPage';
 import TermsOfService from '../pages/TermsOfService/TermsOfService';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
+import ForgotPassword from '../pages/ForgotPasswordPage/ForgotPassword';
+import ResetPassword from '../pages/ResetPasswordPage/ResetPassword';
+import EmailVerification from '../pages/EmailVerificationPage/EmailVerification';
 
 const AppRoutes = () => (
   <Routes>
@@ -44,6 +46,11 @@ const AppRoutes = () => (
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Register />} />
+
+
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/verify-email/:token" element={<EmailVerification />} />
     </Route>
 
     {/* Admin routes with Admin Layout */}

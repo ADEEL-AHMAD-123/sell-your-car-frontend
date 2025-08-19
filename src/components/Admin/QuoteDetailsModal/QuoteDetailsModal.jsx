@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './QuoteDetailsModal.scss';
+import './QuoteDetailsModal.scss'
 
 const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
@@ -92,39 +92,47 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
         return 'Quote Details';
     }
   };
-
-  // Get summary section title based on page type
-  const getSummaryTitle = () => {
-    switch (pageType) {
-      case 'manual':
-        return 'Request Summary';
-      case 'accepted':
-        return 'Quote Summary';
-      case 'pending':
-        return 'Quote Summary';
-      case 'rejected':
-        return 'Quote Summary';
-      case 'completed':
-        return 'Final Summary';
-      default:
-        return 'Summary';
-    }
-  };
-
+  
   if (!quote) return null;
 
+  // Destructure from the updated schema
   const {
-    // DVLA fields
-    regNumber, make, model, year, fuelType, colour, wheelPlan, engineCapacity,
-    revenueWeight, co2Emissions, taxStatus, motStatus, euroStatus, realDrivingEmissions,
-    typeApproval, markedForExport, artEndDate, taxDueDate, monthOfFirstRegistration,
-    yearOfManufacture, dateOfLastV5CIssued, dvlaFetchedAt, lastUpdatedAt,
-
-    // App-specific fields
-    estimatedScrapPrice, finalPrice, images = [], userEstimatedPrice, userProvidedWeight,
-    manualQuoteReason, message, user, collectionDetails, adminMessage, rejectionReason,
+    vehicleRegistration,
+    otherVehicleData,
+    images = [],
+    user,
+    collectionDetails,
+    rejectionReason,
+    estimatedScrapPrice,
+    finalPrice,
+    clientDecision,
+    type,
+    createdAt,
+    updatedAt,
+    rejectedAt,
+    userEstimatedPrice,
+    userProvidedWeight,
+    message,
+    manualQuoteReason,
+    lastManualRequestAt,
+    adminMessage,
   } = quote;
+  
+  // Get the current status based on the quote data
+  const getCurrentStatus = () => {
+    if (collectionDetails?.collected) return 'Collected';
+    if (clientDecision === 'accepted') return 'Accepted';
+    if (clientDecision === 'rejected') return 'Rejected';
+    return 'Pending';
+  };
 
+  // Get summary section title based on the quote data
+  const getSummaryTitle = () => {
+    const status = getCurrentStatus();
+    if (status === 'Collected') return 'Final Summary';
+    return 'Quote Summary';
+  };
+  
   const renderField = (label, value, unit = '') => {
     if (value === undefined || value === null || value === '') return null;
     
@@ -136,22 +144,6 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
       formattedValue = value ? 'Yes' : 'No';
     }
     
-    // Handle dates
-    if (label.toLowerCase().includes('date') && value && typeof value === 'string') {
-      try {
-        const date = new Date(value);
-        if (!isNaN(date.getTime())) {
-          formattedValue = date.toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-          });
-        }
-      } catch (e) {
-        // Keep original value if date parsing fails
-      }
-    }
-
     return (
       <p key={label}>
         <strong>{label}:</strong> {formattedValue}{unit}
@@ -191,27 +183,57 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
       return dateString;
     }
   };
-
-  // Determine which price to show based on page type
-  const getPriceToShow = () => {
-    if (pageType === 'accepted' && finalPrice) {
-      return formatCurrency(finalPrice);
-    }
-    return formatCurrency(estimatedScrapPrice);
-  };
-
-  const getPriceLabel = () => {
-    if (pageType === 'accepted' && finalPrice) {
-      return 'Final Price';
-    }
-    return 'Offered Price';
-  };
-
+  
   // Handle image loading error
   const handleImageError = (e) => {
     e.target.parentElement.style.display = 'none';
   };
+  
+  const renderVehicleDetailsSection = () => {
+    const hasDVLAData = Object.values(vehicleRegistration || {}).some(Boolean);
+    const hasOtherData = Object.values(otherVehicleData || {}).some(Boolean);
+    
+    if (!hasDVLAData && !hasOtherData) {
+      return null;
+    }
 
+    return (
+      <section className="details-section">
+        <h3>Vehicle Details</h3>
+        {hasDVLAData && (
+          <div className="sub-section dvla-details">
+            {/* Essential Vehicle Data from DVLA */}
+            {renderField('Make', vehicleRegistration?.Make)}
+            {renderField('Model', vehicleRegistration?.Model)}
+            {renderField('Year of Manufacture', vehicleRegistration?.YearOfManufacture)}
+            {renderField('Colour', vehicleRegistration?.Colour)}
+            {renderField('Fuel Type', vehicleRegistration?.FuelType)}
+            {renderField('Engine Capacity', vehicleRegistration?.EngineCapacity, ' cc')}
+            {renderField('Revenue Weight', vehicleRegistration?.RevenueWeight, ' kg')}
+            {renderField('CO₂ Emissions', vehicleRegistration?.Co2Emissions, ' g/km')}
+            {renderField('Transmission', vehicleRegistration?.Transmission)}
+
+            {/* Other DVLA Data (optional, based on availability) */}
+            {renderField('Tax Status', vehicleRegistration?.TaxStatus)}
+            {renderField('MOT Status', vehicleRegistration?.MotStatus)}
+            {renderField('Tax Due Date', formatDate(vehicleRegistration?.TaxDueDate))}
+            {renderField('MOT Expiry Date', formatDate(vehicleRegistration?.MotExpiryDate))}
+            {renderField('Euro Status', vehicleRegistration?.EuroStatus)}
+            {renderField('Date of Last V5C Issued', formatDate(vehicleRegistration?.DateOfLastV5CIssued))}
+          </div>
+        )}
+        {hasOtherData && (
+          <div className="sub-section other-details">
+            {/* Other relevant data from external APIs or user input */}
+            {renderField('Kerb Weight', otherVehicleData?.KerbWeight, ' kg')}
+            {renderField('Body Style', otherVehicleData?.BodyStyle)}
+            {renderField('Number of Doors', otherVehicleData?.NumberOfDoors)}
+          </div>
+        )}
+      </section>
+    );
+  };
+  
   return (
     <>
       <div className="quote-details-modal" onClick={handleBackdropClick}>
@@ -222,36 +244,43 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
           
           <h2>{getModalTitle()}</h2>
 
-          {/* Group 0: Key Summary Info */}
+          {/* New Quote Summary Section - Conditional rendering based on quote data */}
           <section className="details-section top-summary">
             <h3>{getSummaryTitle()}</h3>
-            {renderField('Registration Number', regNumber)}
-            {renderField('Manual Quote Reason', manualQuoteReason)}
-            {renderField('Revenue Weight', revenueWeight, ' kg')}
-            {renderField(getPriceLabel(), getPriceToShow())}
-          </section>
+            
+            {/* Display Registration number first as requested */}
+            {renderField('REG number', vehicleRegistration?.Vrm)}
+            {renderField('Current Status', getCurrentStatus())}
+            {renderField('Quote Type', type.charAt(0).toUpperCase() + type.slice(1))}
+            {renderField('Generated At', formatDateTime(createdAt))}
+            
+            {/* Conditional fields based on client decision */}
+            {clientDecision === 'accepted' && (
+              <>
+                {renderField('Accepted At', formatDateTime(updatedAt))}
+                {renderField('Final Price', formatCurrency(finalPrice))}
+              </>
+            )}
 
-          {/* Collection Details Section - Only show for accepted quotes with collection details */}
-          {pageType === 'accepted' && collectionDetails && (
-            <section className="details-section collection-details-section">
-              <h3>Collection Details</h3>
-              {collectionDetails.pickupDate && (
-                <p><strong>Pickup Date:</strong> {formatDate(collectionDetails.pickupDate)}</p>
-              )}
-              {collectionDetails.contactNumber && (
-                <p><strong>Contact Number:</strong> {collectionDetails.contactNumber}</p>
-              )}
-              {collectionDetails.address && (
-                <p><strong>Collection Address:</strong> {collectionDetails.address}</p>
-              )}
-              <p>
-                <strong>Collection Status:</strong> 
-                <span className={`collection-status ${collectionDetails.collected ? 'collected' : 'pending'}`}>
-                  {collectionDetails.collected ? 'Collected' : 'Pending Collection'}
-                </span>
-              </p>
-            </section>
-          )}
+            {clientDecision === 'rejected' && (
+              <>
+                {renderField('Rejected At', formatDateTime(rejectedAt))}
+                {renderField('Rejection Reason', rejectionReason)}
+                {renderField('Offered Price', formatCurrency(estimatedScrapPrice))}
+                {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
+              </>
+            )}
+
+            {type === 'manual' && clientDecision === 'pending' && (
+              <>
+                {renderField('Manual Request At', formatDateTime(lastManualRequestAt))}
+                {renderField('Manual Request Reason', manualQuoteReason)}
+                {renderField('Offered Price', formatCurrency(estimatedScrapPrice))}
+                {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
+              </>
+            )}
+            
+          </section>
 
           {/* Client Info */}
           {(user?.firstName || user?.lastName || user?.email || user?.phone) && (
@@ -269,31 +298,8 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
             </section>
           )}
 
-          {/* Vehicle Info */}
-          <section className="details-section">
-            <h3>Vehicle Details</h3>
-            {renderField('Make', make)}
-            {renderField('Model', model)}
-            {renderField('Year', year)}
-            {renderField('Fuel Type', fuelType)}
-            {renderField('Colour', colour)}
-            {renderField('Wheel Plan', wheelPlan)}
-            {renderField('Engine Capacity', engineCapacity, ' cc')}
-            {renderField('CO₂ Emissions', co2Emissions, ' g/km')}
-            {renderField('Tax Status', taxStatus)}
-            {renderField('MOT Status', motStatus)}
-            {renderField('Euro Status', euroStatus)}
-            {renderField('Real Driving Emissions', realDrivingEmissions)}
-            {renderField('Type Approval', typeApproval)}
-            {renderField('Marked for Export', markedForExport)}
-            {renderField('Tax Due Date', taxDueDate)}
-            {renderField('ART End Date', artEndDate)}
-            {renderField('Month of First Registration', monthOfFirstRegistration)}
-            {renderField('Year of Manufacture', yearOfManufacture)}
-            {renderField('Date of Last V5C Issued', dateOfLastV5CIssued)}
-            {renderField('DVLA Fetched At', formatDateTime(dvlaFetchedAt))}
-            {renderField('Last Updated At', formatDateTime(lastUpdatedAt))}
-          </section>
+          {/* Vehicle Details */}
+          {renderVehicleDetailsSection()}
 
           {/* User Submitted Info */}
           {(userEstimatedPrice || userProvidedWeight || message) && (
@@ -306,11 +312,32 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
           )}
 
           {/* Admin Messages */}
-          {(adminMessage || rejectionReason) && (
+          {adminMessage && (
             <section className="details-section">
               <h3>Admin Notes</h3>
               {renderField('Admin Message', adminMessage)}
-              {renderField('Rejection Reason', rejectionReason)}
+            </section>
+          )}
+          
+          {/* Collection Details Section - Only show for accepted quotes with collection details */}
+          {clientDecision === 'accepted' && collectionDetails && (
+            <section className="details-section collection-details-section">
+              <h3>Collection Details</h3>
+              {collectionDetails.pickupDate && (
+                <p><strong>Pickup Date:</strong> {formatDate(collectionDetails.pickupDate)}</p>
+              )}
+              {collectionDetails.contactNumber && (
+                <p><strong>Contact Number:</strong> {collectionDetails.contactNumber}</p>
+              )}
+              {collectionDetails.address && (
+                <p><strong>Collection Address:</strong> {collectionDetails.address}</p>
+              )}
+              <p>
+                <strong>Collection Status:</strong> 
+                <span className={`collection-status ${collectionDetails.collected ? 'collected' : 'pending'}`}>
+                  {collectionDetails.collected ? 'Collected' : 'Pending Collection'}
+                </span>
+              </p>
             </section>
           )}
 
@@ -444,6 +471,9 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
               <span className="keyboard-hint">
                 Use ← → arrow keys to navigate
               </span>
+            </div>
+            <div className="keyboard-hint">
+              Use ← → arrow keys to navigate
             </div>
           </div>
         </div>

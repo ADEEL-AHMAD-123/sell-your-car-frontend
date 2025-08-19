@@ -72,9 +72,10 @@ const Register = ({ onClose }) => {
         const result = await dispatch(registerUser({ data: payload }));
 
         if (registerUser.fulfilled.match(result)) {
-          toast.success('🎉 Account created successfully! Please sign in to continue.');
-          navigate('/login');
+
+          toast.success('🎉 Account created! Please check your email to verify your account.');
           if (onClose) onClose();
+          // Do not navigate to login yet, as the user must verify their email.
         } else if (registerUser.rejected.match(result)) {
           toast.error(result.payload?.message || 'Registration failed. Please try again.');
         }

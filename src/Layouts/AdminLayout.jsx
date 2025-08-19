@@ -5,57 +5,103 @@ import AdminHeader from '../components/Admin/AdminHeader/AdminHeader';
 import './AdminLayout.scss';
 
 const AdminLayout = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // Check if device is mobile
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth <= 1024;
+    const checkDeviceType = () => {
+      const mobile = window.innerWidth <= 768;
+      const tablet = window.innerWidth <= 1024;
+      
       setIsMobile(mobile);
+      
       if (mobile) {
+        // On mobile, sidebar is hidden by default
         setSidebarOpen(false);
         setSidebarCollapsed(false);
-      } else {
+      } else if (tablet) {
+        // On tablet, sidebar is collapsed by default
         setSidebarOpen(true);
+        setSidebarCollapsed(true);
+      } else {
+        // On desktop, sidebar is fully open by default
+        setSidebarOpen(true);
+        setSidebarCollapsed(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    checkDeviceType();
+    window.addEventListener('resize', checkDeviceType);
+    
+    return () => window.removeEventListener('resize', checkDeviceType);
   }, []);
 
+  // Single toggle function for all devices
   const toggleSidebar = () => {
     if (isMobile) {
+      // On mobile: toggle visibility (overlay mode)
       setSidebarOpen(prev => !prev);
     } else {
-      setSidebarCollapsed(prev => !prev);
+      // On desktop/tablet: toggle between collapsed and expanded
+      if (!sidebarOpen) {
+        setSidebarOpen(true);
+        setSidebarCollapsed(false);
+      } else if (!sidebarCollapsed) {
+        setSidebarCollapsed(true);
+      } else {
+        setSidebarCollapsed(false);
+      }
     }
+  };
+
+  // Close sidebar when clicking outside on mobile
+  const closeSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
+  // Determine main content classes
+  const getMainClasses = () => {
+    let classes = 'admin-main';
+    
+    if (isMobile) {
+      classes += ' mobile';
+    } else if (sidebarCollapsed) {
+      classes += ' sidebar-collapsed';
+    } else {
+      classes += ' sidebar-expanded';
+    }
+    
+    return classes;
   };
 
   return (
     <div className="admin-layout">
-      {/* Backdrop for mobile sidebar */}
+      {/* Mobile backdrop */}
       {isMobile && sidebarOpen && (
         <div 
-          className="admin-backdrop" 
-          onClick={() => setSidebarOpen(false)}
+          className="admin-backdrop"
+          onClick={closeSidebar}
         />
       )}
 
       {/* Sidebar */}
       <AdminSidebar 
-        isOpen={sidebarOpen} 
+        isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
         isMobile={isMobile}
-        onClose={() => setSidebarOpen(false)}
+        onClose={closeSidebar}
       />
 
-      {/* Main Content Area */}
-      <div className={`admin-main ${sidebarCollapsed && !isMobile ? 'sidebar-collapsed' : ''}`}>
+      {/* Main Content */}
+      <div className={getMainClasses()}>
         <AdminHeader 
           onToggle={toggleSidebar}
           sidebarCollapsed={sidebarCollapsed}
+          sidebarOpen={sidebarOpen}
           isMobile={isMobile}
         />
         

@@ -31,11 +31,51 @@ export const logoutUser = createApiAsyncThunk({
   typePrefix: "auth",
 });
 
+export const verifyEmail = createApiAsyncThunk({
+  name: "verifyEmail",
+  method: "GET",
+  url: (rest) => `/api/auth/verifyemail/${rest.token}`,
+  typePrefix: "auth",
+});
+
+export const forgotPassword = createApiAsyncThunk({
+  name: "forgotPassword",
+  method: "POST",
+  url: "/api/auth/forgotpassword",
+  typePrefix: "auth",
+});
+
+export const resetPassword = createApiAsyncThunk({
+  name: "resetPassword",
+  method: "PUT",
+  url: (rest) => `/api/auth/resetpassword/${rest.token}`,
+  typePrefix: "auth",
+});
+
+export const updatePassword = createApiAsyncThunk({
+  name: "updatePassword",
+  method: "PUT",
+  url: "/api/auth/updatepassword",
+  typePrefix: "auth",
+});
+
+
+export const resendVerificationEmail = createApiAsyncThunk({
+  name: "resendVerificationEmail",
+  method: "POST",
+  url: "/api/auth/resendVerificationEmail",
+  typePrefix: "auth",
+});
+
 const initialState = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  //state to manage specific errors, like unverified email
+  authError: null, 
+  //state to manage loading for resend email
+  resendLoading: false, 
 };
 
 const authSlice = createSlice({
@@ -43,28 +83,30 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     resetAuthState: () => initialState,
+    clearAuthError: (state) => {
+      state.authError = null;
+    }
   },
   extraReducers: (builder) => {
     builder
-      // Register
+      // Register 
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.authError = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => { 
         state.isLoading = false;
-        state.user = action.payload.user;
-        state.isAuthenticated = true;
+        state.isAuthenticated = false; 
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload?.message || "Registration failed";
+        state.authError = action.payload?.message || "Registration failed";
       })
 
       // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.authError = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -73,7 +115,12 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload?.message || "Login failed";
+        // Check for the specific unverified email message from the backend
+        if (action.payload?.message.includes('Please verify your email')) {
+            state.authError = action.payload.message;
+        } else {
+            state.authError = action.payload?.message || "Login failed";
+        }
       })
 
       // Logout
@@ -81,13 +128,13 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.isLoading = false;
-        state.error = null;
+        state.authError = null;
       })
       
       // Get Logged-in User
       .addCase(getLoggedInUser.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
+        state.authError = null;
       })
       .addCase(getLoggedInUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -97,10 +144,75 @@ const authSlice = createSlice({
       })
       .addCase(getLoggedInUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload?.message || "Failed to fetch user data";
+        state.authError = action.payload?.message || "Failed to fetch user data";
+      })
+
+      // Email Verification
+      .addCase(verifyEmail.pending, (state) => {
+        state.isLoading = true;
+        state.authError = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        state.authError = action.payload?.message || "Email verification failed";
+      })
+
+      // Forgot Password
+      .addCase(forgotPassword.pending, (state) => {
+        state.isLoading = true;
+        state.authError = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.authError = action.payload?.message || "Forgot password request failed";
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.authError = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.authError = action.payload?.message || "Password reset failed";
+      })
+
+      // Update Password
+      .addCase(updatePassword.pending, (state) => {
+        state.isLoading = true;
+        state.authError = null;
+      })
+      .addCase(updatePassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(updatePassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.authError = action.payload?.message || "Password update failed";
+      })
+
+      // Resend Verification Email
+      .addCase(resendVerificationEmail.pending, (state) => {
+        state.resendLoading = true;
+        state.authError = null;
+      })
+      .addCase(resendVerificationEmail.fulfilled, (state) => {
+        state.resendLoading = false;
+      })
+      .addCase(resendVerificationEmail.rejected, (state, action) => {
+        state.resendLoading = false;
+        state.authError = action.payload?.message || "Failed to resend email";
       });
   },
 });
 
-export const { resetAuthState } = authSlice.actions;
+export const { resetAuthState, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,4 +1,3 @@
-// src/pages/QuoteConfirmation/QuoteConfirmation.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./QuoteConfirmation.scss";
@@ -22,16 +21,18 @@ const QuoteConfirmation = () => {
     return null;
   }
 
+  // Destructure from the new schema
   const { quote, collectionDetails, referenceId } = confirmationData;
+  const { estimatedScrapPrice, vehicleRegistration } = quote;
 
   const handleCopyQuote = async () => {
     const quoteText = `
 VEHICLE SCRAP QUOTE - ${quote._id}
 =====================================
-Registration: ${quote.regNumber}
-Vehicle: ${quote.make} ${quote.model} (${quote.year})
-Estimated Price: £${quote.estimatedScrapPrice}
-Revenue Weight: ${quote.revenueWeight} kg
+Registration: ${vehicleRegistration?.Vrm}
+Vehicle: ${vehicleRegistration?.Make} ${vehicleRegistration?.Model} (${vehicleRegistration?.YearOfManufacture})
+Estimated Price: £${estimatedScrapPrice}
+Kerb Weight: ${quote?.otherVehicleData?.KerbWeight} kg
 
 Collection Details:
 - Date: ${collectionDetails.pickupDate}
@@ -44,7 +45,14 @@ Generated: ${new Date().toLocaleDateString()}
     `;
 
     try {
-      await navigator.clipboard.writeText(quoteText.trim());
+      // Use document.execCommand('copy') for better compatibility in iframes
+      const textarea = document.createElement('textarea');
+      textarea.value = quoteText.trim();
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -97,65 +105,65 @@ Generated: ${new Date().toLocaleDateString()}
           <div className="quote-details">
             <div className="detail-row highlight">
               <span className="label">Agreed Price</span>
-              <span className="value price">£{quote.estimatedScrapPrice}</span>
+              <span className="value price">£{estimatedScrapPrice}</span>
             </div>
             <div className="detail-row">
               <span className="label">Vehicle</span>
-              <span className="value">{quote.make} {quote.model} ({quote.year})</span>
+              <span className="value">{vehicleRegistration?.Make} {vehicleRegistration?.Model} ({vehicleRegistration?.YearOfManufacture})</span>
             </div>
             <div className="detail-row">
               <span className="label">Registration</span>
-              <span className="value">{quote.regNumber}</span>
+              <span className="value">{vehicleRegistration?.Vrm}</span>
             </div>
             <div className="detail-row">
-              <span className="label">Revenue Weight</span>
-              <span className="value">{quote.revenueWeight} kg</span>
+              <span className="label">Kerb Weight</span>
+              <span className="value">{quote?.otherVehicleData?.KerbWeight} kg</span>
             </div>
           </div>
         </div>
-{/* Collection Card  */}
+        {/* Collection Card  */}
         <div className="collection-card">
-  <h3>📅 Collection Details</h3>
-  <div className="collection-info">
-    <div className="info-item">
-      <div className="info-left">
-        <div className="info-icon">📅</div>
-        <div className="info-content">
-          <strong>Available From (Earliest Collection Date)</strong>
-          <p>{new Date(collectionDetails.pickupDate).toLocaleDateString('en-GB', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}</p>
-          <small className="note">
-            We’ll collect your vehicle on or after this date. Our team will confirm the exact time.
-          </small>
-        </div>
-      </div>
-    </div>
+          <h3>📅 Collection Details</h3>
+          <div className="collection-info">
+            <div className="info-item">
+              <div className="info-left">
+                <div className="info-icon">📅</div>
+                <div className="info-content">
+                  <strong>Available From (Earliest Collection Date)</strong>
+                  <p>{new Date(collectionDetails.pickupDate).toLocaleDateString('en-GB', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</p>
+                  <small className="note">
+                    We’ll collect your vehicle on or after this date. Our team will confirm the exact time.
+                  </small>
+                </div>
+              </div>
+            </div>
 
-    <div className="info-item">
-      <div className="info-left">
-        <div className="info-icon">📍</div>
-        <div className="info-content">
-          <strong>Collection Address</strong>
-          <p>{collectionDetails.address}</p>
-        </div>
-      </div>
-    </div>
+            <div className="info-item">
+              <div className="info-left">
+                <div className="info-icon">📍</div>
+                <div className="info-content">
+                  <strong>Collection Address</strong>
+                  <p>{collectionDetails.address}</p>
+                </div>
+              </div>
+            </div>
 
-    <div className="info-item">
-      <div className="info-left">
-        <div className="info-icon">📞</div>
-        <div className="info-content">
-          <strong>Contact Number</strong>
-          <p>{collectionDetails.contactNumber}</p>
+            <div className="info-item">
+              <div className="info-left">
+                <div className="info-icon">📞</div>
+                <div className="info-content">
+                  <strong>Contact Number</strong>
+                  <p>{collectionDetails.contactNumber}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
         {/* Next Steps */}

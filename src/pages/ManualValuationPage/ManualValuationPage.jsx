@@ -362,7 +362,7 @@ const ManualValuationPage = () => {
                 <svg className="valuation-icon" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                   <path d="M8 21L9.5 17.5L13 19L9.5 20.5L8 21Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-                  <path d="M19 12L20.5 8.5L24 10L20.5 11.5L19 12Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                  <path d="M19 12L20.5 8.5L24 10L20.5 11.5L19 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
 
@@ -415,7 +415,7 @@ const ManualValuationPage = () => {
               <div className="form-section">
                 <h3 className="section-title">
                   <span className="section-number">1</span>
-                  Basic Information
+                  Basic Vehicle Information
                 </h3>
 
                 <div className="form-grid">
@@ -457,7 +457,7 @@ const ManualValuationPage = () => {
                   />
                   <ConditionalInput
                     id="year"
-                    label="Year"
+                    label="Year of Manufacture"
                     icon="📅"
                     placeholder="e.g., 2019"
                     type="number"
@@ -472,7 +472,7 @@ const ManualValuationPage = () => {
               <div className="form-section">
                 <h3 className="section-title">
                   <span className="section-number">2</span>
-                  Technical Specifications
+                  Technical Details
                 </h3>
 
                 <div className="form-grid">
@@ -496,7 +496,7 @@ const ManualValuationPage = () => {
                   />
                   <ConditionalInput
                     id="weight"
-                    label="Revenue Estimated Weight (kg)"
+                    label="Approximate Weight (kg)"
                     icon="⚖️"
                     placeholder="e.g., 1500"
                     type="number"
@@ -520,7 +520,7 @@ const ManualValuationPage = () => {
               <div className="form-section">
                 <h3 className="section-title">
                   <span className="section-number">3</span>
-                  Additional Information
+                  Further Information
                 </h3>
                 <div className="form-group full-width">
                   <label htmlFor="message">
@@ -581,7 +581,7 @@ const ManualValuationPage = () => {
               <div className="form-section">
                 <h3 className="section-title">
                   <span className="section-number">4</span>
-                  Expected Price
+                  Your Price Expectation
                 </h3>
                 <div className="form-group full-width">
                   <label htmlFor="expectedPrice">

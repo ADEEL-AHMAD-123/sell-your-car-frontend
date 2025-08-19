@@ -1,8 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../redux/slices/authSlice';
+import { 
+  loginUser, 
+  resendVerificationEmail, 
+  clearAuthError // Import the new clearAuthError action
+} from '../../redux/slices/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,8 +23,11 @@ import '../../styles/AuthForm.scss';
 const Login = ({ onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.auth);
-  const [showPassword, setShowPassword] = React.useState(false);
+  // We're now using authError for all specific authentication errors
+  const { isLoading, authError, resendLoading } = useSelector((state) => state.auth);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResend, setShowResend] = useState(false); // New state to control resend form visibility
+  const [resendEmail, setResendEmail] = useState(''); // New state to hold the email for resending
 
   const formik = useFormik({
     initialValues: { 
@@ -36,6 +43,10 @@ const Login = ({ onClose }) => {
         .required('Password is required'),
     }),
     onSubmit: async (values) => {
+      // Clear any previous resend state
+      setShowResend(false); 
+      dispatch(clearAuthError());
+
       try {
         const result = await dispatch(
           loginUser({
@@ -51,6 +62,11 @@ const Login = ({ onClose }) => {
           navigate('/');
           if (onClose) onClose();
         } else if (loginUser.rejected.match(result)) {
+          // Check for the specific unverified email error from the backend
+          if (result.payload?.message.includes('Please verify your email')) {
+            setShowResend(true);
+            setResendEmail(values.email); // Pre-fill the resend form with the user's email
+          }
           toast.error(result.payload?.message || 'Login failed. Please try again.');
         }
       } catch (error) {
@@ -58,6 +74,21 @@ const Login = ({ onClose }) => {
       }
     },
   });
+
+  // New handler for resending the email
+  const handleResend = async () => {
+    try {
+      const result = await dispatch(resendVerificationEmail({ data: { email: resendEmail } }));
+      if (resendVerificationEmail.fulfilled.match(result)) {
+        toast.success('A new verification email has been sent. Please check your inbox!');
+        setShowResend(false);
+      } else if (resendVerificationEmail.rejected.match(result)) {
+        toast.error(result.payload?.message || 'Failed to resend verification email.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong while trying to resend the email.');
+    }
+  };
 
   // Handle escape key to close modal
   useEffect(() => {
@@ -94,9 +125,9 @@ const Login = ({ onClose }) => {
 
           <form onSubmit={formik.handleSubmit} className="auth-form">
             {/* Global error from Redux */}
-            {error?.message && (
+            {authError && (
               <div className="form-error form-error--global">
-                {error.message}
+                {authError}
               </div>
             )}
 
@@ -169,8 +200,42 @@ const Login = ({ onClose }) => {
             </button>
           </form>
 
+          {/* New: Resend Verification Form */}
+          {showResend && (
+            <div className="auth-resend-form mt-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Your email is not verified. To receive a new verification link, click the button below.
+              </p>
+              <div className="form-group">
+                <input 
+                  type="email" 
+                  value={resendEmail} 
+                  onChange={(e) => setResendEmail(e.target.value)} 
+                  className="form-input" 
+                  placeholder="Enter your email"
+                  aria-label="Email for resending verification link"
+                />
+              </div>
+              <button 
+                type="button" 
+                onClick={handleResend}
+                className={`auth-btn auth-btn--secondary mt-2 w-full ${resendLoading ? 'auth-btn--loading' : ''}`}
+                disabled={resendLoading}
+              >
+                {resendLoading ? (
+                  <>
+                    <div className="auth-btn__spinner"></div>
+                    Sending...
+                  </>
+                ) : (
+                  'Resend Verification Email'
+                )}
+              </button>
+            </div>
+          )}
+
           {/* Switch to Register */}
-          <div className="auth-switch">
+          <div className="auth-switch mt-4">
             <p>Don't have an account? <Link to="/signup">Create one here</Link></p>
           </div>
         </div>

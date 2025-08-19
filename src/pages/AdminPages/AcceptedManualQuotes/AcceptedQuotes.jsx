@@ -122,8 +122,12 @@ const AcceptedQuotes = () => {
     });
   };
 
+  // Helper function to safely get vehicle information
   const getVehicleString = (quote) => {
-    const { make, model, year } = quote;
+    // Access nested properties with optional chaining
+    const make = quote?.vehicleRegistration?.Make;
+    const model = quote?.vehicleRegistration?.Model;
+    const year = quote?.vehicleRegistration?.YearOfManufacture;
     let parts = [];
     if (make) parts.push(make);
     if (model) parts.push(model);
@@ -135,6 +139,7 @@ const AcceptedQuotes = () => {
     return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
   };
 
+  // Updated to use KerbWeight from the new schema
   const formatWeight = (weight) => {
     return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
   };
@@ -163,8 +168,9 @@ const AcceptedQuotes = () => {
         <tbody>
           {quotes.map((quote) => (
             <tr key={quote._id}>
-              <td title={quote.regNumber || 'N/A'}>
-                {quote.regNumber || 'N/A'}
+              {/* Updated to use Vrm from the new schema */}
+              <td title={quote?.vehicleRegistration?.Vrm || 'N/A'}>
+                {quote?.vehicleRegistration?.Vrm || 'N/A'}
               </td>
               <td title={getVehicleString(quote)}>
                 {getVehicleString(quote)}
@@ -180,15 +186,16 @@ const AcceptedQuotes = () => {
               <td title={formatPrice(quote.finalPrice)}>
                 {formatPrice(quote.finalPrice)}
               </td>
-              <td title={formatWeight(quote.revenueWeight)}>
-                {formatWeight(quote.revenueWeight)}
+              {/* Updated to use KerbWeight from the new schema */}
+              <td title={formatWeight(quote?.otherVehicleData?.KerbWeight)}>
+                {formatWeight(quote?.otherVehicleData?.KerbWeight)}
               </td>
               <td>
                 <div className="actions-container">
                   <button
                     className="btn-view"
                     onClick={() => handleViewDetails(quote)}
-                    aria-label={`View details for ${quote.regNumber || 'quote'}`}
+                    aria-label={`View details for ${quote?.vehicleRegistration?.Vrm || 'quote'}`}
                   >
                     View
                   </button>
@@ -197,7 +204,7 @@ const AcceptedQuotes = () => {
                     <button
                       className="btn-collected"
                       onClick={() => handleMarkAsCollected(quote)}
-                      aria-label={`Mark as collected for ${quote.regNumber || 'vehicle'}`}
+                      aria-label={`Mark as collected for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
                     >
                       Mark Collected
                     </button>
@@ -216,7 +223,8 @@ const AcceptedQuotes = () => {
       {quotes.map((quote) => (
         <div key={quote._id} className="quote-card">
           <div className="card-header">
-            <h3 className="card-title">{quote.regNumber || 'N/A'}</h3>
+            {/* Updated to use Vrm from the new schema */}
+            <h3 className="card-title">{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
             <span className={`card-badge ${getQuoteType(quote).toLowerCase()}`}>
               {getQuoteType(quote)}
             </span>
@@ -239,7 +247,8 @@ const AcceptedQuotes = () => {
             </div>
             <div className="detail-item">
               <div className="label">Weight</div>
-              <div className="value">{formatWeight(quote.revenueWeight)}</div>
+              {/* Updated to use KerbWeight from the new schema */}
+              <div className="value">{formatWeight(quote?.otherVehicleData?.KerbWeight)}</div>
             </div>
           </div>
           
@@ -345,7 +354,7 @@ const AcceptedQuotes = () => {
             <h3>Key Information</h3>
             <ul>
               <li><strong>Price:</strong> Final agreed price for the vehicle</li>
-              <li><strong>Weight:</strong> Revenue weight in kilograms</li>
+              <li><strong>Weight:</strong> Kerb weight in kilograms (from vehicle API)</li>
               <li><strong>Type:</strong> Manual or auto-generated quote</li>
             </ul>
           </div>

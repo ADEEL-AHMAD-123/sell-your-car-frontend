@@ -120,8 +120,11 @@ const AllManualQuotes = () => {
     });
   };
 
+  // Helper function to safely get vehicle information from the new schema
   const getVehicleString = (quote) => {
-    const { make, model, year } = quote;
+    const make = quote?.vehicleRegistration?.Make;
+    const model = quote?.vehicleRegistration?.Model;
+    const year = quote?.vehicleRegistration?.YearOfManufacture;
     let parts = [];
     if (make) parts.push(make);
     if (model) parts.push(model);
@@ -133,10 +136,6 @@ const AllManualQuotes = () => {
     return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
   };
 
-  // Removed the getQuoteType function
-
-  // Removed the getPriorityLevel function
-
   const renderDesktopTable = () => (
     <div className="table-wrapper">
       <table>
@@ -145,18 +144,17 @@ const AllManualQuotes = () => {
             <th>Reg No</th>
             <th>Vehicle</th>
             <th>Client</th>
-            {/* Removed the 'Type' column header */}
             <th>Reason</th>
             <th>Client Offer</th>
-            {/* Removed the 'Priority' column header */}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {quotes.map((quote) => (
             <tr key={quote._id}>
-              <td title={quote.regNumber || 'N/A'}>
-                {quote.regNumber || 'N/A'}
+              {/* Updated to use Vrm from the new schema */}
+              <td title={quote?.vehicleRegistration?.Vrm || 'N/A'}>
+                {quote?.vehicleRegistration?.Vrm || 'N/A'}
               </td>
               <td title={getVehicleString(quote)}>
                 {getVehicleString(quote)}
@@ -164,7 +162,6 @@ const AllManualQuotes = () => {
               <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </td>
-              {/* Removed the 'Type' data cell */}
               <td title={quote.manualQuoteReason || 'N/A'}>
                 <span className="reason-text">
                   {quote.manualQuoteReason || 'N/A'}
@@ -173,20 +170,19 @@ const AllManualQuotes = () => {
               <td title={formatPrice(quote.userEstimatedPrice)}>
                 {formatPrice(quote.userEstimatedPrice)}
               </td>
-              {/* Removed the 'Priority' data cell */}
               <td>
                 <div className="actions-container">
                   <button
                     className="btn-view"
                     onClick={() => handleViewDetails(quote)}
-                    aria-label={`View details for ${quote.regNumber || 'quote'}`}
+                    aria-label={`View details for ${quote?.vehicleRegistration?.Vrm || 'quote'}`}
                   >
                     View
                   </button>
                   <button
                     className="btn-review"
                     onClick={() => handleReview(quote)}
-                    aria-label={`Review quote for ${quote.regNumber || 'vehicle'}`}
+                    aria-label={`Review quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
                   >
                     Review
                   </button>
@@ -204,9 +200,9 @@ const AllManualQuotes = () => {
       {quotes.map((quote) => (
         <div key={quote._id} className="quote-card">
           <div className="card-header">
-            <h3 className="card-title">{quote.regNumber || 'N/A'}</h3>
+            {/* Updated to use Vrm from the new schema */}
+            <h3 className="card-title">{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
             <div className="card-badges">
-              {/* Removed the type and priority badges */}
             </div>
           </div>
 
@@ -331,7 +327,6 @@ const AllManualQuotes = () => {
             <ul>
               <li><strong>Reason:</strong> Why automatic processing failed</li>
               <li><strong>Client Offer:</strong> Customer's estimated price</li>
-              {/* Removed the 'Priority' list item */}
             </ul>
           </div>
         </div>

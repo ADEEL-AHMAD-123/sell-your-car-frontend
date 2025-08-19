@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FaUsers,
   FaQuoteRight,
@@ -9,9 +9,9 @@ import {
   FaToolbox,
   FaChartBar,
   FaTachometerAlt,
-  FaTimes,
   FaChevronDown,
-  FaInfoCircle
+  FaInfoCircle,
+  FaSignOutAlt
 } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -20,27 +20,43 @@ import './AdminSidebar.scss';
 const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
   const { pathname } = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({});
-  const { firstName, lastName, role } = useSelector(state => state.auth.user); // Fetch user data from the Redux state
+  const { firstName, lastName, role } = useSelector(state => state.auth.user);
 
   const isActive = (path) => pathname === path;
   const isParentActive = (paths) => paths.some(path => pathname.startsWith(path));
 
-  const toggleSubmenu = (menuKey) => {
+  // Auto-expand active parent menu
+  useEffect(() => {
+    menuItems.forEach(item => {
+      if (item.submenu && isParentActive(item.submenu.map(sub => sub.path))) {
+        setExpandedMenus(prev => ({
+          ...prev,
+          [item.key]: true
+        }));
+      }
+    });
+  }, [pathname]);
+
+  const toggleSubmenu = (menuKey, e) => {
+    e.preventDefault();
     setExpandedMenus(prev => ({
       ...prev,
       [menuKey]: !prev[menuKey]
     }));
   };
 
-  const futureFeatureTooltip = "This feature will be implemented in the future.";
+  const handleLinkClick = () => {
+    if (isMobile) {
+      onClose();
+    }
+  };
 
   const menuItems = [
     {
       key: 'dashboard',
       icon: FaTachometerAlt,
       label: 'Dashboard',
-      path: '/dashboard',
-      badge: null
+      path: '/dashboard'
     },
     {
       key: 'analytics',
@@ -53,7 +69,7 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       key: 'users',
       icon: FaUsers,
       label: 'User Management',
-      path: '/dashboard/users' 
+      path: '/dashboard/users'
     },
     {
       key: 'quotes',
@@ -62,8 +78,7 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       submenu: [
         { label: 'All Quotes', path: '/dashboard/quotes' },
         { label: 'Pending Manual Quotes', path: '/dashboard/manual-quotes' },
-        { label: 'Accepted Quotes', path: '/dashboard/accepted-quotes' },
-
+        { label: 'Accepted Quotes', path: '/dashboard/accepted-quotes' }
       ]
     },
     {
@@ -92,98 +107,38 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
     }
   ];
 
-  const adminName = `${firstName || 'Admin'} ${lastName || ''}`;
+  const adminName = `${firstName || 'Admin'} ${lastName || ''}`.trim();
 
   return (
-    <>
-      <aside className={`admin-sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
-        {/* Sidebar Header */}
-        <div className="admin-sidebar__header">
-          {isMobile && (
-            <button className="admin-sidebar__close" onClick={onClose}>
-              <FaTimes />
-            </button>
-          )}
-          
+    <aside className={`admin-sidebar ${isOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
+      {/* Header */}
+      <div className="admin-sidebar__header">
+        <div className="admin-sidebar__brand">
+          <div className="admin-sidebar__logo">
+            <FaHome />
+          </div>
           {!isCollapsed && (
-            <div className="admin-sidebar__brand">
-              <div className="admin-sidebar__logo">
-                <FaHome />
-              </div>
-              <div className="admin-sidebar__brand-text">
-                <h3>SellYourCar</h3>
-                <span>Admin Panel</span>
-              </div>
-            </div>
-          )}
-          
-          {isCollapsed && (
-            <div className="admin-sidebar__logo-collapsed">
-              <FaHome />
+            <div className="admin-sidebar__brand-text">
+              <h3>SellYourCar</h3>
+              <span>Admin Panel</span>
             </div>
           )}
         </div>
+      </div>
 
-        {/* Navigation */}
-        <nav className="admin-sidebar__nav">
-          <div className="admin-sidebar__menu">
-            {menuItems.map((item) => (
-              <div key={item.key} className="admin-sidebar__menu-item">
-                {item.submenu ? (
-                  <div className={`admin-sidebar__submenu-wrapper ${expandedMenus[item.key] ? 'expanded' : ''}`}>
-                    <button
-                      className={`admin-sidebar__link admin-sidebar__submenu-toggle ${
-                        isParentActive(item.submenu.map(sub => sub.path)) ? 'active' : ''
-                      }`}
-                      onClick={() => toggleSubmenu(item.key)}
-                    >
-                      <div className="admin-sidebar__link-content">
-                        <item.icon className="admin-sidebar__icon" />
-                        {!isCollapsed && (
-                          <>
-                            <span className="admin-sidebar__label">{item.label}</span>
-                            <FaChevronDown className={`admin-sidebar__chevron ${expandedMenus[item.key] ? 'rotated' : ''}`} />
-                          </>
-                        )}
-                      </div>
-                    </button>
-                    
-                    {!isCollapsed && (
-                      <div className="admin-sidebar__submenu">
-                        {item.submenu.map((subItem, index) => (
-                          <Link
-                            key={index}
-                            to={subItem.path}
-                            className={`admin-sidebar__sublink ${isActive(subItem.path) ? 'active' : ''}`}
-                            onClick={isMobile ? onClose : undefined}
-                          >
-                            <div className="admin-sidebar__sublink-indicator" />
-                            <span>{subItem.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : item.isFutureFeature ? (
-                  <div
-                    className={`admin-sidebar__link admin-sidebar__future-feature ${isCollapsed ? 'collapsed' : ''}`}
-                    title={futureFeatureTooltip}
-                  >
-                    <div className="admin-sidebar__link-content">
-                      <item.icon className="admin-sidebar__icon" />
-                      {!isCollapsed && (
-                        <>
-                          <span className="admin-sidebar__label">{item.label}</span>
-                          <FaInfoCircle className="admin-sidebar__info-icon" />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <Link
-                    to={item.path}
-                    className={`admin-sidebar__link ${isActive(item.path) ? 'active' : ''}`}
-                    onClick={isMobile ? onClose : undefined}
+      {/* Navigation */}
+      <nav className="admin-sidebar__nav">
+        <div className="admin-sidebar__menu">
+          {menuItems.map((item) => (
+            <div key={item.key} className="admin-sidebar__menu-item">
+              {item.submenu ? (
+                // Submenu item
+                <div className={`admin-sidebar__submenu-wrapper ${expandedMenus[item.key] ? 'expanded' : ''}`}>
+                  <button
+                    className={`admin-sidebar__link admin-sidebar__submenu-toggle ${
+                      isParentActive(item.submenu.map(sub => sub.path)) ? 'active' : ''
+                    }`}
+                    onClick={(e) => toggleSubmenu(item.key, e)}
                     title={isCollapsed ? item.label : ''}
                   >
                     <div className="admin-sidebar__link-content">
@@ -191,44 +146,99 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
                       {!isCollapsed && (
                         <>
                           <span className="admin-sidebar__label">{item.label}</span>
-                          {item.badge && (
-                            <span className={`admin-sidebar__badge ${item.badge === 'New' ? 'new' : ''}`}>
-                              {item.badge}
-                            </span>
-                          )}
+                          <FaChevronDown className={`admin-sidebar__chevron ${expandedMenus[item.key] ? 'rotated' : ''}`} />
                         </>
                       )}
                     </div>
-                    {isCollapsed && item.badge && (
-                      <div className="admin-sidebar__badge-collapsed">
-                        {item.badge === 'New' ? '!' : item.badge}
-                      </div>
+                  </button>
+                  
+                  {!isCollapsed && expandedMenus[item.key] && (
+                    <div className="admin-sidebar__submenu">
+                      {item.submenu.map((subItem, index) => (
+                        <Link
+                          key={index}
+                          to={subItem.path}
+                          className={`admin-sidebar__sublink ${isActive(subItem.path) ? 'active' : ''}`}
+                          onClick={handleLinkClick}
+                        >
+                          <div className="admin-sidebar__sublink-indicator" />
+                          <span>{subItem.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : item.isFutureFeature ? (
+                // Future feature item
+                <div
+                  className="admin-sidebar__link admin-sidebar__future-feature"
+                  title={isCollapsed ? `${item.label} (Coming Soon)` : 'This feature will be implemented in the future.'}
+                >
+                  <div className="admin-sidebar__link-content">
+                    <item.icon className="admin-sidebar__icon" />
+                    {!isCollapsed && (
+                      <>
+                        <span className="admin-sidebar__label">{item.label}</span>
+                        <FaInfoCircle className="admin-sidebar__info-icon" />
+                      </>
                     )}
-                  </Link>
-                )}
-              </div>
-            ))}
-          </div>
-        </nav>
+                  </div>
+                </div>
+              ) : (
+                // Regular menu item
+                <Link
+                  to={item.path}
+                  className={`admin-sidebar__link ${isActive(item.path) ? 'active' : ''}`}
+                  onClick={handleLinkClick}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <div className="admin-sidebar__link-content">
+                    <item.icon className="admin-sidebar__icon" />
+                    {!isCollapsed && (
+                      <>
+                        <span className="admin-sidebar__label">{item.label}</span>
+                        {item.badge && (
+                          <span className={`admin-sidebar__badge ${item.badge.toLowerCase()}`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  {isCollapsed && item.badge && (
+                    <div className="admin-sidebar__badge-collapsed">
+                      <div className="admin-sidebar__badge-dot"></div>
+                    </div>
+                  )}
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </nav>
 
-        {/* Sidebar Footer */}
-        {!isCollapsed && (
-          <div className="admin-sidebar__footer">
-            <div className="admin-sidebar__footer-content">
-              <div className="admin-sidebar__user-info">
-                <div className="admin-sidebar__user-avatar">
-                  <span>{(firstName?.[0] || 'A').toUpperCase()}{(lastName?.[0] || 'D').toUpperCase()}</span>
-                </div>
-                <div className="admin-sidebar__user-details">
-                  <span className="admin-sidebar__user-name">{adminName}</span>
-                  <span className="admin-sidebar__user-role">{role}</span>
-                </div>
-              </div>
+      {/* Footer */}
+      {!isCollapsed && (
+        <div className="admin-sidebar__footer">
+          <div className="admin-sidebar__user-profile">
+            <div className="admin-sidebar__user-avatar">
+              <span>
+                {(firstName?.[0] || 'A').toUpperCase()}
+                {(lastName?.[0] || 'D').toUpperCase()}
+              </span>
+            </div>
+            <div className="admin-sidebar__user-info">
+              <span className="admin-sidebar__user-name">{adminName}</span>
+              <span className="admin-sidebar__user-role">{role}</span>
             </div>
           </div>
-        )}
-      </aside>
-    </>
+          
+          <button className="admin-sidebar__logout" title="Logout">
+            <FaSignOutAlt />
+          </button>
+        </div>
+      )}
+    </aside>
   );
 };
 

@@ -1,14 +1,53 @@
-@import '../styles/base/admin-variables.scss';
+// AdminLayout.scss - Modern responsive admin layout
+
+// CSS Variables for theming
+:root {
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --header-height: 80px;
+  
+  // Colors - Dark theme (Default)
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --border-color: #334155;
+  --shadow-light: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+// Light theme
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+}
+
+// Reset and base styles
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
 
 .admin-layout {
+  position: relative;
+  min-height: 100vh;
   display: flex;
-  height: 100vh;
-  background: $admin-bg-primary;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: $admin-text-primary;
-  overflow: hidden;
+  background-color: var(--bg-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  // Mobile backdrop
+  // Backdrop for mobile
   .admin-backdrop {
     position: fixed;
     top: 0;
@@ -17,8 +56,13 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
-    z-index: $admin-z-modal-backdrop;
-    animation: fadeIn $admin-transition-fast;
+    z-index: 998;
+    opacity: 0;
+    animation: fadeIn 0.2s ease-out forwards;
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
   }
 
   // Main content area
@@ -27,87 +71,131 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left $admin-transition-base;
-    margin-left: $admin-sidebar-width;
-    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: var(--sidebar-width);
 
+    // Desktop states
     &.sidebar-collapsed {
-      margin-left: $admin-sidebar-collapsed-width;
+      margin-left: var(--sidebar-collapsed-width);
     }
 
-    @media (max-width: $admin-breakpoint-lg) {
+    &.sidebar-expanded {
+      margin-left: var(--sidebar-width);
+    }
+
+    // Mobile state
+    &.mobile {
       margin-left: 0;
     }
-  }
 
-  // Content wrapper
-  .admin-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: $admin-bg-primary;
-  }
-
-  .admin-content-wrapper {
-    flex: 1;
-    padding: $admin-spacing-xl;
-    overflow-y: auto;
-    background: $admin-bg-primary;
-    
-    // Custom scrollbar
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: $admin-bg-secondary;
-      border-radius: $admin-radius-full;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $admin-border;
-      border-radius: $admin-radius-full;
+    // Main content
+    .admin-content {
+      flex: 1;
+      padding: 1.5rem;
+      background-color: var(--bg-primary);
+      min-height: calc(100vh - var(--header-height));
       
-      &:hover {
-        background: $admin-border-light;
+      .admin-content-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        background-color: var(--bg-secondary);
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+
+        min-height: 600px;
       }
     }
+  }
 
-    @media (max-width: $admin-breakpoint-md) {
-      padding: $admin-spacing-lg;
+  // Responsive breakpoints
+  @media (max-width: 1024px) {
+    .admin-main {
+      margin-left: 0;
+      
+      .admin-content {
+        padding: 1rem;
+        
+        .admin-content-wrapper {
+          border-radius: 8px;
+          min-height: 500px;
+        }
+      }
     }
+  }
 
-    @media (max-width: $admin-breakpoint-sm) {
-      padding: $admin-spacing-md;
+  @media (max-width: 768px) {
+    .admin-main {
+      .admin-content {
+        padding: 0.75rem;
+        
+        .admin-content-wrapper {
+          border-radius: 6px;
+          border: none;
+          box-shadow: none;
+          background-color: transparent;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .admin-main {
+      .admin-content {
+        padding: 0.5rem;
+      }
     }
   }
 }
 
-// Animations
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+// Smooth transitions for theme switching
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+// Loading states
+.admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--text-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
-  to {
-    opacity: 1;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
+// Print styles
+@media print {
+  .admin-layout {
+    .admin-sidebar {
+      display: none !important;
+    }
+    
+    .admin-main {
+      margin-left: 0 !important;
+      
+      .admin-header {
+        display: none !important;
+      }
+    }
   }
 }

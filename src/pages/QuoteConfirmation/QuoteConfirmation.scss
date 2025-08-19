@@ -117,10 +117,10 @@
         .detail-row {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           padding: 1rem 0;
           border-bottom: 1px solid #f0f0f0;
-          
+          gap: 1rem;
           &:last-child {
             border-bottom: none;
           }

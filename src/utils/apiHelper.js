@@ -46,5 +46,5 @@ export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHead
       console.error("API Error:", errData);
       return rejectWithValue(errData);
     }
-  });
+  }); 
 

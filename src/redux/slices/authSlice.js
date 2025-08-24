@@ -20,8 +20,9 @@ export const loginUser = createApiAsyncThunk({
 export const getLoggedInUser = createApiAsyncThunk({
   name: "getLoggedInUser",
   method: "GET",
-  url: "/api/auth/me", 
+  url: "/api/auth/me",
   typePrefix: "auth",
+  prepareHeaders: true, // ADDED: Send token in headers for this protected route
 });
 
 export const logoutUser = createApiAsyncThunk({
@@ -29,6 +30,7 @@ export const logoutUser = createApiAsyncThunk({
   method: "POST",
   url: "/api/auth/logout",
   typePrefix: "auth",
+  prepareHeaders: true, // ADDED: Logout also needs authentication
 });
 
 export const verifyEmail = createApiAsyncThunk({
@@ -57,8 +59,8 @@ export const updatePassword = createApiAsyncThunk({
   method: "PUT",
   url: "/api/auth/updatepassword",
   typePrefix: "auth",
+  prepareHeaders: true, // ADDED: Password update requires authentication
 });
-
 
 export const resendVerificationEmail = createApiAsyncThunk({
   name: "resendVerificationEmail",
@@ -72,10 +74,8 @@ const initialState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
-  //state to manage specific errors, like unverified email
-  authError: null, 
-  //state to manage loading for resend email
-  resendLoading: false, 
+  authError: null,
+  resendLoading: false,
 };
 
 const authSlice = createSlice({
@@ -85,53 +85,50 @@ const authSlice = createSlice({
     resetAuthState: () => initialState,
     clearAuthError: (state) => {
       state.authError = null;
-    }
+    },
   },
   extraReducers: (builder) => {
-    builder
-      // Register 
+    builder // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.authError = null;
       })
-      .addCase(registerUser.fulfilled, (state) => { 
+      .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
-        state.isAuthenticated = false; 
+        state.isAuthenticated = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.authError = action.payload?.message || "Registration failed";
-      })
+      }) // Login
 
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.authError = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.data.user;
-        state.isAuthenticated = true; 
+        state.user = {
+          ...action.payload.data.user,
+          token: action.payload.data.token, // ADDED: Store the token
+        };
+        state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
-        // Check for the specific unverified email message from the backend
-        if (action.payload?.message.includes('Please verify your email')) {
-            state.authError = action.payload.message;
+        if (action.payload?.message.includes("Please verify your email")) {
+          state.authError = action.payload.message;
         } else {
-            state.authError = action.payload?.message || "Login failed";
+          state.authError = action.payload?.message || "Login failed";
         }
-      })
+      }) // Logout
 
-      // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
         state.isLoading = false;
         state.authError = null;
-      })
-      
-      // Get Logged-in User
+      }) // Get Logged-in User
       .addCase(getLoggedInUser.pending, (state) => {
         state.isLoading = true;
         state.authError = null;
@@ -139,12 +136,13 @@ const authSlice = createSlice({
       .addCase(getLoggedInUser.fulfilled, (state, action) => {
         state.isLoading = false;
         if (action.payload.data.user) {
-            state.user = action.payload.data.user;
+          state.user = action.payload.data.user;
         }
       })
       .addCase(getLoggedInUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.authError = action.payload?.message || "Failed to fetch user data";
+        state.authError =
+          action.payload?.message || "Failed to fetch user data";
       })
 
       // Email Verification
@@ -157,7 +155,8 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.isLoading = false;
-        state.authError = action.payload?.message || "Email verification failed";
+        state.authError =
+          action.payload?.message || "Email verification failed";
       })
 
       // Forgot Password
@@ -170,7 +169,8 @@ const authSlice = createSlice({
       })
       .addCase(forgotPassword.rejected, (state, action) => {
         state.isLoading = false;
-        state.authError = action.payload?.message || "Forgot password request failed";
+        state.authError =
+          action.payload?.message || "Forgot password request failed";
       })
 
       // Reset Password

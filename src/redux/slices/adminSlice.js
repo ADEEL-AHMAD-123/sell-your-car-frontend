@@ -1,65 +1,73 @@
-import { createSlice } from '@reduxjs/toolkit';
+// src/redux/slices/adminSlice.js
+import { createSlice } from "@reduxjs/toolkit";
 import { createApiAsyncThunk } from "../../utils/apiHelper";
 
 // === User-related Thunks ===
 export const fetchAllUsers = createApiAsyncThunk({
-  name: 'fetchAllUsers',
-  method: 'GET',
-  url: '/api/admin/users',
-  typePrefix: 'admin',
+  name: "fetchAllUsers",
+  method: "GET",
+  url: "/api/admin/users",
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 export const updateUser = createApiAsyncThunk({
-  name: 'updateUser',
-  method: 'PUT',
+  name: "updateUser",
+  method: "PUT",
   url: ({ id }) => `/api/admin/users/${id}`,
-  typePrefix: 'admin',
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 export const deleteUser = createApiAsyncThunk({
-  name: 'deleteUser',
-  method: 'DELETE',
+  name: "deleteUser",
+  method: "DELETE",
   url: ({ id }) => `/api/admin/users/${id}`,
-  typePrefix: 'admin',
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 export const refillUserChecks = createApiAsyncThunk({
-  name: 'refillUserChecks',
-  method: 'PATCH',
+  name: "refillUserChecks",
+  method: "PATCH",
   url: ({ id }) => `/api/admin/users/${id}/refill-checks`,
-  typePrefix: 'admin',
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 // === Quote-related Thunks ===
 export const fetchAnalyticsOverview = createApiAsyncThunk({
-  name: 'fetchAnalyticsOverview',
-  method: 'GET',
-  url: '/api/admin/analytics/overview',
-  typePrefix: 'admin',
+  name: "fetchAnalyticsOverview",
+  method: "GET",
+  url: "/api/admin/analytics/overview",
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 export const fetchAdminSearchedQuotes = createApiAsyncThunk({
-  name: 'fetchAdminSearchedQuotes',
-  method: 'GET',
-  url: '/api/admin/quotes/search',
-  typePrefix: 'admin',
+  name: "fetchAdminSearchedQuotes",
+  method: "GET",
+  url: "/api/admin/quotes/search",
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 // === NEW: Settings Thunks ===
 export const fetchSettings = createApiAsyncThunk({
-  name: 'fetchSettings',
-  method: 'GET',
-  url: '/api/admin/settings',
-  typePrefix: 'admin',
+  name: "fetchSettings",
+  method: "GET",
+  url: "/api/admin/settings",
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
 
 export const updateSettings = createApiAsyncThunk({
-  name: 'updateSettings',
-  method: 'PUT',
-  url: '/api/admin/settings',
-  typePrefix: 'admin',
+  name: "updateSettings",
+  method: "PUT",
+  url: "/api/admin/settings",
+  typePrefix: "admin",
+  prepareHeaders: true, // ADDED
 });
-
 
 // === Initial State ===
 const initialState = {
@@ -72,15 +80,11 @@ const initialState = {
   },
   quotes: [],
   analyticsOverview: null,
-  loading: false, 
-  error: null,    
-
-  // === STATE FOR SEARCHED QUOTES ===
+  loading: false,
+  error: null,
   searchedQuotes: null,
   searchedQuotesLoading: false,
   searchedQuotesError: null,
-
-  // === STATE FOR ADMIN SETTINGS ===
   settings: null,
   settingsLoading: false,
   settingsError: null,
@@ -97,10 +101,9 @@ const handleRejected = (state, action) => {
   state.error = action.payload?.message || "Something went wrong";
 };
 
-
 // === Slice ===
 const adminSlice = createSlice({
-  name: 'admin',
+  name: "admin",
   initialState,
   reducers: {
     clearAdminSearchedQuotes: (state) => {
@@ -109,11 +112,10 @@ const adminSlice = createSlice({
     },
     setSettings: (state, action) => {
       state.settings = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
-    builder
-      // === All Users ===
+    builder // === All Users ===
       .addCase(fetchAllUsers.pending, handlePending)
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
@@ -123,9 +125,8 @@ const adminSlice = createSlice({
         state.pagination.totalUsers = action.payload.data?.totalUsers || 0;
         state.pagination.limit = action.payload.data?.limit || 10;
       })
-      .addCase(fetchAllUsers.rejected, handleRejected)
+      .addCase(fetchAllUsers.rejected, handleRejected) // === Update User (Role, First Name, Last Name) ===
 
-      // === Update User (Role, First Name, Last Name) ===
       .addCase(updateUser.pending, handlePending)
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
@@ -134,18 +135,16 @@ const adminSlice = createSlice({
           u._id === updatedUser._id ? updatedUser : u
         );
       })
-      .addCase(updateUser.rejected, handleRejected)
+      .addCase(updateUser.rejected, handleRejected) // === Delete User ===
 
-      // === Delete User ===
       .addCase(deleteUser.pending, handlePending)
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.loading = false;
         const id = action.meta.arg;
         state.users = state.users.filter((u) => u._id !== id);
       })
-      .addCase(deleteUser.rejected, handleRejected)
+      .addCase(deleteUser.rejected, handleRejected) // === Refill User Checks ===
 
-      // === Refill User Checks ===
       .addCase(refillUserChecks.pending, handlePending)
       .addCase(refillUserChecks.fulfilled, (state, action) => {
         state.loading = false;
@@ -154,17 +153,15 @@ const adminSlice = createSlice({
           u._id === refilledUser._id ? refilledUser : u
         );
       })
-      .addCase(refillUserChecks.rejected, handleRejected)
+      .addCase(refillUserChecks.rejected, handleRejected) // === Fetch Analytics Overview ===
 
-      // === Fetch Analytics Overview ===
       .addCase(fetchAnalyticsOverview.pending, handlePending)
       .addCase(fetchAnalyticsOverview.fulfilled, (state, action) => {
         state.loading = false;
         state.analyticsOverview = action.payload.data || null;
       })
-      .addCase(fetchAnalyticsOverview.rejected, handleRejected)
+      .addCase(fetchAnalyticsOverview.rejected, handleRejected) // === fetchAdminSearchedQuotes ===
 
-      // === fetchAdminSearchedQuotes ===
       .addCase(fetchAdminSearchedQuotes.pending, (state) => {
         state.searchedQuotesLoading = true;
         state.searchedQuotesError = null;
@@ -176,11 +173,11 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAdminSearchedQuotes.rejected, (state, action) => {
         state.searchedQuotesLoading = false;
-        state.searchedQuotesError = action.payload?.message || "Failed to fetch quotes.";
+        state.searchedQuotesError =
+          action.payload?.message || "Failed to fetch quotes.";
         state.searchedQuotes = null;
-      })
+      }) // === NEW: fetchSettings ===
 
-      // === NEW: fetchSettings ===
       .addCase(fetchSettings.pending, (state) => {
         state.settingsLoading = true;
         state.settingsError = null;
@@ -191,21 +188,22 @@ const adminSlice = createSlice({
       })
       .addCase(fetchSettings.rejected, (state, action) => {
         state.settingsLoading = false;
-        state.settingsError = action.payload?.message || "Failed to fetch settings.";
-      })
+        state.settingsError =
+          action.payload?.message || "Failed to fetch settings.";
+      }) // === NEW: updateSettings ===
 
-      // === NEW: updateSettings ===
       .addCase(updateSettings.pending, (state) => {
         state.settingsLoading = true;
         state.settingsError = null;
       })
       .addCase(updateSettings.fulfilled, (state, action) => {
         state.settingsLoading = false;
-        state.settings = action.payload.data; 
+        state.settings = action.payload.data;
       })
       .addCase(updateSettings.rejected, (state, action) => {
         state.settingsLoading = false;
-        state.settingsError = action.payload?.message || "Failed to update settings.";
+        state.settingsError =
+          action.payload?.message || "Failed to update settings.";
       });
   },
 });

@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = '';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHeaders = false }) =>
   createAsyncThunk(`${typePrefix}/${name}`, async (
@@ -46,5 +46,4 @@ export const createApiAsyncThunk = ({ name, method, url, typePrefix, prepareHead
       console.error("API Error:", errData);
       return rejectWithValue(errData);
     }
-  }); 
-
+  });

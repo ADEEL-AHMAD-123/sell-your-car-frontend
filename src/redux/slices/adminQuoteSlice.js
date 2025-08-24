@@ -1,3 +1,4 @@
+// src/redux/slices/adminQuoteSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { createApiAsyncThunk } from "../../utils/apiHelper";
 
@@ -19,6 +20,7 @@ export const fetchPendingManualQuotes = createApiAsyncThunk({
   method: "GET",
   url: API.PENDING_QUOTES,
   typePrefix: "adminQuotes",
+  prepareHeaders: true, // ADDED
 });
 
 export const fetchAcceptedQuotes = createApiAsyncThunk({
@@ -26,14 +28,15 @@ export const fetchAcceptedQuotes = createApiAsyncThunk({
   method: "GET",
   url: API.ACCEPTED_QUOTES,
   typePrefix: "adminQuotes",
+  prepareHeaders: true, // ADDED
 });
-
 
 export const reviewManualQuote = createApiAsyncThunk({
   name: "reviewManualQuote",
   method: "PATCH",
   url: ({ id }) => API.REVIEW_QUOTE(id),
   typePrefix: "adminQuotes",
+  prepareHeaders: true, // ADDED
 });
 
 export const markManualQuoteAsCollected = createApiAsyncThunk({
@@ -41,6 +44,7 @@ export const markManualQuoteAsCollected = createApiAsyncThunk({
   method: "PATCH",
   url: ({ id }) => API.MARK_COLLECTED(id),
   typePrefix: "adminQuotes",
+  prepareHeaders: true, // ADDED
 });
 
 // -------------------
@@ -48,7 +52,7 @@ export const markManualQuoteAsCollected = createApiAsyncThunk({
 // -------------------
 const initialState = {
   pending: {
-    response: null, // full response including pagination, filters, etc.
+    response: null,
     loading: false,
     error: null,
   },
@@ -84,9 +88,8 @@ const adminQuoteSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
+    builder // === Fetch Pending ===
 
-      // === Fetch Pending ===
       .addCase(fetchPendingManualQuotes.pending, (state) => {
         state.pending.loading = true;
         state.pending.error = null;
@@ -99,9 +102,8 @@ const adminQuoteSlice = createSlice({
         state.pending.loading = false;
         state.pending.error =
           action.payload?.message || "Failed to fetch pending quotes.";
-      })
+      }) // === Fetch Accepted ===
 
-      // === Fetch Accepted ===
       .addCase(fetchAcceptedQuotes.pending, (state) => {
         state.accepted.loading = true;
         state.accepted.error = null;
@@ -114,10 +116,7 @@ const adminQuoteSlice = createSlice({
         state.accepted.loading = false;
         state.accepted.error =
           action.payload?.message || "Failed to fetch accepted quotes.";
-      })
-      
-
-      // === Review Quote ===
+      }) // === Review Quote ===
       .addCase(reviewManualQuote.pending, (state) => {
         state.review.loading = true;
         state.review.error = null;
@@ -135,9 +134,8 @@ const adminQuoteSlice = createSlice({
         state.review.loading = false;
         state.review.error =
           action.payload?.message || "Failed to review quote.";
-      })
+      }) // === Mark as Collected ===
 
-      // === Mark as Collected ===
       .addCase(markManualQuoteAsCollected.pending, (state) => {
         state.accepted.loading = true;
         state.accepted.error = null;
@@ -159,5 +157,5 @@ const adminQuoteSlice = createSlice({
   },
 });
 
-export const { clearQuoteErrors,clearReviewError } = adminQuoteSlice.actions;
+export const { clearQuoteErrors, clearReviewError } = adminQuoteSlice.actions;
 export default adminQuoteSlice.reducer;

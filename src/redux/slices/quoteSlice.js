@@ -11,6 +11,7 @@ export const getQuote = createApiAsyncThunk({
   method: "POST",
   url: "/api/quote/get",
   typePrefix: "quote",
+  prepareHeaders:true
 });
 
 /**

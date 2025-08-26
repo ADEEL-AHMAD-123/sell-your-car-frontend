@@ -106,6 +106,7 @@ const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
+    resetState: () => initialState,
     clearAdminSearchedQuotes: (state) => {
       state.searchedQuotes = null;
       state.searchedQuotesError = null;
@@ -208,6 +209,6 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdminSearchedQuotes, setSettings } = adminSlice.actions;
+export const { clearAdminSearchedQuotes, setSettings,resetState } = adminSlice.actions;
 
 export default adminSlice.reducer;

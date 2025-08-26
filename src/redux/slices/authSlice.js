@@ -22,7 +22,7 @@ export const getLoggedInUser = createApiAsyncThunk({
   method: "GET",
   url: "/api/auth/me",
   typePrefix: "auth",
-  prepareHeaders: true, // ADDED: Send token in headers for this protected route
+  prepareHeaders: true,
 });
 
 export const logoutUser = createApiAsyncThunk({
@@ -30,7 +30,7 @@ export const logoutUser = createApiAsyncThunk({
   method: "POST",
   url: "/api/auth/logout",
   typePrefix: "auth",
-  prepareHeaders: true, // ADDED: Logout also needs authentication
+  prepareHeaders: true,
 });
 
 export const verifyEmail = createApiAsyncThunk({
@@ -59,7 +59,7 @@ export const updatePassword = createApiAsyncThunk({
   method: "PUT",
   url: "/api/auth/updatepassword",
   typePrefix: "auth",
-  prepareHeaders: true, // ADDED: Password update requires authentication
+  prepareHeaders: true,
 });
 
 export const resendVerificationEmail = createApiAsyncThunk({
@@ -71,6 +71,7 @@ export const resendVerificationEmail = createApiAsyncThunk({
 
 const initialState = {
   user: null,
+  token: null, // New: Store the token separately
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -101,17 +102,14 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.authError = action.payload?.message || "Registration failed";
       }) // Login
-
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.authError = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = {
-          ...action.payload.data.user,
-          token: action.payload.data.token, // ADDED: Store the token
-        };
+        state.user = action.payload.data.user; // Update user data
+        state.token = action.payload.data.token; // Update the token
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -122,9 +120,9 @@ const authSlice = createSlice({
           state.authError = action.payload?.message || "Login failed";
         }
       }) // Logout
-
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.token = null; // Clear the token on logout
         state.isAuthenticated = false;
         state.isLoading = false;
         state.authError = null;
@@ -144,7 +142,6 @@ const authSlice = createSlice({
         state.authError =
           action.payload?.message || "Failed to fetch user data";
       })
-
       // Email Verification
       .addCase(verifyEmail.pending, (state) => {
         state.isLoading = true;
@@ -158,7 +155,6 @@ const authSlice = createSlice({
         state.authError =
           action.payload?.message || "Email verification failed";
       })
-
       // Forgot Password
       .addCase(forgotPassword.pending, (state) => {
         state.isLoading = true;
@@ -172,7 +168,6 @@ const authSlice = createSlice({
         state.authError =
           action.payload?.message || "Forgot password request failed";
       })
-
       // Reset Password
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
@@ -185,7 +180,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.authError = action.payload?.message || "Password reset failed";
       })
-
       // Update Password
       .addCase(updatePassword.pending, (state) => {
         state.isLoading = true;
@@ -198,7 +192,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.authError = action.payload?.message || "Password update failed";
       })
-
       // Resend Verification Email
       .addCase(resendVerificationEmail.pending, (state) => {
         state.resendLoading = true;

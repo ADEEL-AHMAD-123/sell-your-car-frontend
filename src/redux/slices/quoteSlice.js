@@ -22,6 +22,7 @@ export const requestManualQuote = createApiAsyncThunk({
   method: "POST",
   url: "/api/quote/manual-quote",
   typePrefix: "manualQuote",
+  prepareHeaders:true
 });
 
 /**

@@ -78,6 +78,7 @@ const adminQuoteSlice = createSlice({
   name: "adminQuotes",
   initialState,
   reducers: {
+    resetState: () => initialState,
     clearQuoteErrors: (state) => {
       state.pending.error = null;
       state.accepted.error = null;
@@ -157,5 +158,5 @@ const adminQuoteSlice = createSlice({
   },
 });
 
-export const { clearQuoteErrors, clearReviewError } = adminQuoteSlice.actions;
+export const { clearQuoteErrors, clearReviewError,resetState, } = adminQuoteSlice.actions;
 export default adminQuoteSlice.reducer;

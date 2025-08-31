@@ -1,4 +1,3 @@
-// file:/Header.jsx
 import React, { useState, useEffect } from "react";
 import "./Header.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -63,32 +62,34 @@ const Header = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-const handleLogout = async () => {
+  const handleLogout = async () => {
     setIsLogoutModalOpen(false);
 
     try {
-        // Dispatch logoutUser and store the result
-        const result = await dispatch(logoutUser());
+      // Dispatch logoutUser and store the result
+      const result = await dispatch(logoutUser());
 
-        // Check if the logout action was successful
-        if (result.meta.requestStatus === 'fulfilled') {
-            // Dispatch other reset actions ONLY if logout was successful
-            dispatch(resetAuthState());
-            dispatch(resetQuoteState());
-            dispatch(resetAdminState());
-            dispatch(resetAdminQuoteState());
+      // Check if the logout action was successful
+      if (result.meta.requestStatus === "fulfilled") {
+        // Dispatch other reset actions ONLY if logout was successful
+        dispatch(resetAuthState());
+        dispatch(resetQuoteState());
+        dispatch(resetAdminState());
+        dispatch(resetAdminQuoteState());
 
-            // Purge persisted state from local storage
-            await persistor.purge();
+        // Purge persisted state from local storage
+        await persistor.purge();
 
-            console.log('Successfully logged out and cleared all data.');
-        } else {
-            console.error('Logout failed due to an API error. State was not reset.');
-        }
+        console.log("Successfully logged out and cleared all data.");
+      } else {
+        console.error(
+          "Logout failed due to an API error. State was not reset."
+        );
+      }
     } catch (error) {
-        console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
-};
+  };
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -251,6 +252,17 @@ const handleLogout = async () => {
                     Home
                   </Link>
                 </li>
+
+                <li>
+                  <Link
+                    to="/blog"
+                    className={`header__nav-link ${
+                      isActiveLink("/blog") ? "header__nav-link--active" : ""
+                    }`}
+                  >
+                    Blog
+                  </Link>
+                </li>
                 <li>
                   <Link
                     to="/about"
@@ -402,6 +414,20 @@ const handleLogout = async () => {
                   onClick={closeMobileMenu}
                 >
                   Home
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/blog"
+                  className={`header__mobile-nav-link ${
+                    isActiveLink("/blog")
+                      ? "header__mobile-nav-link--active"
+                      : ""
+                  }`}
+                  onClick={closeMobileMenu}
+                >
+                  Blog
                 </Link>
               </li>
               <li>

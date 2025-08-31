@@ -6,6 +6,7 @@ import authReducer from './slices/authSlice';
 import quoteReducer from './slices/quoteSlice';
 import adminReducer from './slices/adminSlice';
 import adminQuoteReducer from './slices/adminQuoteSlice';
+import blogReducer from './slices/blogSlice';
 
 const persistConfig = {
   key: 'root',
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   quote: quoteReducer,
   admin: adminReducer,
   adminQuotes: adminQuoteReducer,
+  blogs: blogReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

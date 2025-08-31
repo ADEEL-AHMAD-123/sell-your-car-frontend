@@ -1,5 +1,6 @@
 // base/_mixins.scss
 @use './variables' as *;
+@use './admin-variables.scss' as *;
 
 @mixin flex-center {
     display: flex;
@@ -44,3 +45,30 @@
     }
   }
   
+@mixin button-style($bg-color, $text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+@mixin button-icon-style($bg-color, $text-color) {
+  @include flex-center;
+  background-color: $bg-color;
+  color: $text-color;
+  width: 40px;
+  height: 40px;
+  border-radius: $admin-radius-sm;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+}  

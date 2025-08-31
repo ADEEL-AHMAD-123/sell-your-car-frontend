@@ -190,7 +190,9 @@
       border: 1px solid rgba(16, 185, 129, 0.2);
       border-radius: $admin-radius-lg;
       margin: $admin-spacing-lg $admin-spacing-xl $admin-spacing-lg $admin-spacing-xl;
-
+@media (max-width: $admin-breakpoint-sm){
+  margin: $admin-spacing-md 0;
+}
       h3 {
         color: $admin-success-light;
         
@@ -671,8 +673,11 @@
         
         p {
           font-size: $admin-font-size-xs;
-          flex-direction: column;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
           gap: 2px;
+
           
           strong {
             min-width: auto;
@@ -861,3 +866,16 @@
 .gallery-image {
   animation: fadeIn 0.3s ease-out;
 }
+
+.badge {
+   display: inline-block;
+        padding: $admin-spacing-xs $admin-spacing-sm;
+        border-radius: $admin-radius-md;
+        font-size: $admin-font-size-xs;
+        font-weight: 600;
+        text-transform: uppercase;
+        background-color: rgba(16, 185, 129, 0.2);
+          color: $admin-text-primary;
+          border: 1px solid $admin-success;
+}
+

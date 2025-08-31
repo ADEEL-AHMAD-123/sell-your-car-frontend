@@ -1,3 +1,4 @@
+// file:/components/common/MessageCard.jsx 
 import React, { useEffect } from 'react';
 import Logo from '../common/Logo/Logo';
 import './MessageCard.scss';

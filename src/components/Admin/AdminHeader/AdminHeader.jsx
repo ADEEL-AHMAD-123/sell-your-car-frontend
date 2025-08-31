@@ -1,23 +1,34 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminHeader.scss';
 import {
   FaBell,
   FaSearch,
-  FaUserCircle,
   FaBars,
   FaExpand,
   FaMoon,
   FaSun,
-  FaCog,
   FaChevronDown
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
+import { logoutUser } from "../../../redux/slices/authSlice";
+import { resetQuote as resetQuoteState } from "../../../redux/slices/quoteSlice";
+import { resetAuthState } from "../../../redux/slices/authSlice";
+import { resetState as resetAdminState } from "../../../redux/slices/adminSlice";
+import { resetState as resetAdminQuoteState } from "../../../redux/slices/adminQuoteSlice";
+import { persistor } from "../../../redux/store";
+import { useDispatch } from 'react-redux';
+
+
 
 const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [notificationCount] = useState(3);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // Added state for the modal
+  const dispatch=useDispatch()
+ const navigate = useNavigate();
 
   // Assuming Redux state shape, but using placeholders for this example
   const user = useSelector(state => state.auth?.user) || {};
@@ -38,6 +49,32 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
 
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!profileDropdownOpen);
+  };
+
+  const handleLogout = async () => {
+    setIsLogoutModalOpen(false);
+
+    try {
+      // NOTE: `dispatch` must be defined in your component's scope (e.g., const dispatch = useDispatch();)
+      const result = await dispatch(logoutUser());
+
+      if (result.meta.requestStatus === "fulfilled") {
+        dispatch(resetAuthState());
+        dispatch(resetQuoteState());
+        dispatch(resetAdminState());
+        dispatch(resetAdminQuoteState());
+
+        await persistor.purge();
+        navigate('/')
+        
+      } else {
+        console.error(
+          "Logout failed due to an API error. State was not reset."
+        );
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   // Get toggle button state for better UX
@@ -101,13 +138,6 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
             {isDarkMode ? <FaSun /> : <FaMoon />}
           </button>
 
-          <button
-            className="admin-header__action-btn"
-            title="Settings"
-          >
-            <FaCog />
-          </button>
-
           <div className="admin-header__notification">
             <button className="admin-header__action-btn" title="Notifications">
               <FaBell />
@@ -121,7 +151,7 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
         </div>
 
         <div className="admin-header__profile">
-          <button 
+          <button
             className={`admin-header__profile-btn ${profileDropdownOpen ? 'active' : ''}`}
             onClick={toggleProfileDropdown}
           >
@@ -156,18 +186,9 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
                   <span className="admin-header__dropdown-role">{role}</span>
                 </div>
               </div>
-              
+
               <div className="admin-header__dropdown-menu">
-                <a href="#profile" className="admin-header__dropdown-item">
-                  <FaUserCircle />
-                  <span>Profile</span>
-                </a>
-                <a href="#settings" className="admin-header__dropdown-item">
-                  <FaCog />
-                  <span>Settings</span>
-                </a>
-                <hr className="admin-header__dropdown-divider" />
-                <button className="admin-header__dropdown-item admin-header__logout">
+                <button className="admin-header__dropdown-item admin-header__logout" onClick={handleLogout}>
                   <span>Logout</span>
                 </button>
               </div>
@@ -175,7 +196,7 @@ const AdminHeader = ({ onToggle, sidebarCollapsed, sidebarOpen, isMobile }) => {
           )}
         </div>
       </div>
-    </header>
+    </header> 
   );
 };
 

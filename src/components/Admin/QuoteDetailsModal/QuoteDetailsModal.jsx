@@ -85,7 +85,7 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
       case 'pending':
         return 'Pending Quote Details';
       case 'rejected':
-        return 'Rejected Quote Details';
+      return 'Rejected Quote Details';
       case 'completed':
         return 'Completed Quote Details';
       default:
@@ -133,7 +133,7 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
     return 'Quote Summary';
   };
   
-  const renderField = (label, value, unit = '') => {
+  const renderField = (label, value, unit = '', className = '', valueClassName = '') => {
     if (value === undefined || value === null || value === '') return null;
     
     // Format the value appropriately
@@ -145,8 +145,8 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
     }
     
     return (
-      <p key={label}>
-        <strong>{label}:</strong> {formattedValue}{unit}
+      <p key={label} className={className}>
+        <strong>{label}:</strong> <span className={valueClassName}>{formattedValue}{unit}</span>
       </p>
     );
   };
@@ -218,16 +218,18 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
             {renderField('MOT Status', vehicleRegistration?.MotStatus)}
             {renderField('Tax Due Date', formatDate(vehicleRegistration?.TaxDueDate))}
             {renderField('MOT Expiry Date', formatDate(vehicleRegistration?.MotExpiryDate))}
-            {renderField('Euro Status', vehicleRegistration?.EuroStatus)}
+            {renderField('Euro Status', otherVehicleData?.EuroStatus)}
             {renderField('Date of Last V5C Issued', formatDate(vehicleRegistration?.DateOfLastV5CIssued))}
           </div>
         )}
         {hasOtherData && (
           <div className="sub-section other-details">
             {/* Other relevant data from external APIs or user input */}
-            {renderField('Kerb Weight', otherVehicleData?.KerbWeight, ' kg')}
+            {renderField('Wheel Plan', otherVehicleData?.WheelPlan)}
             {renderField('Body Style', otherVehicleData?.BodyStyle)}
             {renderField('Number of Doors', otherVehicleData?.NumberOfDoors)}
+            {renderField('Number of Seats', otherVehicleData?.NumberOfSeats)}
+{renderField('Number of Axles', otherVehicleData?.NumberOfAxles)}
           </div>
         )}
       </section>
@@ -255,10 +257,26 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
             {renderField('Generated At', formatDateTime(createdAt))}
             
             {/* Conditional fields based on client decision */}
+            {(clientDecision === 'accepted' || clientDecision === 'pending' || type === 'manual') && otherVehicleData?.KerbWeight && (
+              renderField('Kerb Weight', otherVehicleData.KerbWeight, ' kg', '', "badge")
+            )}
+            
+            {clientDecision === 'accepted' && finalPrice && (
+              // 💡 FIX: Applied the badge class to the valueClassName parameter.
+              renderField('Final Price', formatCurrency(finalPrice), '', '', 'badge')
+            )}
+            
+            {(clientDecision === 'rejected' && estimatedScrapPrice) && (
+              renderField('Offered Price', formatCurrency(estimatedScrapPrice))
+            )}
+            
+            {type === 'manual' && clientDecision === 'pending' && estimatedScrapPrice && (
+              renderField('Offered Price', formatCurrency(estimatedScrapPrice ))
+            )}
+
             {clientDecision === 'accepted' && (
               <>
                 {renderField('Accepted At', formatDateTime(updatedAt))}
-                {renderField('Final Price', formatCurrency(finalPrice))}
               </>
             )}
 
@@ -266,7 +284,6 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
               <>
                 {renderField('Rejected At', formatDateTime(rejectedAt))}
                 {renderField('Rejection Reason', rejectionReason)}
-                {renderField('Offered Price', formatCurrency(estimatedScrapPrice))}
                 {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
               </>
             )}
@@ -275,7 +292,6 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
               <>
                 {renderField('Manual Request At', formatDateTime(lastManualRequestAt))}
                 {renderField('Manual Request Reason', manualQuoteReason)}
-                {renderField('Offered Price', formatCurrency(estimatedScrapPrice))}
                 {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
               </>
             )}

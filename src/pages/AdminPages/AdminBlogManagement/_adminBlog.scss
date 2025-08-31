@@ -1,0 +1,410 @@
+// src/styles/components/_adminBlog.scss
+@import '../../../styles/base/admin-variables.scss';
+
+
+.blog-form {
+  background: $admin-bg-primary;
+  min-height: 100vh;
+  color: $admin-text-primary;
+  
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $admin-spacing-xl;
+    
+    @media (max-width: $admin-breakpoint-md) {
+      padding: $admin-spacing-lg;
+    }
+  }
+
+  // Header Section - Fixed positioning issues
+  .header {
+    background: $admin-bg-card;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-lg;
+    padding: $admin-spacing-xl;
+    margin-bottom: $admin-spacing-xl;
+    box-shadow: $admin-shadow-md;
+    position: relative; // Changed from sticky to relative
+    z-index: 1; // Reduced z-index
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: $admin-spacing-lg;
+      
+      @media (max-width: $admin-breakpoint-md) {
+        flex-direction: column;
+        gap: $admin-spacing-md;
+      }
+    }
+    
+    .header-info {
+      flex: 1;
+      
+      .title {
+        font-size: $admin-font-size-3xl;
+        font-weight: 700;
+        color: $admin-text-primary;
+        margin: 0 0 $admin-spacing-sm 0;
+        line-height: 1.2;
+      }
+      
+      .subtitle {
+        font-size: $admin-font-size-lg;
+        color: $admin-text-secondary;
+        margin: 0 0 $admin-spacing-md 0;
+        line-height: 1.5;
+      }
+      
+      .guide-text {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: $admin-radius-md;
+        padding: $admin-spacing-md;
+        font-size: $admin-font-size-sm;
+        color: $admin-text-secondary;
+        margin-bottom: $admin-spacing-md;
+        .highlight {
+          color: $admin-primary-light;
+          font-weight: 600;
+        }
+      }
+    }
+    
+    .header-actions {
+      flex-shrink: 0;
+      
+      .btn {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &__form {
+    display: contents;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: $admin-spacing-xl;
+    
+    @media (max-width: $admin-breakpoint-lg) {
+      grid-template-columns: 1fr;
+      gap: $admin-spacing-lg;
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $admin-spacing-xl;
+  }
+
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: $admin-spacing-lg;
+    
+    @media (max-width: $admin-breakpoint-lg) {
+      order: -1;
+    }
+  }
+}
+
+// Form Sections
+.form-section {
+  background: $admin-bg-card;
+  border: 1px solid $admin-border;
+  border-radius: $admin-radius-lg;
+  padding: $admin-spacing-xl;
+  
+  h2 {
+    font-size: $admin-font-size-xl;
+    font-weight: 600;
+    margin: 0 0 $admin-spacing-lg 0;
+    color: $admin-text-primary;
+  }
+  
+  @media (max-width: $admin-breakpoint-md) {
+    padding: $admin-spacing-lg;
+  }
+}
+
+// Sidebar Cards
+.sidebar-card {
+  background: $admin-bg-card;
+  border: 1px solid $admin-border;
+  border-radius: $admin-radius-lg;
+  padding: $admin-spacing-lg;
+  
+  h3 {
+    font-size: $admin-font-size-lg;
+    font-weight: 600;
+    margin: 0 0 $admin-spacing-md 0;
+    color: $admin-text-primary;
+  }
+}
+
+// Form Elements
+.form-group {
+  margin-bottom: $admin-spacing-lg;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.form-input {
+  width: 100%;
+  padding: $admin-spacing-md;
+  background: $admin-bg-tertiary;
+  border: 1px solid $admin-border;
+  border-radius: $admin-radius-md;
+  color: $admin-text-primary;
+  font-size: $admin-font-size-base;
+  transition: $admin-transition-base;
+  
+  &--large {
+    padding: $admin-spacing-lg;
+    font-size: $admin-font-size-lg;
+    font-weight: 600;
+  }
+  
+  &::placeholder {
+    color: $admin-text-muted;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $admin-primary;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+.form-select {
+  @extend .form-input;
+  cursor: pointer;
+}
+
+label {
+  display: block;
+  font-size: $admin-font-size-sm;
+  font-weight: 600;
+  color: $admin-text-primary;
+  margin-bottom: $admin-spacing-sm;
+}
+
+// Meta Description with Counter
+.meta-input {
+  position: relative;
+  
+  .char-count {
+    position: absolute;
+    right: $admin-spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: $admin-font-size-xs;
+    color: $admin-text-muted;
+    font-weight: 600;
+    background: $admin-bg-card;
+    padding: $admin-spacing-xs;
+    border-radius: $admin-radius-sm;
+    
+    &.warning { color: $admin-warning; }
+    &.error { color: $admin-error; }
+  }
+  
+  .form-input {
+    padding-right: 4rem;
+  }
+}
+
+// Keywords Tags
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $admin-spacing-xs;
+  margin-top: $admin-spacing-sm;
+  
+  .tag {
+    background: rgba(99, 102, 241, 0.1);
+    color: $admin-primary-light;
+    padding: $admin-spacing-xs $admin-spacing-sm;
+    border-radius: $admin-radius-sm;
+    font-size: $admin-font-size-xs;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+  }
+}
+
+// Checkbox
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: $admin-spacing-sm;
+  cursor: pointer;
+  font-weight: 500;
+  
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: $admin-primary;
+  }
+}
+
+// Editor Container - Simplified and Fixed
+.editor-container {
+  border: 1px solid $admin-border;
+  border-radius: $admin-radius-md;
+  overflow: hidden;
+  
+  // TinyMCE specific fixes
+  :global(.tox) {
+    border: none !important;
+    
+    .tox-toolbar {
+      background: $admin-bg-secondary !important;
+      border-bottom: 1px solid $admin-border !important;
+    }
+    
+    .tox-edit-area {
+      background: $admin-bg-tertiary !important;
+    }
+    
+    // Fix dropdown menus
+    .tox-menu,
+    .tox-collection {
+      z-index: 1000 !important;
+      background: $admin-bg-card !important;
+      border: 1px solid $admin-border !important;
+      border-radius: $admin-radius-md !important;
+      box-shadow: $admin-shadow-lg !important;
+    }
+    
+    // Fix fullscreen mode
+    &.tox-fullscreen {
+      z-index: 9999 !important;
+      background: $admin-bg-primary !important;
+      
+      .tox-toolbar {
+        background: $admin-bg-card !important;
+      }
+      
+      .tox-menu,
+      .tox-collection {
+        z-index: 10000 !important;
+      }
+    }
+  }
+}
+
+// Image Upload
+.image-upload {
+  border: 2px dashed $admin-border;
+  border-radius: $admin-radius-lg;
+  cursor: pointer;
+  transition: $admin-transition-base;
+  overflow: hidden;
+  
+  &:hover {
+    border-color: $admin-primary;
+  }
+  
+  .image-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .upload-placeholder {
+    padding: $admin-spacing-xl;
+    text-align: center;
+    color: $admin-text-secondary;
+    
+    span {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: $admin-spacing-md;
+    }
+    
+    p {
+      margin: 0 0 $admin-spacing-xs 0;
+      font-weight: 500;
+    }
+    
+    small {
+      color: $admin-text-muted;
+      font-size: $admin-font-size-xs;
+    }
+  }
+}
+
+// Buttons
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $admin-spacing-sm;
+  padding: $admin-spacing-md $admin-spacing-lg;
+  border: none;
+  border-radius: $admin-radius-md;
+  font-size: $admin-font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $admin-transition-base;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &--primary {
+    background: $admin-primary-gradient;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: $admin-shadow-md;
+    }
+  }
+  
+  &--secondary {
+    background: $admin-bg-tertiary;
+    color: $admin-text-primary;
+    border: 1px solid $admin-border;
+    
+    &:hover:not(:disabled) {
+      background: $admin-bg-hover;
+    }
+  }
+  
+  &--full {
+    width: 100%;
+  }
+}
+
+// Error Messages
+.form-error {
+  color: $admin-error;
+  font-size: $admin-font-size-sm;
+  margin-top: $admin-spacing-xs;
+  display: block;
+}
+
+// Global fullscreen fixes
+:global {
+  body.tox-fullscreen {
+    overflow: hidden !important;
+  }
+  
+  .tox.tox-fullscreen {
+    .tox-menu {
+      max-height: 400px !important;
+      overflow-y: auto !important;
+    }
+  }
+}

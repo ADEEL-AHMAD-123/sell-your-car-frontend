@@ -3,11 +3,13 @@
 @use "../../styles/base/mixins" as *;
 
 .quote-result {
-  padding: 3rem 1.5rem;
-  max-width: 1000px;
+  background-color: whitesmoke;
+  padding: 3rem 5rem;
+  // max-width: 1000px;
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
   color: #333;
+  width: 100%;
 
 
   h2, h3 {

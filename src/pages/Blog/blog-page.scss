@@ -1,0 +1,573 @@
+// blog-listing.scss
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
+
+/* ===============================
+  Blog Listing Page Container
+  ===============================
+*/
+.blog-listing-page {
+  background-color: $color-primary-background;
+  min-height: 100vh;
+  color: $color-dark;
+}
+
+/* ===============================
+  Hero Banner Section
+  ===============================
+*/
+.blog-hero-banner {
+  position: relative;
+  background: linear-gradient(135deg, $color-secondary-background 0%, rgba($color-primary, 0.5) 100%);
+  padding: $spacing-xl 0;
+  border-bottom: $border-primary;
+  overflow: hidden;
+  text-align: center;
+  color: $color-light;
+
+  // Blurry decorative circles - adjusted sizes for smaller screens
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    background: rgba($color-primary, 0.1);
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+
+    @include responsive(sm) {
+      width: 150px;
+      height: 150px;
+      filter: blur(50px);
+    }
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 300px;
+    height: 300px;
+    background: rgba($color-primary, 0.05);
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+
+    @include responsive(sm) {
+      width: 200px;
+      height: 200px;
+      filter: blur(60px);
+    }
+  }
+
+  // Adjust hero section padding for different screen sizes
+  @include responsive(md) {
+    padding: $spacing-lg 0;
+  }
+
+  @include responsive(sm) {
+    padding: $spacing-md 0;
+  }
+}
+
+.hero-content-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: rgba($color-light, 0.2);
+  border: 1px solid rgba($color-light, 0.3);
+  border-radius: 50px;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-sm;
+  font-weight: 600;
+  color: $color-light;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
+}
+
+// `clamp` function already handles responsiveness, but we can make additional tweaks
+.hero-main-heading {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: $spacing-md;
+  color: $color-light;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @include responsive(sm) {
+    font-size: 2.2rem;
+  }
+}
+
+.hero-description-text {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto $spacing-lg;
+  color: $color-light;
+
+  @include responsive(sm) {
+    font-size: 1rem;
+    padding: 0 $spacing-sm;
+  }
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+
+  // Using a mixin for responsiveness
+  @include responsive(sm) {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.stat-item {
+  .stat-number {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffd700;
+    line-height: 1.1;
+
+    @include responsive(sm) {
+      font-size: 1.8rem;
+    }
+  }
+  .stat-label {
+    font-size: 0.9rem;
+    color: rgba($color-light, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Blog Content Area
+.blog-content-area {
+  @include section-spacing;
+  padding-top: $spacing-xl;
+
+  .container {
+    @include container;
+  }
+}
+
+.blog-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: $spacing-md;
+  }
+
+  @include responsive(sm) {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+// Post Item
+.post-item {
+  background: $color-light;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(53, 52, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 1px solid rgba(53, 52, 255, 0.08);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $color-primary, lighten($color-primary, 20%));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(53, 52, 255, 0.15);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .post-thumbnail {
+      transform: scale(1.1);
+    }
+
+    .post-title-text {
+      color: $color-primary;
+    }
+  }
+
+  &.featured-post {
+    grid-column: span 2;
+    
+    @include responsive(md) {
+      grid-column: span 1;
+    }
+
+    .post-image-container {
+      height: 280px;
+    }
+
+    .post-title-text {
+      font-size: 1.6rem;
+    }
+  }
+}
+
+.post-image-container {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(53, 52, 255, 0.05), rgba(53, 52, 255, 0.02));
+}
+
+.post-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.post-category-badge {
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  background: linear-gradient(135deg, $color-primary, lighten($color-primary, 15%));
+  color: $color-light;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(53, 52, 255, 0.3);
+}
+
+.post-content-area {
+  padding: $spacing-lg;
+  background: $color-light;
+
+  @include responsive(sm) {
+    padding: $spacing-md;
+  }
+}
+
+.post-title-wrapper {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.post-title-text {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: $color-dark;
+  transition: color 0.3s ease;
+  margin-bottom: $spacing-sm;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-excerpt-text {
+  color: lighten($color-dark, 25%);
+  line-height: 1.7;
+  margin-bottom: $spacing-md;
+  font-size: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-metadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-sm;
+  border-top: 2px solid rgba(53, 52, 255, 0.08);
+
+  @include responsive(sm) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-xs;
+  }
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.author-avatar {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary, lighten($color-primary, 20%));
+  color: $color-light;
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 12px rgba(53, 52, 255, 0.2);
+}
+
+.author-name {
+  font-weight: 600;
+  color: $color-dark;
+  font-size: 0.95rem;
+}
+
+.publish-date {
+  font-size: 0.9rem;
+  color: lighten($color-dark, 40%);
+  font-weight: 500;
+}
+
+// Empty State
+.empty-blog-state {
+  text-align: center;
+  padding: $spacing-xl;
+  background: linear-gradient(135deg, rgba(53, 52, 255, 0.02), rgba(53, 52, 255, 0.05));
+  border-radius: 20px;
+  border: 2px dashed rgba(53, 52, 255, 0.2);
+  grid-column: 1 / -1;
+  max-width: 500px;
+  margin: 0 auto;
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: $spacing-sm;
+    opacity: 0.7;
+  }
+
+  h3 {
+    color: $color-dark;
+    margin-bottom: $spacing-xs;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: lighten($color-dark, 30%);
+    font-size: 1.1rem;
+  }
+}
+
+// Error State
+.error-display {
+  @include flex-center;
+  height: 60vh;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  color: $color-red;
+  border-radius: 20px;
+  margin: $spacing-md;
+  font-weight: 600;
+  border: 2px solid #fecaca;
+  font-size: 1.1rem;
+}
+
+// Pagination
+.blog-pagination-area {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-xl;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $color-light;
+  padding: $spacing-md;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(53, 52, 255, 0.1);
+  border: 1px solid rgba(53, 52, 255, 0.1);
+
+  @include responsive(sm) {
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+  }
+}
+
+.nav-button {
+  @include button-style($color-light, $color-dark);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  border: 2px solid rgba(53, 52, 255, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: $color-primary;
+    color: $color-light;
+    border-color: $color-primary;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(53, 52, 255, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      filter: none;
+    }
+  }
+
+  @include responsive(sm) {
+    width: 100%;
+    padding: 0.7rem 1.2rem;
+  }
+}
+
+.page-number-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  @include responsive(sm) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.number-button {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  background: rgba(53, 52, 255, 0.05);
+  color: $color-primary;
+  border: 2px solid transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(53, 52, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(53, 52, 255, 0.15);
+  }
+
+  &.active-page {
+    background: $color-primary;
+    color: $color-light;
+    box-shadow: 0 8px 25px rgba(53, 52, 255, 0.3);
+    
+    &:hover {
+      background: darken($color-primary, 8%);
+      transform: translateY(-2px);
+    }
+  }
+
+  @include responsive(sm) {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.page-ellipsis {
+  padding: 0.8rem 0.5rem;
+  color: lighten($color-primary, 20%);
+  font-weight: 700;
+}
+
+// Animations
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.post-item {
+  animation: fadeInScale 0.6s ease forwards;
+  
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+// Featured post special styling
+.featured-post {
+  background: linear-gradient(135deg, $color-light 0%, rgba(53, 52, 255, 0.02) 100%);
+  
+  .post-content-area {
+    background: linear-gradient(135deg, $color-light 0%, rgba(53, 52, 255, 0.02) 100%);
+  }
+  
+  .post-category-badge {
+    background: linear-gradient(135deg, darken($color-primary, 10%), $color-primary);
+    box-shadow: 0 6px 20px rgba(53, 52, 255, 0.4);
+  }
+}
+
+// Responsive improvements
+@include responsive(lg) {
+  .blog-posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  }
+}
+
+@include responsive(md) {
+  .blog-hero-banner {
+    padding: $spacing-md 0;
+  }
+  
+  .post-content-area {
+    padding: $spacing-md;
+  }
+  
+  .hero-stats {
+    gap: $spacing-md;
+  }
+}
+
+@include responsive(sm) {
+  .hero-tag {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .stat-item .stat-number {
+    font-size: 1.8rem;
+  }
+}

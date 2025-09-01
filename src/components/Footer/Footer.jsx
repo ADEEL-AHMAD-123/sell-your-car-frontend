@@ -34,12 +34,36 @@ const Footer = () => {
 
         <div className="footer__col">
           <h4>Follow Us</h4>
-          <div className="social-icons">
-            <a href="#"><FaFacebookF /></a>
-            <a href="#"><FaTwitter /></a>
-            <a href="#"><FaInstagram /></a>
-            <a href="#"><FaLinkedinIn /></a>
-          </div>
+        <div className="social-icons">
+  <a 
+    href="https://www.facebook.com/share/1ZPnReZaL2/?mibextid=wwXIfr"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <FaFacebookF />
+  </a>
+  <a
+    href="https://twitter.com/your-twitter-handle" 
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <FaTwitter />
+  </a>
+  <a
+    href="https://www.instagram.com/sellyourcar.info/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <FaInstagram />
+  </a>
+  <a
+    href="https://www.linkedin.com/company/your-linkedin-page"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <FaLinkedinIn />
+  </a>
+</div>
         </div>
       </div>
 

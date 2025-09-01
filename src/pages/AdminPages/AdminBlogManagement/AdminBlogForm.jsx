@@ -3,16 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createBlogPost, updateBlogPost } from '../../../redux/slices/blogSlice';
 import MainLoader from '../../../components/common/Spinner';
-import { Editor } from '@tinymce/tinymce-react';
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import './_adminBlog.scss';
+import MemoizedEditor from '../../../components/common/MemoizedEditor'; // 💡 Import the new MemoizedEditor component
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
-  content: Yup.string().required('Content is required'),
-  // 💡 Updated: The metaDescription validation now allows up to 200 characters
   metaDescription: Yup.string().max(200, 'Max 200 characters').required('Meta description is required'),
   imageAltText: Yup.string().required('Alt text is required'),
 });
@@ -21,20 +19,18 @@ const AdminBlogForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   const isEditing = !!id;
   const { blogs, isLoading } = useSelector(state => state.blogs);
   const blogToEdit = isEditing ? blogs.find(blog => blog._id === id) : null;
-  
+
   const [previewImage, setPreviewImage] = useState(null);
-  // 💡 Updated: The character count state now uses 200 as the new limit
   const [charCount, setCharCount] = useState(0);
   const editorRef = useRef(null);
 
   const formik = useFormik({
     initialValues: {
       title: '',
-      content: '',
       metaDescription: '',
       image: null,
       imageAltText: '',
@@ -45,6 +41,7 @@ const AdminBlogForm = () => {
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
+      // Get content directly from the editor ref on submit
       const content = editorRef.current?.getContent() || '';
       if (!content.trim()) {
         toast.error('Content is required');
@@ -58,11 +55,12 @@ const AdminBlogForm = () => {
         } else if (key === 'keywords') {
           data.append('keywords', JSON.stringify(values.keywords));
         } else if (key !== 'image') {
-          data.append(key, key === 'content' ? content : values[key]);
+          data.append(key, values[key]);
         }
       });
+      data.append('content', content);
 
-      const result = isEditing 
+      const result = isEditing
         ? await dispatch(updateBlogPost({ id, data }))
         : await dispatch(createBlogPost({ data }));
 
@@ -83,7 +81,7 @@ const AdminBlogForm = () => {
         imageAltText: blogToEdit.image?.altText || '',
         keywords: Array.isArray(blogToEdit.keywords) ? blogToEdit.keywords : [],
       });
-      
+
       setPreviewImage(blogToEdit.image?.url || null);
       setCharCount((blogToEdit.metaDescription || '').length);
     }
@@ -152,8 +150,8 @@ const AdminBlogForm = () => {
             </div>
             <div className="header-actions">
               {isEditing && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-secondary"
                   onClick={() => navigate('/dashboard/blog/create')}
                   disabled={isLoading}
@@ -172,21 +170,19 @@ const AdminBlogForm = () => {
               {/* Title & Meta */}
               <section className="form-section">
                 <h2>Basic Information</h2>
-                
                 <div className="form-group">
                   <label htmlFor="title">Title</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     id="title"
                     className="form-input form-input--large"
                     placeholder="Enter post title"
-                    {...formik.getFieldProps('title')} 
+                    {...formik.getFieldProps('title')}
                   />
                   {formik.touched.title && formik.errors.title && (
                     <span className="form-error">{formik.errors.title}</span>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="metaDescription">Meta Description</label>
                   <div className="meta-input">
@@ -194,7 +190,6 @@ const AdminBlogForm = () => {
                       id="metaDescription"
                       className="form-input form-textarea"
                       placeholder="Brief description for SEO"
-                      // 💡 Updated: The maxLength is now 200
                       maxLength="200"
                       rows="2"
                       value={formik.values.metaDescription}
@@ -202,7 +197,6 @@ const AdminBlogForm = () => {
                       onBlur={formik.handleBlur}
                     />
                     <span className={`char-count ${charCount > 200 ? 'error' : charCount > 180 ? 'warning' : ''}`}>
-                      {/* 💡 Updated: The counter limit is now 200 */}
                       {charCount}/200
                     </span>
                   </div>
@@ -210,11 +204,10 @@ const AdminBlogForm = () => {
                     <span className="form-error">{formik.errors.metaDescription}</span>
                   )}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="keywords">Keywords</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     id="keywords"
                     className="form-input"
                     placeholder="Type keyword and press Enter"
@@ -236,33 +229,13 @@ const AdminBlogForm = () => {
               <section className="form-section">
                 <h2>Content</h2>
                 <div className="editor-container">
-                  <Editor
-                    apiKey='l6f3fdlflomcknz3v6lz0yyjuefcnmuclverywux19f54brl'
-                    onInit={(evt, editor) => {
+                  <MemoizedEditor
+                    initialValue={blogToEdit?.content || ''}
+                    onInit={(editor) => {
                       editorRef.current = editor;
-                    }}
-                    initialValue={formik.values.content}
-                    onEditorChange={(content) => formik.setFieldValue('content', content)}
-                    init={{
-                      height: 500,
-                      menubar: false,
-                      skin: 'oxide-dark',
-                      content_css: 'dark',
-                      plugins: [
-                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                        'preview', 'anchor', 'searchreplace', 'visualblocks', 'code',
-                        'fullscreen', 'insertdatetime', 'media', 'table', 'wordcount'
-                      ],
-                      toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | fullscreen code',
-                      branding: false,
-                      resize: false,
-                      statusbar: false,
                     }}
                   />
                 </div>
-                {formik.touched.content && formik.errors.content && (
-                  <span className="form-error">{formik.errors.content}</span>
-                )}
               </section>
             </main>
 
@@ -271,10 +244,9 @@ const AdminBlogForm = () => {
               {/* Settings */}
               <div className="sidebar-card">
                 <h3>Settings</h3>
-                
                 <div className="form-group">
                   <label htmlFor="category">Category</label>
-                  <select 
+                  <select
                     id="category"
                     className="form-select"
                     {...formik.getFieldProps('category')}
@@ -285,10 +257,9 @@ const AdminBlogForm = () => {
                     <option value="announcements">Announcements</option>
                   </select>
                 </div>
-
                 <div className="form-group">
                   <label className="checkbox-label">
-                    <input 
+                    <input
                       type="checkbox"
                       className="checkbox"
                       checked={formik.values.featured}
@@ -302,7 +273,6 @@ const AdminBlogForm = () => {
               {/* Image */}
               <div className="sidebar-card">
                 <h3>Featured Image</h3>
-                
                 <div className="image-upload" onClick={() => document.getElementById('imageInput').click()}>
                   {previewImage ? (
                     <img src={previewImage} alt="Preview" className="image-preview" />
@@ -313,7 +283,7 @@ const AdminBlogForm = () => {
                       <small>JPG, PNG, WebP (max 5MB)</small>
                     </div>
                   )}
-                  <input 
+                  <input
                     type="file"
                     id="imageInput"
                     hidden
@@ -321,15 +291,14 @@ const AdminBlogForm = () => {
                     onChange={handleFileChange}
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="imageAltText">Alt Text</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     id="imageAltText"
                     className="form-input"
                     placeholder="Describe the image"
-                    {...formik.getFieldProps('imageAltText')} 
+                    {...formik.getFieldProps('imageAltText')}
                   />
                   {formik.touched.imageAltText && formik.errors.imageAltText && (
                     <span className="form-error">{formik.errors.imageAltText}</span>
@@ -339,8 +308,8 @@ const AdminBlogForm = () => {
 
               {/* Actions */}
               <div className="sidebar-card">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn btn--primary btn--full"
                   disabled={isLoading}
                 >

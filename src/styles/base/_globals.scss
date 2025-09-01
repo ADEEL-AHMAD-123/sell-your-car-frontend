@@ -4,7 +4,7 @@
 // HEADINGS
 h1, h2, h3, h4, h5 {
     font-weight: 600;
-    color: $color-dark;
+   
     margin-bottom: 0.5em;
   }
   
@@ -15,12 +15,12 @@ h1, h2, h3, h4, h5 {
   h5 { font-size: 1.1rem; }
   
   a {
-    color: $color-primary;
+   
     text-decoration: none;
     transition: 0.3s ease;
   
     &:hover {
-      color: $color-secondary;
+     
     }
   }
   
@@ -33,10 +33,10 @@ h1, h2, h3, h4, h5 {
   // GLOBAL SECTION
   .section {
     @include section-spacing;
-    background-color: $color-gray;
+   
   
     &.alt {
-      background-color: $color-light;
+     
     }
   
     .section-title {
@@ -45,11 +45,11 @@ h1, h2, h3, h4, h5 {
   
       h2 {
         font-size: 2rem;
-        color: $color-primary;
+       
       }
   
       p {
-        color: $color-dark;
+        
         max-width: 600px;
         margin: auto;
       }

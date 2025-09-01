@@ -1,6 +1,6 @@
 // base/_mixins.scss
 @use './variables' as *;
-@use './admin-variables.scss' as *;
+
 
 @mixin flex-center {
     display: flex;

@@ -1,15 +1,37 @@
 @import '../styles/base/admin-variables';
 
+// Define a common mixin for button styles to ensure consistency
+@mixin button-base {
+  padding: $admin-spacing-xs $admin-spacing-sm;
+  border: 1px solid transparent;
+  border-radius: $admin-radius-md;
+  font-size: $admin-font-size-xs;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $admin-transition-fast;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: auto;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ===================================
+// MAIN PAGE STYLES
+// ===================================
 .admin-quotes-page {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: $admin-bg-primary;
   color: $admin-text-primary;
   min-height: 100vh;
-overflow-y: hidden;
+  overflow-y: hidden;
+
   // Page Header
   .page-header {
     margin-bottom: $admin-spacing-2xl;
-    
+
     h1 {
       font-size: $admin-font-size-3xl;
       font-weight: 700;
@@ -322,7 +344,7 @@ overflow-y: hidden;
     // Desktop Table
     .table-wrapper {
       overflow-x: auto;
-      
+
       &::-webkit-scrollbar {
         height: 6px;
       }
@@ -339,8 +361,8 @@ overflow-y: hidden;
       table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 900px; // Reduced for better responsiveness
-        table-layout: auto; // Changed to auto for flexible column sizing
+        min-width: 900px;
+        table-layout: auto;
 
         thead {
           background: $admin-bg-secondary;
@@ -365,18 +387,18 @@ overflow-y: hidden;
 
             &:last-child {
               padding-right: $admin-spacing-xl;
-              width: 140px; // Fixed width for actions column
+              width: 140px;
               min-width: 140px;
             }
 
             // Set minimum widths for content columns
-            &:nth-child(1) { min-width: 80px; }  // Reg No
-            &:nth-child(2) { min-width: 120px; } // Vehicle
-            &:nth-child(3) { min-width: 120px; } // Client
-            &:nth-child(4) { min-width: 70px; }  // Type
-            &:nth-child(5) { min-width: 150px; } // Reason
-            &:nth-child(6) { min-width: 90px; }  // Client Offer
-            &:nth-child(7) { min-width: 70px; }  // Priority
+            &:nth-child(1) { min-width: 80px; }
+            &:nth-child(2) { min-width: 120px; }
+            &:nth-child(3) { min-width: 120px; }
+            &:nth-child(4) { min-width: 70px; }
+            &:nth-child(5) { min-width: 150px; }
+            &:nth-child(6) { min-width: 90px; }
+            &:nth-child(7) { min-width: 70px; }
           }
         }
 
@@ -397,48 +419,45 @@ overflow-y: hidden;
               padding: $admin-spacing-lg $admin-spacing-md;
               font-size: $admin-font-size-sm;
               color: $admin-text-primary;
-              vertical-align: top; // Align content to top for multi-line cells
-              word-wrap: break-word; // Allow long words to break
-              word-break: break-word; // Break long words if needed
+              vertical-align: top;
+              word-wrap: break-word;
+              word-break: break-word;
 
               &:first-child {
                 padding-left: $admin-spacing-xl;
                 font-weight: 600;
                 color: $admin-primary-light;
-                max-width: 100px; // Limit reg number width
+                max-width: 100px;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap; // Keep reg numbers on single line
+                white-space: nowrap;
               }
 
               &:last-child {
                 padding-right: $admin-spacing-xl;
-                white-space: nowrap; // Prevent actions from wrapping
-                overflow: visible; // Allow buttons to be visible
-                text-overflow: clip; // Don't show ellipsis
-                width: 140px; // Fixed width for actions
+                white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+                width: 140px;
                 min-width: 140px;
               }
 
-              // Allow content wrapping for specific columns
-              &:nth-child(2), // Vehicle
-              &:nth-child(3), // Client
-              &:nth-child(5) { // Reason
-                white-space: normal; // Allow text wrapping
-                line-height: 1.4; // Better line spacing for multi-line content
-                max-width: 200px; // Reasonable max width
+              &:nth-child(2),
+              &:nth-child(3),
+              &:nth-child(5) {
+                white-space: normal;
+                line-height: 1.4;
+                max-width: 200px;
               }
 
-              // Keep single line for shorter content
-              &:nth-child(4), // Type
-              &:nth-child(6), // Client Offer
-              &:nth-child(7) { // Priority
+              &:nth-child(4),
+              &:nth-child(6),
+              &:nth-child(7) {
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
 
-              // Type badges
               .type-badge {
                 padding: $admin-spacing-xs $admin-spacing-sm;
                 border-radius: $admin-radius-full;
@@ -466,7 +485,6 @@ overflow-y: hidden;
                 }
               }
 
-              // Priority badges
               .priority-badge {
                 padding: $admin-spacing-xs $admin-spacing-sm;
                 border-radius: $admin-radius-full;
@@ -495,39 +513,27 @@ overflow-y: hidden;
                 }
               }
 
-              // Reason text styling
               .reason-text {
                 display: block;
                 font-style: italic;
                 color: $admin-text-muted;
-                line-height: 1.4; // Better spacing for wrapped text
-                // Removed max-width and overflow restrictions to allow wrapping
+                line-height: 1.4;
               }
 
-              // Action buttons container
               .actions-container {
                 display: flex;
                 gap: $admin-spacing-xs;
                 align-items: center;
                 justify-content: flex-start;
-                flex-wrap: nowrap; // Prevent buttons from wrapping
-                min-width: 120px; // Ensure minimum space for both buttons
+                flex-wrap: nowrap;
+                min-width: 120px;
               }
 
-              // Action buttons
               .btn-view,
               .btn-review,
               .btn-collected {
-                padding: $admin-spacing-xs $admin-spacing-sm;
-                border: none;
-                border-radius: $admin-radius-md;
-                font-size: $admin-font-size-xs;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all $admin-transition-fast;
-                white-space: nowrap;
-                min-width: auto;
-                flex-shrink: 0; // Prevent buttons from shrinking
+                // Apply common base styles to all action buttons
+                @include button-base;
 
                 &:hover {
                   transform: translateY(-1px);
@@ -563,7 +569,8 @@ overflow-y: hidden;
                 background: rgba(245, 158, 11, 0.1);
                 color: $admin-warning;
                 border: 1px solid rgba(245, 158, 11, 0.2);
-margin-left: 5px;
+                margin-left: 5px;
+
                 &:hover {
                   background: rgba(245, 158, 11, 0.2);
                 }
@@ -574,7 +581,7 @@ margin-left: 5px;
       }
 
       @media (max-width: $admin-breakpoint-md) {
-        display: none; // Hide table on mobile, show cards instead
+        display: none;
       }
     }
 
@@ -711,9 +718,40 @@ margin-left: 5px;
           gap: $admin-spacing-sm;
           flex-wrap: wrap;
 
-          button {
-            flex: 1;
-            min-width: 100px;
+          .btn-view,
+          .btn-review,
+          .btn-collected {
+            // Apply common base styles to mobile card buttons
+            @include button-base;
+
+            // These buttons will now share the same hover/active states
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: $admin-shadow-sm;
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+          }
+
+          // Apply specific button colors from the table styles
+          .btn-view {
+            background: rgba(99, 102, 241, 0.1);
+            color: $admin-primary;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+          }
+          
+          .btn-review {
+            background: rgba(16, 185, 129, 0.1);
+            color: $admin-success;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+          }
+          
+          .btn-collected {
+            background: rgba(245, 158, 11, 0.1);
+            color: $admin-warning;
+            border: 1px solid rgba(245, 158, 11, 0.2);
           }
         }
       }

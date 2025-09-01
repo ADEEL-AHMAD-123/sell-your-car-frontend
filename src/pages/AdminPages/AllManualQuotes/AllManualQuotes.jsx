@@ -11,7 +11,8 @@ import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/Quote
 import QuoteReviewModal from '../../../components/Admin/QuoteReviewModal/QuoteReviewModal';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
-import '../../../styles/AdminQuotesShared.scss';
+// 💡 Corrected import to use CSS Modules
+import styles from '../../../styles/AdminQuotesShared.module.scss';
 
 const AllManualQuotes = () => {
   const dispatch = useDispatch();
@@ -90,19 +91,17 @@ const AllManualQuotes = () => {
 
     if (reviewManualQuote.fulfilled.match(resultAction)) {
       handleCloseReviewModal();
-      // Re-fetch quotes after a successful review to update the list
       dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
     }
   };
 
   const updateFilter = (field) => (e) => {
     const value = e.target.value;
-    // Allow empty string to clear filter
     if (value === '' || /^[a-zA-Z0-9@.\s-]*$/.test(value)) {
       setFilters((prev) => ({
         ...prev,
         [field]: value,
-        page: 1, // Reset to first page on filter change
+        page: 1,
       }));
     }
   };
@@ -120,7 +119,6 @@ const AllManualQuotes = () => {
     });
   };
 
-  // Helper function to safely get vehicle information from the new schema
   const getVehicleString = (quote) => {
     const make = quote?.vehicleRegistration?.Make;
     const model = quote?.vehicleRegistration?.Model;
@@ -137,7 +135,7 @@ const AllManualQuotes = () => {
   };
 
   const renderDesktopTable = () => (
-    <div className="table-wrapper">
+    <div className={styles['table-wrapper']}>
       <table>
         <thead>
           <tr>
@@ -152,7 +150,6 @@ const AllManualQuotes = () => {
         <tbody>
           {quotes.map((quote) => (
             <tr key={quote._id}>
-              {/* Updated to use Vrm from the new schema */}
               <td title={quote?.vehicleRegistration?.Vrm || 'N/A'}>
                 {quote?.vehicleRegistration?.Vrm || 'N/A'}
               </td>
@@ -163,7 +160,7 @@ const AllManualQuotes = () => {
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </td>
               <td title={quote.manualQuoteReason || 'N/A'}>
-                <span className="reason-text">
+                <span className={styles['reason-text']}>
                   {quote.manualQuoteReason || 'N/A'}
                 </span>
               </td>
@@ -171,16 +168,16 @@ const AllManualQuotes = () => {
                 {formatPrice(quote.userEstimatedPrice)}
               </td>
               <td>
-                <div className="actions-container">
+                <div className={styles['actions-container']}>
                   <button
-                    className="btn-view"
+                    className={styles['btn-view']}
                     onClick={() => handleViewDetails(quote)}
                     aria-label={`View details for ${quote?.vehicleRegistration?.Vrm || 'quote'}`}
                   >
                     View
                   </button>
                   <button
-                    className="btn-review"
+                    className={styles['btn-review']}
                     onClick={() => handleReview(quote)}
                     aria-label={`Review quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
                   >
@@ -196,46 +193,43 @@ const AllManualQuotes = () => {
   );
 
   const renderMobileCards = () => (
-    <div className="mobile-cards">
+    <div className={styles['mobile-cards']}>
       {quotes.map((quote) => (
-        <div key={quote._id} className="quote-card">
-          <div className="card-header">
-            {/* Updated to use Vrm from the new schema */}
-            <h3 className="card-title">{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
-            <div className="card-badges">
+        <div key={quote._id} className={styles['quote-card']}>
+          <div className={styles['card-header']}>
+            <h3 className={styles['card-title']}>{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
+            <div className={styles['card-badges']}>
             </div>
           </div>
-
-          <div className="card-details">
-            <div className="detail-item">
-              <div className="label">Vehicle</div>
-              <div className="value">{getVehicleString(quote)}</div>
+          <div className={styles['card-details']}>
+            <div className={styles['detail-item']}>
+              <div className={styles.label}>Vehicle</div>
+              <div className={styles.value}>{getVehicleString(quote)}</div>
             </div>
-            <div className="detail-item">
-              <div className="label">Client</div>
-              <div className="value">
+            <div className={styles['detail-item']}>
+              <div className={styles.label}>Client</div>
+              <div className={styles.value}>
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </div>
             </div>
-            <div className="detail-item">
-              <div className="label">Reason</div>
-              <div className="value">{quote.manualQuoteReason || 'N/A'}</div>
+            <div className={styles['detail-item']}>
+              <div className={styles.label}>Reason</div>
+              <div className={styles.value}>{quote.manualQuoteReason || 'N/A'}</div>
             </div>
-            <div className="detail-item">
-              <div className="label">Client Offer</div>
-              <div className="value">{formatPrice(quote.userEstimatedPrice)}</div>
+            <div className={styles['detail-item']}>
+              <div className={styles.label}>Client Offer</div>
+              <div className={styles.value}>{formatPrice(quote.userEstimatedPrice)}</div>
             </div>
           </div>
-
-          <div className="card-actions">
+          <div className={styles['card-actions']}>
             <button
-              className="btn-view"
+              className={styles['btn-view']}
               onClick={() => handleViewDetails(quote)}
             >
               View Details
             </button>
             <button
-              className="btn-review"
+              className={styles['btn-review']}
               onClick={() => handleReview(quote)}
             >
               Review Quote
@@ -249,25 +243,25 @@ const AllManualQuotes = () => {
   const renderTableContent = () => {
     if (pendingLoading) {
       return (
-        <div className="spinner-container">
+        <div className={styles['spinner-container']}>
           <Spinner />
         </div>
       );
     }
 
     if (pendingError) {
-      return <p className="error-text">{pendingError}</p>;
+      return <p className={styles['error-text']}>{pendingError}</p>;
     }
 
     if (quotes.length === 0) {
-      return <div className="empty-state">No manual quotes pending review.</div>;
+      return <div className={styles['empty-state']}>No manual quotes pending review.</div>;
     }
 
     return (
       <>
         {renderDesktopTable()}
         {renderMobileCards()}
-        <div className="pagination-controls">
+        <div className={styles['pagination-controls']}>
           <button
             disabled={page <= 1}
             onClick={() => handlePageChange(page - 1)}
@@ -275,7 +269,7 @@ const AllManualQuotes = () => {
           >
             Previous
           </button>
-          <span className="page-info">Page {page} of {totalPages}</span>
+          <span className={styles['page-info']}>Page {page} of {totalPages}</span>
           <button
             disabled={page >= totalPages}
             onClick={() => handlePageChange(page + 1)}
@@ -289,18 +283,18 @@ const AllManualQuotes = () => {
   };
 
   return (
-    <section className="admin-quotes-page">
-      <div className="page-header">
+    <section className={styles['admin-quotes-page']}>
+      <div className={styles['page-header']}>
         <h1>Manual Quote Reviews</h1>
-        <p className="page-description">
+        <p className={styles['page-description']}>
           Review and process manual quote requests that require admin attention.
         </p>
       </div>
 
-      <div className="admin-info-banner">
-        <div className="admin-info-card highlight-blue">
-          <div className="icon">📄</div>
-          <div className="content">
+      <div className={styles['admin-info-banner']}>
+        <div className={`${styles['admin-info-card']} ${styles['highlight-blue']}`}>
+          <div className={styles.icon}>📄</div>
+          <div className={styles.content}>
             <h3>What Is This Page?</h3>
             <p>
               Manage <strong>manual quote requests</strong> that couldn't be auto-processed and require your review and pricing decision.
@@ -308,9 +302,9 @@ const AllManualQuotes = () => {
           </div>
         </div>
 
-        <div className="admin-info-card highlight-green">
-          <div className="icon">🛠</div>
-          <div className="content">
+        <div className={`${styles['admin-info-card']} ${styles['highlight-green']}`}>
+          <div className={styles.icon}>🛠</div>
+          <div className={styles.content}>
             <h3>What Can You Do?</h3>
             <ul>
               <li><strong>View:</strong> Inspect complete quote and vehicle details</li>
@@ -320,9 +314,9 @@ const AllManualQuotes = () => {
           </div>
         </div>
 
-        <div className="admin-info-card highlight-purple">
-          <div className="icon">💡</div>
-          <div className="content">
+        <div className={`${styles['admin-info-card']} ${styles['highlight-purple']}`}>
+          <div className={styles.icon}>💡</div>
+          <div className={styles.content}>
             <h3>Key Information</h3>
             <ul>
               <li><strong>Reason:</strong> Why automatic processing failed</li>
@@ -333,14 +327,14 @@ const AllManualQuotes = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="filter-controls">
-        <div className="filter-header">
+      <div className={styles['filter-controls']}>
+        <div className={styles['filter-header']}>
           <h3>Search & Filter</h3>
-          <div className="results-count">
+          <div className={styles['results-count']}>
             {total} pending review{total !== 1 ? 's' : ''}
           </div>
         </div>
-        <div className="filter-grid">
+        <div className={styles['filter-grid']}>
           {[
             ['Customer Name', 'customerName'],
             ['Customer Email', 'customerEmail'],
@@ -349,7 +343,7 @@ const AllManualQuotes = () => {
             ['Make', 'make'],
             ['Model', 'model'],
           ].map(([label, field]) => (
-            <div key={field} className="filter-field">
+            <div key={field} className={styles['filter-field']}>
               <label htmlFor={field}>{label}</label>
               <input
                 id={field}
@@ -361,8 +355,8 @@ const AllManualQuotes = () => {
             </div>
           ))}
 
-          <div className="filter-actions">
-            <button className="btn-reset" onClick={resetFilters}>
+          <div className={styles['filter-actions']}>
+            <button className={styles['btn-reset']} onClick={resetFilters}>
               🔄 Reset Filters
             </button>
           </div>
@@ -370,8 +364,8 @@ const AllManualQuotes = () => {
       </div>
 
       {/* Table Section */}
-      <div className="quote-table-container">
-        <div className="quote-table-header">
+      <div className={styles['quote-table-container']}>
+        <div className={styles['quote-table-header']}>
           <p>Manual Quotes Pending Review: {total}</p>
         </div>
         {renderTableContent()}

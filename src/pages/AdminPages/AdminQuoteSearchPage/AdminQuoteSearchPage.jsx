@@ -17,7 +17,7 @@ import {
   FaFilter
 } from 'react-icons/fa';
 
-import '../../../styles/AdminQuotesShared.scss';
+
 import './AdminQuoteSearchPage.scss';
 
 const AdminQuoteSearchPage = () => {

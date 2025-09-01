@@ -44,7 +44,7 @@
     &::-webkit-scrollbar-thumb {
       background: $admin-border-light;
       border-radius: $admin-radius-sm;
-      
+
       &:hover {
         background: $admin-text-muted;
       }
@@ -99,7 +99,7 @@
     .details-section {
       padding: $admin-spacing-lg $admin-spacing-xl;
       border-bottom: 1px solid $admin-border;
-      
+
       &:last-child {
         border-bottom: none;
       }
@@ -155,7 +155,7 @@
 
         // Special styling for certain fields
         &:has(strong:contains("Registration Number")) {
-          strong + * {
+          strong+* {
             font-family: monospace;
             background: $admin-bg-secondary;
             padding: 2px 6px;
@@ -166,14 +166,14 @@
         }
 
         &:has(strong:contains("Price")) {
-          strong + * {
+          strong+* {
             color: $admin-success-light;
             font-weight: 600;
           }
         }
 
         &:has(strong:contains("Status")) {
-          strong + * {
+          strong+* {
             padding: 2px 8px;
             border-radius: $admin-radius-sm;
             font-size: $admin-font-size-xs;
@@ -190,12 +190,14 @@
       border: 1px solid rgba(16, 185, 129, 0.2);
       border-radius: $admin-radius-lg;
       margin: $admin-spacing-lg $admin-spacing-xl $admin-spacing-lg $admin-spacing-xl;
-@media (max-width: $admin-breakpoint-sm){
-  margin: $admin-spacing-md 0;
-}
+
+      @media (max-width: $admin-breakpoint-sm) {
+        margin: $admin-spacing-md 0;
+      }
+
       h3 {
         color: $admin-success-light;
-        
+
         &::before {
           background: linear-gradient(135deg, $admin-success 0%, $admin-success-light 100%);
         }
@@ -345,11 +347,9 @@
             .image-overlay {
               position: absolute;
               inset: 0;
-              background: linear-gradient(
-                135deg,
-                rgba(0, 0, 0, 0.7) 0%,
-                rgba(0, 0, 0, 0.4) 100%
-              );
+              background: linear-gradient(135deg,
+                  rgba(0, 0, 0, 0.7) 0%,
+                  rgba(0, 0, 0, 0.4) 100%);
               display: flex;
               flex-direction: column;
               align-items: center;
@@ -491,7 +491,7 @@
         &:disabled {
           opacity: 0.3;
           cursor: not-allowed;
-          
+
           &:hover {
             transform: translateY(-50%) scale(1);
             background: rgba(0, 0, 0, 0.6);
@@ -511,6 +511,8 @@
         .gallery-image {
           max-width: 100%;
           max-height: 100%;
+          width: 100%;
+          height: 100%;
           border-radius: $admin-radius-lg;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
           object-fit: contain;
@@ -555,7 +557,7 @@
         &::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.3);
           border-radius: 2px;
-          
+
           &:hover {
             background: rgba(255, 255, 255, 0.5);
           }
@@ -582,8 +584,8 @@
           }
 
           img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: cover;
           }
         }
@@ -642,16 +644,16 @@
   .quote-details-modal {
     padding: $admin-spacing-sm;
     align-items: flex-start;
-    
+
     .modal-content {
       margin-top: $admin-spacing-md;
       border-radius: $admin-radius-lg;
-      
+
       h2 {
         font-size: $admin-font-size-xl;
         padding: $admin-spacing-lg;
       }
-      
+
       .close-btn {
         top: $admin-spacing-md;
         right: $admin-spacing-md;
@@ -659,18 +661,18 @@
         height: 35px;
         font-size: 1.5rem;
       }
-      
+
       .details-section {
         padding: $admin-spacing-md;
-        
+
         &.top-summary {
           margin: 0 $admin-spacing-md $admin-spacing-md $admin-spacing-md;
         }
-        
+
         h3 {
           font-size: $admin-font-size-base;
         }
-        
+
         p {
           font-size: $admin-font-size-xs;
           flex-direction: row;
@@ -678,25 +680,25 @@
           align-items: center;
           gap: 2px;
 
-          
+
           strong {
             min-width: auto;
           }
         }
       }
-      
+
       .images-section {
         padding: $admin-spacing-md;
-        
+
         .images-header {
           flex-direction: column;
           gap: $admin-spacing-sm;
-          
+
           .view-all-btn {
             width: 100%;
           }
         }
-        
+
         .image-grid {
           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
           gap: $admin-spacing-sm;
@@ -709,39 +711,39 @@
     .gallery-content {
       .gallery-header {
         padding: $admin-spacing-sm $admin-spacing-md;
-        
+
         .gallery-title {
           font-size: $admin-font-size-base;
         }
-        
+
         .gallery-close {
           width: 35px;
           height: 35px;
           font-size: 1.25rem;
         }
       }
-      
+
       .gallery-main {
         padding: $admin-spacing-sm;
-        
+
         .gallery-nav {
           width: 45px;
           height: 45px;
           font-size: 1.25rem;
-          
+
           &.prev {
             left: $admin-spacing-xs;
           }
-          
+
           &.next {
             right: $admin-spacing-xs;
           }
         }
       }
-      
+
       .gallery-thumbnails {
         padding: $admin-spacing-sm;
-        
+
         .thumbnails-container {
           .thumbnail {
             width: 45px;
@@ -771,23 +773,23 @@
           width: 40px;
           height: 40px;
           font-size: 1rem;
-          
+
           &.prev,
           &.next {
             position: fixed;
             top: 50%;
           }
-          
+
           &.prev {
             left: 10px;
           }
-          
+
           &.next {
             right: 10px;
           }
         }
       }
-      
+
       .gallery-thumbnails {
         .thumbnails-container {
           .thumbnail {
@@ -807,7 +809,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &::after {
     content: '';
     width: 20px;
@@ -820,8 +822,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Fade-in animation for gallery
@@ -830,6 +837,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -846,6 +854,7 @@
     opacity: 0;
     transform: translateX(50px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -857,6 +866,7 @@
     opacity: 0;
     transform: translateX(-50px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -868,14 +878,13 @@
 }
 
 .badge {
-   display: inline-block;
-        padding: $admin-spacing-xs $admin-spacing-sm;
-        border-radius: $admin-radius-md;
-        font-size: $admin-font-size-xs;
-        font-weight: 600;
-        text-transform: uppercase;
-        background-color: rgba(16, 185, 129, 0.2);
-          color: $admin-text-primary;
-          border: 1px solid $admin-success;
+  display: inline-block;
+  padding: $admin-spacing-xs $admin-spacing-sm;
+  border-radius: $admin-radius-md;
+  font-size: $admin-font-size-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: $admin-text-primary;
+  border: 1px solid $admin-success;
 }
-

@@ -5,7 +5,10 @@
 .logo {
   &--in-footer {
     .logo__image {
-      // You may need to add specific styles here for the footer version
+    margin-left: -2rem;
+     @include responsive(sm) {
+     margin-left: -1.5rem;
+    }
      
     }
   }

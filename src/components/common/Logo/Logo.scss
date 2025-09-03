@@ -5,9 +5,12 @@
 .logo {
   &--in-footer {
     .logo__image {
-    margin-left: -2rem;
+    margin-left: -4rem;
+    height: 55px;
+    
      @include responsive(sm) {
-     margin-left: -1.5rem;
+     margin-left: -2.5rem;
+     height: 40px;
     }
      
     }

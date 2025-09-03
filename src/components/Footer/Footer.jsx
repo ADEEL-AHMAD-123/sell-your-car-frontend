@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer__top container">
         <div className="footer__col">
-          <Logo className="logo--in-footer" />
+          <Logo className="logo--in-footer" theme='dark' />
           <p>Sell your scrap car with ease. Instant quotes, free collection, and fast payments nationwide.</p>
         </div>
 

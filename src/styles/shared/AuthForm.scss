@@ -1,5 +1,5 @@
-@use './base/variables' as *;
-@use './base/mixins' as *;
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
 
 // Animation keyframes
 @keyframes fadeInScale {
@@ -7,6 +7,7 @@
     opacity: 0;
     transform: scale(0.9) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -17,6 +18,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -29,9 +31,26 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
 }
 
 // Full screen overlay
@@ -41,7 +60,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.75) !important;
   backdrop-filter: blur(8px);
   z-index: 9999;
   display: flex;
@@ -57,9 +76,9 @@
 
 // Modal container
 .auth-modal {
-  background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+  background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%) !important;
   border-radius: 24px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   width: 100%;
@@ -87,17 +106,17 @@
     width: 40px;
     height: 40px;
     border: none;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.05) !important;
     border-radius: 50%;
-    color: #666;
+    color: #666 !important;
     font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     z-index: 10;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.1);
-      color: #333;
+      background: rgba(0, 0, 0, 0.1) !important;
+      color: #333 !important;
       transform: scale(1.05);
     }
 
@@ -114,7 +133,7 @@
   &__logo {
     text-align: center;
     padding: 2.5rem 2rem 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
 
     @include responsive(sm) {
       padding: 2rem 1.5rem 1rem;
@@ -138,7 +157,7 @@
     h2 {
       font-size: 2rem;
       font-weight: 700;
-      color: $color-dark;
+      color: $color-dark !important;
       margin: 0 0 0.5rem;
       line-height: 1.2;
 
@@ -149,7 +168,7 @@
 
     p {
       font-size: 1rem;
-      color: #6b7280;
+      color: #6b7280 !important;
       margin: 0;
       font-weight: 400;
 
@@ -184,7 +203,7 @@
     label {
       font-size: 0.9rem;
       font-weight: 600;
-      color: $color-dark;
+      color: $color-dark !important;
       margin-bottom: 0.5rem;
       display: block;
     }
@@ -198,7 +217,7 @@
     .form-input-icon {
       position: absolute;
       left: 1rem;
-      color: #9ca3af;
+      color: #9ca3af !important;
       font-size: 1rem;
       z-index: 2;
       transition: color 0.2s ease;
@@ -207,35 +226,35 @@
     .form-input {
       width: 100%;
       padding: 1rem 1rem 1rem 2.8rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid #e5e7eb !important;
       border-radius: 12px;
       font-size: 1rem;
-      background: #ffffff;
+      background: #ffffff !important;
       transition: all 0.2s ease;
-      color: $color-dark;
+      color: $color-dark !important;
 
       &::placeholder {
-        color: #9ca3af;
+        color: #9ca3af !important;
         font-weight: 400;
       }
 
       &:focus {
         outline: none;
-        border-color: $color-primary;
-        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-        
-        + .form-input-icon {
-          color: $color-primary;
+        border-color: $color-primary !important;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1) !important;
+
+        +.form-input-icon {
+          color: $color-primary !important;
         }
       }
 
       &--error {
-        border-color: #ef4444;
+        border-color: #ef4444 !important;
         animation: shake 0.5s ease-in-out;
 
         &:focus {
-          border-color: #ef4444;
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+          border-color: #ef4444 !important;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
         }
       }
 
@@ -248,15 +267,15 @@
     .form-input-toggle {
       position: absolute;
       right: 1rem;
-      background: none;
+      background: none !important;
       border: none;
-      color: #9ca3af;
+      color: #9ca3af !important;
       cursor: pointer;
       padding: 0.25rem;
       transition: color 0.2s ease;
 
       &:hover {
-        color: $color-primary;
+        color: $color-primary !important;
       }
     }
   }
@@ -306,15 +325,15 @@
 
   .form-error {
     font-size: 0.85rem;
-    color: #ef4444;
+    color: #ef4444 !important;
     margin-top: 0.4rem;
     display: flex;
     align-items: center;
     font-weight: 500;
 
     &--global {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.1) !important;
+      border: 1px solid rgba(239, 68, 68, 0.2) !important;
       border-radius: 8px;
       padding: 0.75rem 1rem;
       margin-bottom: 0.5rem;
@@ -325,11 +344,11 @@
   .form-terms {
     text-align: center;
     font-size: 0.85rem;
-    color: #6b7280;
+    color: #6b7280 !important;
     line-height: 1.5;
 
     a {
-      color: $color-primary;
+      color: $color-primary !important;
       text-decoration: none;
       font-weight: 500;
 
@@ -345,7 +364,7 @@
 
     a {
       font-size: 0.9rem;
-      color: $color-primary;
+      color: $color-primary !important;
       text-decoration: none;
       font-weight: 500;
 
@@ -362,7 +381,7 @@
 
   &__bar {
     height: 4px;
-    background: #e5e7eb;
+    background: #e5e7eb !important;
     border-radius: 2px;
     overflow: hidden;
     margin-bottom: 0.25rem;
@@ -373,16 +392,32 @@
     border-radius: 2px;
     transition: all 0.3s ease;
 
-    &--1 { background: #ef4444; } // Weak - Red
-    &--2 { background: #f59e0b; } // Fair - Orange
-    &--3 { background: #10b981; } // Good - Green
-    &--4 { background: #059669; } // Strong - Dark Green
+    &--1 {
+      background: #ef4444 !important;
+    }
+
+    // Weak - Red
+    &--2 {
+      background: #f59e0b !important;
+    }
+
+    // Fair - Orange
+    &--3 {
+      background: #10b981 !important;
+    }
+
+    // Good - Green
+    &--4 {
+      background: #059669 !important;
+    }
+
+    // Strong - Dark Green
   }
 
   &__label {
     font-size: 0.8rem;
     font-weight: 500;
-    color: #6b7280;
+    color: #6b7280 !important;
   }
 }
 
@@ -400,13 +435,13 @@
   overflow: hidden;
 
   &--primary {
-    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba($color-primary, 0.3);
+    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 14px rgba($color-primary, 0.3) !important;
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba($color-primary, 0.4);
+      box-shadow: 0 6px 20px rgba($color-primary, 0.4) !important;
     }
 
     &:active {
@@ -430,9 +465,9 @@
     display: none;
     width: 16px;
     height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 50%;
-    border-top-color: white;
+    border-top-color: white !important;
     animation: spin 0.8s linear infinite;
     margin-right: 0.5rem;
   }
@@ -448,22 +483,22 @@
   text-align: center;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 
   p {
     font-size: 0.95rem;
-    color: #6b7280;
+    color: #6b7280 !important;
     margin: 0;
 
     a {
-      color: $color-primary;
+      color: $color-primary !important;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.2s ease;
 
       &:hover {
         text-decoration: underline;
-        color: darken($color-primary, 10%);
+        color: darken($color-primary, 10%) !important;
       }
     }
   }
@@ -478,102 +513,50 @@
   }
 }
 
-// Responsive adjustments
-@include responsive(xs) {
-  .auth-modal {
-    border-radius: 16px;
-    margin: 0.25rem;
-
-    &__logo {
-      padding: 1.5rem 1rem 0.75rem;
-    }
-
-    &__content {
-      padding: 1rem;
-    }
-
-    &__header {
-      margin-bottom: 1.5rem;
-
-      h2 {
-        font-size: 1.5rem;
-      }
-
-      p {
-        font-size: 0.85rem;
-      }
-    }
-  }
-
-  .auth-form {
-    gap: 1.25rem;
-
-    .form-row {
-      gap: 1.25rem;
-    }
-
-    .form-input-wrapper .form-input {
-      padding: 0.8rem 0.8rem 0.8rem 2.4rem;
-      font-size: 0.9rem;
-    }
-
-    .form-phone-wrapper .form-phone-container .form-phone-input {
-      height: 44px !important;
-      font-size: 0.9rem !important;
-      padding-left: 54px !important;
-    }
-  }
-
-  .auth-btn {
-    padding: 0.8rem;
-    font-size: 0.9rem;
-  }
-}
-
 // Dark mode support (optional)
 @media (prefers-color-scheme: dark) {
   .auth-overlay {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.85) !important;
   }
 
   .auth-modal {
-    background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
-    color: white;
+    background: linear-gradient(145deg, #1f2937 0%, #111827 100%) !important;
+    color: white !important;
 
     &__header {
       h2 {
-        color: white;
+        color: white !important;
       }
 
       p {
-        color: #9ca3af;
+        color: #9ca3af !important;
       }
     }
   }
 
   .auth-form {
     .form-group label {
-      color: white;
+      color: white !important;
     }
 
     .form-input-wrapper {
       .form-input {
-        background: #374151;
-        border-color: #4b5563;
-        color: white;
+        background: #374151 !important;
+        border-color: #4b5563 !important;
+        color: white !important;
 
         &::placeholder {
-          color: #9ca3af;
+          color: #9ca3af !important;
         }
 
         &:focus {
-          border-color: $color-primary;
-          background: #374151;
+          border-color: $color-primary !important;
+          background: #374151 !important;
         }
 
         &--error {
-          border-color: #ef4444;
-          background: #374151;
+          border-color: #ef4444 !important;
+          background: #374151 !important;
         }
       }
     }
@@ -590,11 +573,11 @@
   }
 
   .auth-switch p {
-    color: #9ca3af;
+    color: #9ca3af !important;
   }
 
   .form-terms {
-    color: #9ca3af;
+    color: #9ca3af !important;
   }
 }
 
@@ -618,8 +601,8 @@
     border: 2px solid transparent;
 
     &:focus {
-      border-color: white;
-      outline: 2px solid $color-primary;
+      border-color: white !important;
+      outline: 2px solid $color-primary !important;
       outline-offset: 2px;
     }
   }

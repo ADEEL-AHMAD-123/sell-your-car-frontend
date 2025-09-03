@@ -18,7 +18,7 @@ import {
   faTimes 
 } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../components/common/Logo/Logo';
-import '../../styles/AuthForm.scss';
+import '../../styles/shared/AuthForm.scss';
 
 const Login = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -112,10 +112,7 @@ const Login = ({ onClose }) => {
           </button>
         )}
 
-        {/* Logo */}
-        <div className="auth-modal__logo">
-          <Logo />
-        </div>
+      
 
         <div className="auth-modal__content">
           <div className="auth-modal__header">

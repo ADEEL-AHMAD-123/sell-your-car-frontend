@@ -10,7 +10,7 @@ import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/Quote
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
 // 💡 Corrected import to use CSS Modules
-import styles from '../../../styles/AdminQuotesShared.module.scss';
+import styles from '../../../styles/shared/AdminQuotesShared.module.scss';
 
 const AcceptedQuotes = () => {
   const dispatch = useDispatch();

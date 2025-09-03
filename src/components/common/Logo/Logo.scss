@@ -4,74 +4,30 @@
 
 .logo {
   &--in-footer {
-    .logo__tagline {
-      color: $color-light; 
+    .logo__image {
+      // You may need to add specific styles here for the footer version
+     
     }
   }
 
   &__link {
+    // This now directly contains the image
     display: flex;
     align-items: center;
     text-decoration: none;
-    gap: 10px;
   }
 
-  &__icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, $color-primary 0%, darken($color-primary, 10%) 100%);
-    border-radius: 10px;
-    @include flex-center;
-    color: $color-light;
-    font-size: 18px;
-    box-shadow: 0 4px 12px rgba($color-primary, 0.3);
-
+  &__image {
+    // New class for styling the logo image
+    height: 70px; // Adjust height to your preference
+    width: auto; // This will maintain the image's aspect ratio
+    
     @include responsive(md) {
-      width: 36px;
-      height: 36px;
-      font-size: 16px;
+      height: 55px;
     }
-
+    
     @include responsive(sm) {
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-    }
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    @include responsive(sm) {
-      gap: 1px;
-    }
-  }
-
-  &__main {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: $color-primary;
-    line-height: 1;
-
-    @include responsive(md) {
-      font-size: 1.2rem;
-    }
-
-    @include responsive(sm) {
-      font-size: 1rem;
-    }
-  }
-
-  &__tagline {
-    font-size: 0.7rem;
-    color: $color-gray;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-
-    @include responsive(sm) {
-      font-size: 0.6rem;
+      height: 55px;
     }
   }
 }

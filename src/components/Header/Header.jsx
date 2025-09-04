@@ -309,7 +309,7 @@ const Header = () => {
             </nav>
             <div className="header__auth-area">{renderUserSection()}</div>
             <div className="header__mobile-controls">
-              {/* 💡 CHANGE: Use isAuthenticated and optional chaining for the checks */}
+              {/* CHANGE: Use isAuthenticated and optional chaining for the checks */}
               {isAuthenticated && user?.role !== "admin" && (
                 <div className="header__mobile-checks">
                   {renderChecksIndicator()}
@@ -341,7 +341,7 @@ const Header = () => {
         }`}
       >
         <div className="header__mobile-content">
-          {/* 💡 CHANGE: Use only isAuthenticated for the main check */}
+          {/*  CHANGE: Use only isAuthenticated for the main check */}
           {isAuthenticated ? (
             <div className="header__mobile-user">
               <div className="header__mobile-user-info">
@@ -484,20 +484,46 @@ const Header = () => {
               </li>
             </ul>
           </nav>
-          <div className="header__social-icons">
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faFacebookF} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faTwitter} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faInstagram} />
-            </a>
-            <a href="#" className="header__social-icon">
-              <FontAwesomeIcon icon={faLinkedinIn} />
-            </a>
-          </div>
+         <div className="header__social-icons">
+  {/* Facebook (active) */}
+  <a
+    href="https://www.facebook.com/share/1ZPnReZaL2/?mibextid=wwXIfr"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="header__social-icon"
+  >
+    <FontAwesomeIcon icon={faFacebookF} />
+  </a>
+
+  {/* Twitter (no redirect) */}
+  <a
+    href="#"
+    onClick={(e) => e.preventDefault()}
+    className="header__social-icon"
+  >
+    <FontAwesomeIcon icon={faTwitter} />
+  </a>
+
+  {/* Instagram (active) */}
+  <a
+    href="https://www.instagram.com/sellyourcar.info/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="header__social-icon"
+  >
+    <FontAwesomeIcon icon={faInstagram} />
+  </a>
+
+  {/* LinkedIn (no redirect) */}
+  <a
+    href="#"
+    onClick={(e) => e.preventDefault()}
+    className="header__social-icon"
+  >
+    <FontAwesomeIcon icon={faLinkedinIn} />
+  </a>
+</div>
+
         </div>
       </div>
 

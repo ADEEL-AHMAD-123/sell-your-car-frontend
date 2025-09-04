@@ -15,7 +15,7 @@
 }
 
 // Page Header
-.page-header {
+.page-header { 
   margin-bottom: $admin-spacing-2xl;
 
   .header-content {
@@ -605,7 +605,7 @@
     display: flex;
     align-items: center;
     gap: $admin-spacing-sm;
-
+background-color: $admin-bg-primary;
     .page-numbers {
       display: flex;
       gap: $admin-spacing-xs;

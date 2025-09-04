@@ -1,15 +1,21 @@
-// Footer.js
 import './Footer.scss';
+
 import { Link } from 'react-router-dom';
+
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
-import Logo from '../../components/common/Logo/Logo'; 
+
+import Logo from '../../components/common/Logo/Logo';
+
 const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer__top container">
         <div className="footer__col">
-          <Logo className="logo--in-footer" theme='dark' />
-          <p>Sell your scrap car with ease. Instant quotes, free collection, and fast payments nationwide.</p>
+          <Logo className="logo--in-footer" theme="dark" />
+          <p>
+            Sell your scrap car with ease. Instant quotes, free collection, and
+            fast payments nationwide.
+          </p>
         </div>
 
         <div className="footer__col">
@@ -34,36 +40,35 @@ const Footer = () => {
 
         <div className="footer__col">
           <h4>Follow Us</h4>
-        <div className="social-icons">
-  <a 
-    href="https://www.facebook.com/share/1ZPnReZaL2/?mibextid=wwXIfr"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <FaFacebookF />
-  </a>
-  <a
-    href="https://twitter.com/your-twitter-handle" 
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <FaTwitter />
-  </a>
-  <a
-    href="https://www.instagram.com/sellyourcar.info/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <FaInstagram />
-  </a>
-  <a
-    href="https://www.linkedin.com/company/your-linkedin-page"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <FaLinkedinIn />
-  </a>
-</div>
+          <div className="social-icons">
+            {/* Facebook (active) */}
+            <a
+              href="https://www.facebook.com/share/1ZPnReZaL2/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaFacebookF />
+            </a>
+
+            {/* Twitter (clickable but no redirect) */}
+            <a href="#" onClick={(e) => e.preventDefault()}>
+              <FaTwitter />
+            </a>
+
+            {/* Instagram (active) */}
+            <a
+              href="https://www.instagram.com/sellyourcar.info/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagram />
+            </a>
+
+            {/* LinkedIn (clickable but no redirect) */}
+            <a href="#" onClick={(e) => e.preventDefault()}>
+              <FaLinkedinIn />
+            </a>
+          </div>
         </div>
       </div>
 

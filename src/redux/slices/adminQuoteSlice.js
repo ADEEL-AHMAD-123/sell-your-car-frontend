@@ -1,4 +1,3 @@
-// src/redux/slices/adminQuoteSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { createApiAsyncThunk } from "../../utils/apiHelper";
 
@@ -8,6 +7,7 @@ import { createApiAsyncThunk } from "../../utils/apiHelper";
 const API = {
   PENDING_QUOTES: "/api/quote/pending-manual",
   ACCEPTED_QUOTES: "/api/quote/accepted",
+  COLLECTED_QUOTES: "/api/quote/collected",
   REVIEW_QUOTE: (id) => `/api/quote/review-manual/${id}`,
   MARK_COLLECTED: (id) => `/api/quote/collection-status/${id}`,
 };
@@ -20,7 +20,7 @@ export const fetchPendingManualQuotes = createApiAsyncThunk({
   method: "GET",
   url: API.PENDING_QUOTES,
   typePrefix: "adminQuotes",
-  prepareHeaders: true, // ADDED
+  prepareHeaders: true,
 });
 
 export const fetchAcceptedQuotes = createApiAsyncThunk({
@@ -28,7 +28,15 @@ export const fetchAcceptedQuotes = createApiAsyncThunk({
   method: "GET",
   url: API.ACCEPTED_QUOTES,
   typePrefix: "adminQuotes",
-  prepareHeaders: true, // ADDED
+  prepareHeaders: true,
+});
+
+export const fetchCollectedQuotes = createApiAsyncThunk({
+  name: "fetchCollectedQuotes",
+  method: "GET",
+  url: API.COLLECTED_QUOTES,
+  typePrefix: "adminQuotes",
+  prepareHeaders: true,
 });
 
 export const reviewManualQuote = createApiAsyncThunk({
@@ -36,7 +44,7 @@ export const reviewManualQuote = createApiAsyncThunk({
   method: "PATCH",
   url: ({ id }) => API.REVIEW_QUOTE(id),
   typePrefix: "adminQuotes",
-  prepareHeaders: true, // ADDED
+  prepareHeaders: true,
 });
 
 export const markManualQuoteAsCollected = createApiAsyncThunk({
@@ -44,7 +52,7 @@ export const markManualQuoteAsCollected = createApiAsyncThunk({
   method: "PATCH",
   url: ({ id }) => API.MARK_COLLECTED(id),
   typePrefix: "adminQuotes",
-  prepareHeaders: true, // ADDED
+  prepareHeaders: true,
 });
 
 // -------------------
@@ -57,6 +65,11 @@ const initialState = {
     error: null,
   },
   accepted: {
+    response: null,
+    loading: false,
+    error: null,
+  },
+  collected: {
     response: null,
     loading: false,
     error: null,
@@ -82,6 +95,7 @@ const adminQuoteSlice = createSlice({
     clearQuoteErrors: (state) => {
       state.pending.error = null;
       state.accepted.error = null;
+      state.collected.error = null;
       state.review.error = null;
     },
     clearReviewError: (state) => {
@@ -117,6 +131,20 @@ const adminQuoteSlice = createSlice({
         state.accepted.loading = false;
         state.accepted.error =
           action.payload?.message || "Failed to fetch accepted quotes.";
+      }) // === Fetch Collected ===
+
+      .addCase(fetchCollectedQuotes.pending, (state) => {
+        state.collected.loading = true;
+        state.collected.error = null;
+      })
+      .addCase(fetchCollectedQuotes.fulfilled, (state, action) => {
+        state.collected.loading = false;
+        state.collected.response = action.payload.data || {};
+      })
+      .addCase(fetchCollectedQuotes.rejected, (state, action) => {
+        state.collected.loading = false;
+        state.collected.error =
+          action.payload?.message || "Failed to fetch collected quotes.";
       }) // === Review Quote ===
       .addCase(reviewManualQuote.pending, (state) => {
         state.review.loading = true;
@@ -138,25 +166,37 @@ const adminQuoteSlice = createSlice({
       }) // === Mark as Collected ===
 
       .addCase(markManualQuoteAsCollected.pending, (state) => {
-        state.accepted.loading = true;
-        state.accepted.error = null;
+        // Defensive check to ensure the 'collect' state object exists
+        if (!state.collect) {
+          state.collect = { loading: false, error: null };
+        }
+        state.collect.loading = true;
+        state.collect.error = null;
       })
       .addCase(markManualQuoteAsCollected.fulfilled, (state, action) => {
-        state.accepted.loading = false;
-        const updated = action.payload.data?.manualQuote;
+        // Defensive check
+        if (!state.collect) {
+          state.collect = { loading: false, error: null };
+        }
+        state.collect.loading = false;
+        const updated = action.payload.data?.quote;
         if (updated && state.accepted.response?.quotes) {
-          state.accepted.response.quotes = state.accepted.response.quotes.map(
-            (quote) => (quote._id === updated._id ? updated : quote)
+          state.accepted.response.quotes = state.accepted.response.quotes.filter(
+            (quote) => quote._id !== updated._id
           );
         }
       })
       .addCase(markManualQuoteAsCollected.rejected, (state, action) => {
-        state.accepted.loading = false;
-        state.accepted.error =
+        // Defensive check
+        if (!state.collect) {
+          state.collect = { loading: false, error: null };
+        }
+        state.collect.loading = false;
+        state.collect.error =
           action.payload?.message || "Failed to mark as collected.";
       });
   },
 });
 
-export const { clearQuoteErrors, clearReviewError,resetState, } = adminQuoteSlice.actions;
+export const { clearQuoteErrors, clearReviewError, resetState, } = adminQuoteSlice.actions;
 export default adminQuoteSlice.reducer;

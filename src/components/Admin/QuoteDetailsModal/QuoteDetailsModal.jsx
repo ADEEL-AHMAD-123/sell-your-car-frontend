@@ -87,8 +87,8 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
         return 'Pending Quote Details';
       case 'rejected':
       return 'Rejected Quote Details';
-      case 'completed':
-        return 'Completed Quote Details';
+      case 'collected':
+        return 'Collected Quote Details';
       default:
         return 'Quote Details';
     }
@@ -108,14 +108,14 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
     clientDecision,
     type,
     createdAt,
-    updatedAt,
+    acceptedAt, // Corrected: Use acceptedAt instead of updatedAt
     rejectedAt,
     manualDetails = {},
     adminMessage,
   } = quote;
   
-  // Destructure from manualDetails
-  const { userEstimatedPrice, userProvidedWeight, message, manualQuoteReason, lastManualRequestAt } = manualDetails;
+  // Destructure from manualDetails
+  const { userEstimatedPrice, userProvidedWeight, message, manualQuoteReason, lastManualRequestAt } = manualDetails;
 
   // Get the current status based on the quote data
   const getCurrentStatus = () => {
@@ -128,7 +128,7 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
   // Get summary section title based on the quote data
   const getSummaryTitle = () => {
     const status = getCurrentStatus();
-    if (status === 'Collected') return 'Final Summary';
+    if (status === 'Collected') return 'Quote Summary';
     return 'Quote Summary';
   };
   
@@ -275,7 +275,7 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
 
             {clientDecision === 'accepted' && (
               <>
-                {renderField('Accepted At', formatDateTime(updatedAt))}
+                {renderField('Accepted At', formatDateTime(acceptedAt))}
               </>
             )}
 
@@ -293,6 +293,11 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
                 {renderField('Manual Request Reason', manualQuoteReason)}
                 {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
               </>
+            )}
+            
+            {/* Add Collected Date only when pageType is collected and a collected date exists */}
+            {pageType === 'collected' && collectionDetails?.collectedAt && (
+              renderField('Collected Date', formatDateTime(collectionDetails.collectedAt))
             )}
             
           </section>
@@ -390,7 +395,7 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
                           loading="lazy"
                           onError={handleImageError}
                         />
-                      </div>
+                    </div>
                     </div>
                   ))}
                 </div>

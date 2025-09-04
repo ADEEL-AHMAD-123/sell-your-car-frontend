@@ -1,4 +1,3 @@
-// 💡 AppRoutes.jsx
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../Layouts/MainLayout';
 import AdminLayout from '../Layouts/AdminLayout';
@@ -19,7 +18,7 @@ import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
 import AllManualQuotes from '../pages/AdminPages/AllManualQuotes/AllManualQuotes';
 import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedQuotes';
-import CollectedManualQuotes from '../pages/AdminPages/CollectedManualQuotes/CollectedManualQuotes';
+import CollectedQuotesPage from '../pages/AdminPages/CollectedQuotesPage/CollectedQuotes';
 import AdminAnalyticsPage from '../pages/AdminPages/AdminAnalytics/AdminAnalyticsPage';
 import AdminQuoteSearchPage from '../pages/AdminPages/AdminQuoteSearchPage/AdminQuoteSearchPage';
 import AdminSettingsPage from '../pages/AdminPages/AdminSettingsPage/AdminSettingsPage';
@@ -65,7 +64,7 @@ const AppRoutes = () => (
       <Route path="/dashboard/quotes" element={<AdminQuoteSearchPage />} />
       <Route path="/dashboard/manual-quotes" element={<AllManualQuotes />} />
       <Route path="/dashboard/accepted-quotes" element={<AcceptedManualQuotes />} />
-      <Route path="/dashboard/collected-quotes" element={<CollectedManualQuotes />} />
+      <Route path="/dashboard/collected-quotes" element={<CollectedQuotesPage />} />
       <Route path="/dashboard/settings" element={<AdminSettingsPage />} />
       {/* Blog Admin Routes */}
       <Route path="/dashboard/blog" element={<AdminBlogManagement />} />

@@ -531,6 +531,8 @@
 
               .btn-view,
               .btn-review,
+              .btn-delete,
+              .btn-contact,
               .btn-collected {
                 // Apply common base styles to all action buttons
                 @include button-base;
@@ -575,6 +577,25 @@
                   background: rgba(245, 158, 11, 0.2);
                 }
               }
+              .btn-contact {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  
+  &:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+}
+.btn-delete {
+          background: rgba(239, 68, 68, 0.1);
+          color: $admin-error;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          
+          &:hover {
+            background: rgba(239, 68, 68, 0.2);
+          }
+        }
+
             }
           }
         }
@@ -713,47 +734,68 @@
           }
         }
 
-        .card-actions {
-          display: flex;
-          gap: $admin-spacing-sm;
-          flex-wrap: wrap;
+.card-actions {
+  display: flex;
+  gap: $admin-spacing-sm;
+  flex-wrap: wrap;
 
-          .btn-view,
-          .btn-review,
-          .btn-collected {
-            // Apply common base styles to mobile card buttons
-            @include button-base;
+  .btn-view,
+  .btn-review,
+  .btn-contact,
+  .btn-collected,
+  .btn-delete { // ADDED: delete button to mobile cards
+    // Apply common base styles to mobile card buttons
+    @include button-base;
 
-            // These buttons will now share the same hover/active states
-            &:hover {
-              transform: translateY(-1px);
-              box-shadow: $admin-shadow-sm;
-            }
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $admin-shadow-sm;
+    }
 
-            &:active {
-              transform: translateY(0);
-            }
-          }
+    &:active {
+      transform: translateY(0);
+    }
+  }
 
-          // Apply specific button colors from the table styles
-          .btn-view {
-            background: rgba(99, 102, 241, 0.1);
-            color: $admin-primary;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-          }
-          
-          .btn-review {
-            background: rgba(16, 185, 129, 0.1);
-            color: $admin-success;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-          }
-          
-          .btn-collected {
-            background: rgba(245, 158, 11, 0.1);
-            color: $admin-warning;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-          }
-        }
+  // Apply specific button colors from the table styles
+  .btn-view {
+    background: rgba(99, 102, 241, 0.1);
+    color: $admin-primary;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+  }
+  
+  .btn-review {
+    background: rgba(16, 185, 129, 0.1);
+    color: $admin-success;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
+  .btn-collected {
+    background: rgba(245, 158, 11, 0.1);
+    color: $admin-warning;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  .btn-contact {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    
+    &:hover {
+      background-color: rgba(16, 185, 129, 0.2);
+    }
+  }
+  
+  // ADDED: Delete button styles for mobile cards
+  .btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: $admin-error;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+  }
+}
       }
     }
 

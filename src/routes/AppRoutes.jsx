@@ -17,7 +17,7 @@ import QuoteConfirmation from '../pages/QuoteConfirmation/QuoteConfirmation'
 import ProtectedRoute from './Protectedroute';
 import AdminRoute from './AdminRoute';
 import AllManualQuotes from '../pages/AdminPages/AllManualQuotes/AllManualQuotes';
-import AcceptedManualQuotes from '../pages/AdminPages/AcceptedManualQuotes/AcceptedQuotes';
+import AcceptedQuotes from '../pages/AdminPages/AcceptedQuotes/AcceptedQuotes';
 import CollectedQuotesPage from '../pages/AdminPages/CollectedQuotesPage/CollectedQuotes';
 import AdminAnalyticsPage from '../pages/AdminPages/AdminAnalytics/AdminAnalyticsPage';
 import AdminQuoteSearchPage from '../pages/AdminPages/AdminQuoteSearchPage/AdminQuoteSearchPage';
@@ -31,6 +31,10 @@ import BlogPage from '../pages/Blog/BlogPage';
 import BlogPost from '../pages/Blog/BlogPost';
 import AdminBlogManagement from '../pages/AdminPages/AdminBlogManagement/AdminBlogManagement';
 import AdminBlogForm from '../pages/AdminPages/AdminBlogManagement/AdminBlogForm';
+
+// New Imports for the new routes
+import PendingAutoQuotes from '../pages/AdminPages/PendingAutoQuotes/PendingAutoQuotes';
+import RejectedQuotes from '../pages/AdminPages/RejectedQuotes/RejectedQuotes';
 
 const AppRoutes = () => (
   <Routes>
@@ -63,9 +67,11 @@ const AppRoutes = () => (
       <Route path="/dashboard/users" element={<AdminUserManagement />} />
       <Route path="/dashboard/quotes" element={<AdminQuoteSearchPage />} />
       <Route path="/dashboard/manual-quotes" element={<AllManualQuotes />} />
-      <Route path="/dashboard/accepted-quotes" element={<AcceptedManualQuotes />} />
+      <Route path="/dashboard/accepted-quotes" element={<AcceptedQuotes />} />
       <Route path="/dashboard/collected-quotes" element={<CollectedQuotesPage />} />
       <Route path="/dashboard/settings" element={<AdminSettingsPage />} />
+      <Route path="/dashboard/pending-auto-quotes" element={<PendingAutoQuotes />} />
+      <Route path="/dashboard/rejected-quotes" element={<RejectedQuotes />} />
       {/* Blog Admin Routes */}
       <Route path="/dashboard/blog" element={<AdminBlogManagement />} />
       <Route path="/dashboard/blog/create" element={<AdminBlogForm />} />

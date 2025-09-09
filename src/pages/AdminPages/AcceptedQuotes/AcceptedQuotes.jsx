@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchPendingManualQuotes,
-  reviewManualQuote,
-  deleteQuote,
-  clearReviewError,
-  clearDeletionError,
+  fetchAcceptedQuotes,
+  markManualQuoteAsCollected,
+  deleteQuote, // Added deleteQuote action
 } from '../../../redux/slices/adminQuoteSlice';
-
 import Spinner from '../../../components/common/Spinner';
+import ConfirmModal from '../../../components/Admin/ConfirmModal/ConfirmModal';
 import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/QuoteDetailsModal';
-import QuoteReviewModal from '../../../components/Admin/QuoteReviewModal/QuoteReviewModal';
-import DeleteModal from '../../../components/Admin/DeleteModal/DeleteModal.jsx';
+import DeleteModal from '../../../components/Admin/DeleteModal/DeleteModal'; // Added DeleteModal
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
 import styles from '../../../styles/shared/AdminQuotesShared.module.scss';
+import ClientContactModal from '../../../components/Admin/ClientContactModal/ClientContactModal';
 
-const AllManualQuotes = () => {
+const AcceptedQuotes = () => {
   const dispatch = useDispatch();
 
+  // State for filters
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -31,91 +30,96 @@ const AllManualQuotes = () => {
   });
 
   const debouncedFilters = useDebouncedValue(filters, 500);
-  const [modalViewQuote, setModalViewQuote] = useState(null);
-  const [modalReviewQuote, setModalReviewQuote] = useState(null);
-  const [modalDeleteQuote, setModalDeleteQuote] = useState(null);
 
+  // State for modals
+  const [modalQuote, setModalQuote] = useState(null);
+  const [confirmCollect, setConfirmCollect] = useState(null);
+  const [deleteModalQuote, setDeleteModalQuote] = useState(null); // Added delete modal state
+
+  // Redux selectors
   const {
-    pendingManual: {
-      response: pendingResponseFromRedux,
-      loading: pendingLoading = false,
-      error: pendingError = null,
+    accepted: {
+      response: acceptedResponseFromRedux,
+      loading: acceptedLoading = false,
+      error: acceptedError = null,
     } = {},
-    review: {
-      loading: reviewLoading = false,
-      error: reviewError = null,
+    collect: {
+      loading: collectLoading = false,
+      error: collectError = null,
     } = {},
+    // Added deletion state
     deletion: {
-      loading: deletionLoading = false,
-      error: deletionError = null,
+      loading: deleteLoading = false,
+      error: deleteError = null,
     } = {},
   } = useSelector((state) => state.adminQuotes || {});
 
-  const pendingResponse = pendingResponseFromRedux || {};
+  // === Defensive check for acceptedResponse ===
+  const acceptedResponse = acceptedResponseFromRedux || {};
 
   const {
     quotes = [],
     total = 0,
     page = 1,
     totalPages = 1,
-  } = pendingResponse;
+  } = acceptedResponse;
 
+  // Fetch data on filter change
   useEffect(() => {
-    dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
+    dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
   }, [dispatch, debouncedFilters]);
 
+  // Handlers
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const handleReview = (quote) => {
-    dispatch(clearReviewError());
-    setModalReviewQuote(quote);
-  };
-
-  const handleCloseReviewModal = () => {
-    dispatch(clearReviewError());
-    setModalReviewQuote(null);
-  };
-
   const handleViewDetails = (quote) => {
-    setModalViewQuote(quote);
+    setModalQuote(quote);
   };
 
   const handleCloseDetailsModal = () => {
-    setModalViewQuote(null);
+    setModalQuote(null);
   };
 
+  const handleMarkAsCollected = (quote) => {
+    setConfirmCollect(quote);
+  };
+
+  const handleConfirmCollected = async () => {
+    if (confirmCollect) {
+      const resultAction = await dispatch(
+        markManualQuoteAsCollected({ id: confirmCollect._id })
+      );
+      if (resultAction.type.endsWith('/fulfilled')) {
+        setConfirmCollect(null);
+        dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
+      }
+    }
+  };
+
+  const handleCloseConfirmModal = () => {
+    setConfirmCollect(null);
+  };
+
+  // New delete handlers
   const handleDeleteConfirmation = (quote) => {
-    dispatch(clearDeletionError());
-    setModalDeleteQuote(quote);
+    setDeleteModalQuote(quote);
   };
 
   const handleCloseDeleteModal = () => {
-    dispatch(clearDeletionError());
-    setModalDeleteQuote(null);
+    setDeleteModalQuote(null);
   };
 
-  const onConfirmDelete = async (quote) => {
-    const resultAction = await dispatch(deleteQuote({ id: quote._id }));
-    if (deleteQuote.fulfilled.match(resultAction)) {
-      handleCloseDeleteModal();
+  const handleConfirmDelete = async (quote) => {
+    if (quote?._id) {
+      // Dispatch the delete action
+      await dispatch(deleteQuote({ id: quote._id }));
+      // Set the deleteModalQuote to null to close the modal
+      setDeleteModalQuote(null);
     }
   };
 
-  const onSubmitReview = async ({ adminOfferPrice, adminMessage }) => {
-    const resultAction = await dispatch(
-      reviewManualQuote({
-        data: { adminOfferPrice, adminMessage },
-        id: modalReviewQuote._id,
-      })
-    );
-
-    if (reviewManualQuote.fulfilled.match(resultAction)) {
-      handleCloseReviewModal();
-      dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
-    }
-  };
 
   const updateFilter = (field) => (e) => {
     const value = e.target.value;
@@ -141,6 +145,7 @@ const AllManualQuotes = () => {
     });
   };
 
+  // Helper function to safely get vehicle information
   const getVehicleString = (quote) => {
     const make = quote?.vehicleRegistration?.Make;
     const model = quote?.vehicleRegistration?.Model;
@@ -156,6 +161,16 @@ const AllManualQuotes = () => {
     return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
   };
 
+  const formatWeight = (weight) => {
+    return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
+  };
+
+  const getQuoteType = (quote) => {
+    if (quote.type === 'manual') return 'Manual';
+    if (quote.type === 'auto') return 'Auto';
+    return 'Standard';
+  };
+
   const renderDesktopTable = () => (
     <div className={styles['table-wrapper']}>
       <table>
@@ -164,8 +179,9 @@ const AllManualQuotes = () => {
             <th>Reg No</th>
             <th>Vehicle</th>
             <th>Client</th>
-            <th>Reason</th>
-            <th>Client Offer</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Weight</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -181,13 +197,16 @@ const AllManualQuotes = () => {
               <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </td>
-              <td title={quote.manualDetails.manualQuoteReason || 'N/A'}>
-                <span className={styles['reason-text']}>
-                  {quote.manualDetails.manualQuoteReason || 'N/A'}
+              <td>
+                <span className={`${styles['type-badge']} ${styles[getQuoteType(quote).toLowerCase()]}`}>
+                  {getQuoteType(quote)}
                 </span>
               </td>
-              <td title={formatPrice(quote.manualDetails.userEstimatedPrice)}>
-                {formatPrice(quote.manualDetails.userEstimatedPrice)}
+              <td title={formatPrice(quote.finalPrice)}>
+                {formatPrice(quote.finalPrice)}
+              </td>
+              <td title={formatWeight(quote?.otherVehicleData?.KerbWeight)}>
+                {formatWeight(quote?.otherVehicleData?.KerbWeight)}
               </td>
               <td>
                 <div className={styles['actions-container']}>
@@ -198,17 +217,20 @@ const AllManualQuotes = () => {
                   >
                     View
                   </button>
-                  <button
-                    className={styles['btn-review']}
-                    onClick={() => handleReview(quote)}
-                    aria-label={`Review quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
-                  >
-                    Review
-                  </button>
+                  {!quote.collectionDetails?.collected && (
+                    <button
+                      className={styles['btn-collected']}
+                      onClick={() => handleMarkAsCollected(quote)}
+                      aria-label={`Mark as collected for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
+                    >
+                      Mark Collected
+                    </button>
+                  )}
+                  {/* Added Delete button */}
                   <button
                     className={styles['btn-delete']}
                     onClick={() => handleDeleteConfirmation(quote)}
-                    aria-label={`Delete quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
+                    aria-label={`Delete quote for ${quote?.vehicleRegistration?.Vrm || 'quote'}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +266,9 @@ const AllManualQuotes = () => {
         <div key={quote._id} className={styles['quote-card']}>
           <div className={styles['card-header']}>
             <h3 className={styles['card-title']}>{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
-            <div className={styles['card-badges']}></div>
+            <span className={`${styles['card-badge']} ${styles[getQuoteType(quote).toLowerCase()]}`}>
+              {getQuoteType(quote)}
+            </span>
           </div>
           <div className={styles['card-details']}>
             <div className={styles['detail-item']}>
@@ -258,12 +282,12 @@ const AllManualQuotes = () => {
               </div>
             </div>
             <div className={styles['detail-item']}>
-              <div className={styles.label}>Reason</div>
-              <div className={styles.value}>{quote.manualDetails.manualQuoteReason || 'N/A'}</div>
+              <div className={styles.label}>Price</div>
+              <div className={styles.value}>{formatPrice(quote.finalPrice)}</div>
             </div>
             <div className={styles['detail-item']}>
-              <div className={styles.label}>Client Offer</div>
-              <div className={styles.value}>{formatPrice(quote.manualDetails.userEstimatedPrice)}</div>
+              <div className={styles.label}>Weight</div>
+              <div className={styles.value}>{formatWeight(quote?.otherVehicleData?.KerbWeight)}</div>
             </div>
           </div>
           <div className={styles['card-actions']}>
@@ -273,16 +297,37 @@ const AllManualQuotes = () => {
             >
               View Details
             </button>
-            <button
-              className={styles['btn-review']}
-              onClick={() => handleReview(quote)}
-            >
-              Review Quote
-            </button>
+            {!quote.collectionDetails?.collected && (
+              <button
+                className={styles['btn-collected']}
+                onClick={() => handleMarkAsCollected(quote)}
+              >
+                Mark Collected
+              </button>
+            )}
+            {/* Added Delete button */}
             <button
               className={styles['btn-delete']}
               onClick={() => handleDeleteConfirmation(quote)}
             >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-trash-2"
+              >
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                <line x1="10" x2="10" y1="11" y2="17" />
+                <line x1="14" x2="14" y1="11" y2="17" />
+              </svg>
               Delete
             </button>
           </div>
@@ -292,7 +337,7 @@ const AllManualQuotes = () => {
   );
 
   const renderTableContent = () => {
-    if (pendingLoading) {
+    if (acceptedLoading) {
       return (
         <div className={styles['spinner-container']}>
           <Spinner />
@@ -300,12 +345,12 @@ const AllManualQuotes = () => {
       );
     }
 
-    if (pendingError) {
-      return <p className={styles['error-text']}>{pendingError}</p>;
+    if (acceptedError) {
+      return <p className={styles['error-text']}>{acceptedError}</p>;
     }
 
     if (quotes.length === 0) {
-      return <div className={styles['empty-state']}>No manual quotes pending review.</div>;
+      return <div className={styles['empty-state']}>No accepted quotes available.</div>;
     }
 
     return (
@@ -336,19 +381,20 @@ const AllManualQuotes = () => {
   return (
     <section className={styles['admin-quotes-page']}>
       <div className={styles['page-header']}>
-        <h1>Manual Quote Reviews</h1>
+        <h1>Accepted Quotes</h1>
         <p className={styles['page-description']}>
-          Review and process manual quote requests that require admin attention.
+          Manage quotes that have been accepted and are ready for collection.
         </p>
       </div>
 
+      {/* Info banners */}
       <div className={styles['admin-info-banner']}>
         <div className={`${styles['admin-info-card']} ${styles['highlight-blue']}`}>
           <div className={styles.icon}>📄</div>
           <div className={styles.content}>
             <h3>What Is This Page?</h3>
             <p>
-              Manage <strong>manual quote requests</strong> that couldn't be auto-processed and require your review and pricing decision.
+              Here you'll see quotes that have been accepted by customers and are ready for vehicle collection.
             </p>
           </div>
         </div>
@@ -358,9 +404,10 @@ const AllManualQuotes = () => {
           <div className={styles.content}>
             <h3>What Can You Do?</h3>
             <ul>
-              <li><strong>View:</strong> Inspect complete quote and vehicle details</li>
-              <li><strong>Review:</strong> Set final price and send response to client</li>
+              <li><strong>View:</strong> Inspect quote and vehicle details</li>
+              <li><strong>Mark as Collected:</strong> Confirm vehicle collection</li>
               <li><strong>Filter:</strong> Search by customer, vehicle, or registration</li>
+              <li><strong>Delete:</strong> Remove quotes that are no longer needed.</li>
             </ul>
           </div>
         </div>
@@ -370,19 +417,20 @@ const AllManualQuotes = () => {
           <div className={styles.content}>
             <h3>Key Information</h3>
             <ul>
-              <li><strong>Reason:</strong> Why automatic processing failed</li>
-              <li><strong>Client Offer:</strong> Customer's estimated price</li>
+              <li><strong>Price:</strong> Final agreed price for the vehicle</li>
+              <li><strong>Weight:</strong> Kerb weight in kilograms (from vehicle API)</li>
+              <li><strong>Type:</strong> Manual or auto-generated quote</li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Filter Section */}
+      {/* Filters */}
       <div className={styles['filter-controls']}>
         <div className={styles['filter-header']}>
           <h3>Search & Filter</h3>
           <div className={styles['results-count']}>
-            {total} pending review{total !== 1 ? 's' : ''}
+            {total} result{total !== 1 ? 's' : ''}
           </div>
         </div>
         <div className={styles['filter-grid']}>
@@ -414,46 +462,51 @@ const AllManualQuotes = () => {
         </div>
       </div>
 
-      {/* Table Section */}
+      {/* Table */}
       <div className={styles['quote-table-container']}>
         <div className={styles['quote-table-header']}>
-          <p>Manual Quotes Pending Review: {total}</p>
+          <p>Total Accepted Quotes: {total}</p>
         </div>
         {renderTableContent()}
       </div>
 
-      {/* Modals */}
-      {modalViewQuote && (
+      {/* Quote Details Modal */}
+      {modalQuote && (
         <QuoteDetailsModal
-          quote={modalViewQuote}
+          quote={modalQuote}
           onClose={handleCloseDetailsModal}
+          pageType={"accepted"}
         />
       )}
 
-      {modalReviewQuote && (
-        <QuoteReviewModal
-          quote={modalReviewQuote}
-          onClose={handleCloseReviewModal}
-          onSubmitReview={onSubmitReview}
-          loading={reviewLoading}
-          error={reviewError}
+      {/* Confirm Mark as Collected Modal */}
+      {confirmCollect && (
+        <ConfirmModal
+          isOpen={true}
+          message={`Are you sure you want to mark vehicle ${confirmCollect.regNumber || 'this vehicle'} as collected?`}
+          title="Confirm Collection"
+          type="success"
+          onConfirm={handleConfirmCollected}
+          onCancel={handleCloseConfirmModal}
+          loading={collectLoading}
+          error={collectError}
         />
       )}
 
-      {modalDeleteQuote && (
+      {/* Added Delete Confirmation Modal */}
+      {deleteModalQuote && (
         <DeleteModal
-          title="Delete Manual Quote"
-          message="Are you sure you want to delete this quote? This action is permanent and cannot be undone. Deleting this quote will remove it from all lists."
-          quote={modalDeleteQuote}
-          status={"Manual_Pending_NotReviewed"}
+          title="Confirm Deletion"
+          vehicle={getVehicleString(deleteModalQuote)}
+          status={"Accepted"}
           onClose={handleCloseDeleteModal}
-          onConfirm={onConfirmDelete}
-          loading={deletionLoading}
-          error={deletionError}
+          onConfirm={() => handleConfirmDelete(deleteModalQuote)}
+          loading={deleteLoading}
+          error={deleteError}
         />
       )}
     </section>
   );
 };
 
-export default AllManualQuotes;
+export default AcceptedQuotes;

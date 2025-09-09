@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCollectedQuotes,
+  deleteQuote, // Reusing the generic delete action
 } from '../../../redux/slices/adminQuoteSlice';
 import Spinner from '../../../components/common/Spinner';
 import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/QuoteDetailsModal';
+import DeleteModal from '../../../components/Admin/DeleteModal/DeleteModal.jsx';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
 import styles from '../../../styles/shared/AdminQuotesShared.module.scss';
@@ -28,14 +30,18 @@ const CollectedQuotes = () => {
 
   // State for modals
   const [modalQuote, setModalQuote] = useState(null);
+  const [modalDeleteQuote, setModalDeleteQuote] = useState(null);
 
   // Redux selectors
+  // Pulling deleteLoading and deleteError from the top level of the state
   const {
     collected: {
       response: collectedResponseFromRedux,
       loading: collectedLoading = false,
       error: collectedError = null,
     } = {},
+    deleteLoading = false,
+    deleteError = null,
   } = useSelector((state) => state.adminQuotes || {});
 
   // === Defensive check for collectedResponse ===
@@ -64,6 +70,26 @@ const CollectedQuotes = () => {
 
   const handleCloseDetailsModal = () => {
     setModalQuote(null);
+  };
+
+  const handleDeleteConfirmation = (quote) => {
+    setModalDeleteQuote(quote);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setModalDeleteQuote(null);
+  };
+
+  const onConfirmDelete = async (quote) => {
+    try {
+      // Dispatch the generic deleteQuote action
+      await dispatch(deleteQuote(quote._id));
+      handleCloseDeleteModal();
+      // Refetch quotes to update the list after deletion
+      dispatch(fetchCollectedQuotes({ params: debouncedFilters }));
+    } catch (error) {
+      console.error("Failed to delete quote:", error);
+    }
   };
 
   const updateFilter = (field) => (e) => {
@@ -172,6 +198,30 @@ const CollectedQuotes = () => {
                   >
                     View
                   </button>
+                  <button
+                    className={styles['btn-delete']}
+                    onClick={() => handleDeleteConfirmation(quote)}
+                    aria-label={`Delete quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-trash-2"
+                    >
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -221,6 +271,12 @@ const CollectedQuotes = () => {
               onClick={() => handleViewDetails(quote)}
             >
               View Details
+            </button>
+            <button
+              className={styles['btn-delete']}
+              onClick={() => handleDeleteConfirmation(quote)}
+            >
+              Delete
             </button>
           </div>
         </div>
@@ -298,6 +354,7 @@ const CollectedQuotes = () => {
             <ul>
               <li><strong>View:</strong> Inspect the full details of a collected vehicle quote.</li>
               <li><strong>Filter:</strong> Search by customer, vehicle, or registration to find specific quotes.</li>
+              <li><strong>Delete:</strong> Permanently remove a collected quote.</li>
             </ul>
           </div>
         </div>
@@ -366,6 +423,20 @@ const CollectedQuotes = () => {
           quote={modalQuote}
           onClose={handleCloseDetailsModal}
           pageType={"collected"}
+        />
+      )}
+
+      {/* Delete Modal */}
+      {modalDeleteQuote && (
+        <DeleteModal
+          title="Delete Collected Quote"
+          status={"collected"}
+          quote={modalDeleteQuote}
+          onClose={handleCloseDeleteModal}
+          onConfirm={onConfirmDelete}
+          loading={deleteLoading}
+          error={deleteError}
+          vehicle={getVehicleString(modalDeleteQuote)}
         />
       )}
     </section>

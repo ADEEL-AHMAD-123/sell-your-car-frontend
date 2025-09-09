@@ -108,8 +108,11 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
     clientDecision,
     type,
     createdAt,
-    acceptedAt, // Corrected: Use acceptedAt instead of updatedAt
+    acceptedAt,
     rejectedAt,
+    isReviewedByAdmin,
+    reviewedAt,
+    adminOfferPrice,
     manualDetails = {},
     adminMessage,
   } = quote;
@@ -127,8 +130,6 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
 
   // Get summary section title based on the quote data
   const getSummaryTitle = () => {
-    const status = getCurrentStatus();
-    if (status === 'Collected') return 'Quote Summary';
     return 'Quote Summary';
   };
   
@@ -249,55 +250,53 @@ const QuoteDetailsModal = ({ quote, onClose, pageType, customTitle = null }) => 
           <section className="details-section top-summary">
             <h3>{getSummaryTitle()}</h3>
             
-            {/* Display Registration number first as requested */}
+            {/* Always Displayed Fields */}
             {renderField('REG number', vehicleRegistration?.Vrm)}
             {renderField('Current Status', getCurrentStatus())}
             {renderField('Quote Type', type.charAt(0).toUpperCase() + type.slice(1))}
             {renderField('Generated At', formatDateTime(createdAt))}
             
-            {/* Conditional fields based on client decision */}
-            {(clientDecision === 'accepted' || clientDecision === 'pending' || type === 'manual') && otherVehicleData?.KerbWeight && (
-              renderField('Kerb Weight', otherVehicleData.KerbWeight, ' kg', '', "badge")
+            {/* Always display these if they are available */}
+            {otherVehicleData?.KerbWeight && (
+              <p>
+                <strong>Kerb Weight:</strong> <span className="badge">{otherVehicleData.KerbWeight} kg</span>
+              </p>
+            )}
+            {estimatedScrapPrice && (
+              renderField('Auto-Generated Price', formatCurrency(estimatedScrapPrice))
             )}
             
-            {clientDecision === 'accepted' && finalPrice && (
-              // 💡 FIX: Applied the badge class to the valueClassName parameter.
-              renderField('Final Price', formatCurrency(finalPrice), '', '', 'badge')
+            {/* Conditional Price Fields based on status */}
+            {(type === 'manual' && userEstimatedPrice) && (
+              renderField('User Estimated Price', formatCurrency(userEstimatedPrice))
             )}
-            
-            {(clientDecision === 'rejected' && estimatedScrapPrice) && (
-              renderField('Offered Price', formatCurrency(estimatedScrapPrice))
+            {isReviewedByAdmin && adminOfferPrice && (
+              renderField('Admin Offer Price', formatCurrency(adminOfferPrice))
             )}
-            
-            {type === 'manual' && clientDecision === 'pending' && estimatedScrapPrice && (
-              renderField('Offered Price', formatCurrency(estimatedScrapPrice ))
+            { (clientDecision === 'accepted' || collectionDetails?.collected) && finalPrice && (
+              <p>
+                <strong>Final Price:</strong> <span className="badge">{formatCurrency(finalPrice)}</span>
+              </p>
             )}
 
-            {clientDecision === 'accepted' && (
-              <>
-                {renderField('Accepted At', formatDateTime(acceptedAt))}
-              </>
+            {/* Conditional Date Fields based on status */}
+            {type === 'manual' && lastManualRequestAt && (
+              renderField('Manual Request At', formatDateTime(lastManualRequestAt))
             )}
-
-            {clientDecision === 'rejected' && (
-              <>
-                {renderField('Rejected At', formatDateTime(rejectedAt))}
-                {renderField('Rejection Reason', rejectionReason)}
-                {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
-              </>
+            {isReviewedByAdmin && reviewedAt && (
+              renderField('Reviewed At', formatDateTime(reviewedAt))
+            )} 
+            {clientDecision === 'accepted' && acceptedAt && (
+              renderField('Accepted At', formatDateTime(acceptedAt))
             )}
-
-            {type === 'manual' && clientDecision === 'pending' && (
-              <>
-                {renderField('Manual Request At', formatDateTime(lastManualRequestAt))}
-                {renderField('Manual Request Reason', manualQuoteReason)}
-                {renderField('User Estimated Price', formatCurrency(userEstimatedPrice))}
-              </>
+            {clientDecision === 'rejected' && rejectedAt && (
+              renderField('Rejected At', formatDateTime(rejectedAt))
             )}
-            
-            {/* Add Collected Date only when pageType is collected and a collected date exists */}
-            {pageType === 'collected' && collectionDetails?.collectedAt && (
-              renderField('Collected Date', formatDateTime(collectionDetails.collectedAt))
+            {collectionDetails?.collected && collectionDetails.collectedAt && (
+              renderField('Collected At', formatDateTime(collectionDetails.collectedAt))
+            )}
+            {clientDecision === 'rejected' && rejectionReason && (
+              renderField('Rejection Reason', rejectionReason)
             )}
             
           </section>

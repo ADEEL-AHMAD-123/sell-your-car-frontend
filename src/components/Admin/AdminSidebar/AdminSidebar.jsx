@@ -78,8 +78,10 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
       submenu: [
         { label: 'All Quotes', path: '/dashboard/quotes' },
         { label: 'Pending Manual Quotes', path: '/dashboard/manual-quotes' },
+        { label: 'Pending Auto Quotes', path: '/dashboard/pending-auto-quotes' },
         { label: 'Accepted Quotes', path: '/dashboard/accepted-quotes' },
-        { label: 'Collected Quotes', path: '/dashboard/collected-quotes' }
+        { label: 'Collected Quotes', path: '/dashboard/collected-quotes' },
+        { label: 'Rejected Quotes', path: '/dashboard/rejected-quotes' }
       ]
     },
   

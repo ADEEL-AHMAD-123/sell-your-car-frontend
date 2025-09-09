@@ -1,0 +1,217 @@
+@import '../../../styles/base/admin-variables.scss';
+
+
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $admin-z-modal-backdrop;
+  padding: $admin-spacing-md;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.delete-modal {
+  background: $admin-bg-card;
+  border: 1px solid $admin-border;
+  border-radius: $admin-radius-lg;
+  box-shadow: $admin-shadow-xl;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+  
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $admin-spacing-lg $admin-spacing-xl;
+    border-bottom: 1px solid $admin-border;
+    background: $admin-bg-secondary;
+  }
+  
+  &__title {
+    color: $admin-text-primary;
+    font-size: $admin-font-size-lg;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  &__close {
+    background: none;
+    border: none;
+    color: $admin-text-muted;
+    font-size: 24px;
+    cursor: pointer;
+    padding: $admin-spacing-xs;
+    border-radius: $admin-radius-sm;
+    transition: all $admin-transition-fast;
+    
+    &:hover:not(:disabled) {
+      color: $admin-text-primary;
+      background: $admin-bg-hover;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__body {
+    padding: $admin-spacing-xl;
+    color: $admin-text-secondary;
+    line-height: 1.6;
+  }
+  
+  &__message {
+    font-size: $admin-font-size-base;
+    margin: 0 0 $admin-spacing-lg 0;
+    color: $admin-text-primary;
+  }
+  
+  &__details {
+    background: $admin-bg-secondary;
+    border: 1px solid $admin-border;
+    border-radius: $admin-radius-md;
+    padding: $admin-spacing-md;
+    margin-bottom: $admin-spacing-lg;
+  }
+  
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: $admin-spacing-sm 0;
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid $admin-border;
+    }
+  }
+  
+  .detail-label {
+    font-weight: 500;
+    color: $admin-text-muted;
+  }
+  
+  .detail-value {
+    color: $admin-text-primary;
+    font-weight: 500;
+  }
+  
+  &__loading {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-md;
+    padding: $admin-spacing-lg;
+    background: rgba($admin-info, 0.1);
+    border: 1px solid rgba($admin-info, 0.2);
+    border-radius: $admin-radius-md;
+    color: $admin-info-light;
+    font-size: $admin-font-size-sm;
+    margin-bottom: $admin-spacing-lg;
+  }
+  
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: $admin-spacing-sm;
+    padding: $admin-spacing-md;
+    background: rgba($admin-error, 0.1);
+    border: 1px solid rgba($admin-error, 0.2);
+    border-radius: $admin-radius-md;
+    color: $admin-error-light;
+    font-size: $admin-font-size-sm;
+    margin-bottom: $admin-spacing-lg;
+    
+    .error-icon {
+      font-size: $admin-font-size-lg;
+      flex-shrink: 0;
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    gap: $admin-spacing-md;
+    justify-content: flex-end;
+    padding: $admin-spacing-lg $admin-spacing-xl;
+    background: $admin-bg-secondary;
+    border-top: 1px solid $admin-border;
+  }
+}
+
+.btn {
+  padding: $admin-spacing-sm $admin-spacing-lg;
+  border-radius: $admin-radius-md;
+  font-size: $admin-font-size-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $admin-transition-fast;
+  border: 1px solid transparent;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &--secondary {
+    background: $admin-bg-tertiary;
+    color: $admin-text-primary;
+    border-color: $admin-border;
+    
+    &:hover:not(:disabled) {
+      background: $admin-bg-hover;
+    }
+  }
+  
+  &--danger {
+    background: $admin-error;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background: darken($admin-error, 8%);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: $admin-breakpoint-sm) {
+  .delete-modal {
+    margin: $admin-spacing-sm;
+    max-width: calc(100vw - #{$admin-spacing-lg});
+    
+    &__header, &__actions {
+      padding: $admin-spacing-md;
+    }
+    
+    &__body {
+      padding: $admin-spacing-lg $admin-spacing-md;
+    }
+    
+    &__actions {
+      flex-direction: column;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}

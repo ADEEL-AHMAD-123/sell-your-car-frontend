@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchPendingManualQuotes,
-  reviewManualQuote,
+  fetchPendingAutoQuotes,
   deleteQuote,
-  clearReviewError,
-  clearDeletionError,
 } from '../../../redux/slices/adminQuoteSlice';
-
 import Spinner from '../../../components/common/Spinner';
 import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/QuoteDetailsModal';
-import QuoteReviewModal from '../../../components/Admin/QuoteReviewModal/QuoteReviewModal';
-import DeleteModal from '../../../components/Admin/DeleteModal/DeleteModal.jsx';
+import DeleteModal from '../../../components/Admin/DeleteModal/DeleteModal';
 import { useDebouncedValue } from '../../../utils/useDebouncedValue';
 
-import styles from '../../../styles/shared/AdminQuotesShared.module.scss';
 
-const AllManualQuotes = () => {
+import styles from '../../../styles/shared/AdminQuotesShared.module.scss';
+import ClientContactModal from '../../../components/Admin/ClientContactModal/ClientContactModal';
+
+const PendingAutoQuotes = () => {
   const dispatch = useDispatch();
 
+  // State for filters
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -31,89 +29,77 @@ const AllManualQuotes = () => {
   });
 
   const debouncedFilters = useDebouncedValue(filters, 500);
-  const [modalViewQuote, setModalViewQuote] = useState(null);
-  const [modalReviewQuote, setModalReviewQuote] = useState(null);
-  const [modalDeleteQuote, setModalDeleteQuote] = useState(null);
 
+  // State for modals
+  const [modalQuote, setModalQuote] = useState(null);
+  const [contactModalQuote, setContactModalQuote] = useState(null);
+  const [deleteModalQuote, setDeleteModalQuote] = useState(null);
+
+  // Redux selectors
   const {
-    pendingManual: {
-      response: pendingResponseFromRedux,
-      loading: pendingLoading = false,
-      error: pendingError = null,
+    pendingAuto: {
+      response: pendingAutoResponseFromRedux,
+      loading: pendingAutoLoading = false,
+      error: pendingAutoError = null,
     } = {},
-    review: {
-      loading: reviewLoading = false,
-      error: reviewError = null,
-    } = {},
+    // CORRECTED LINE: Use 'deletion' instead of 'deleteQuote'
     deletion: {
-      loading: deletionLoading = false,
-      error: deletionError = null,
+      loading: deleteLoading = false,
+      error: deleteError = null,
     } = {},
   } = useSelector((state) => state.adminQuotes || {});
 
-  const pendingResponse = pendingResponseFromRedux || {};
+  // === Defensive check for pendingAutoResponse ===
+  const pendingAutoResponse = pendingAutoResponseFromRedux || {};
 
   const {
     quotes = [],
     total = 0,
     page = 1,
     totalPages = 1,
-  } = pendingResponse;
+  } = pendingAutoResponse;
 
+  // Fetch data on filter change
   useEffect(() => {
-    dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
+    dispatch(fetchPendingAutoQuotes({ params: debouncedFilters }));
   }, [dispatch, debouncedFilters]);
 
+  // Handlers
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const handleReview = (quote) => {
-    dispatch(clearReviewError());
-    setModalReviewQuote(quote);
-  };
-
-  const handleCloseReviewModal = () => {
-    dispatch(clearReviewError());
-    setModalReviewQuote(null);
-  };
-
   const handleViewDetails = (quote) => {
-    setModalViewQuote(quote);
+    setModalQuote(quote);
   };
 
   const handleCloseDetailsModal = () => {
-    setModalViewQuote(null);
+    setModalQuote(null);
+  };
+
+  const handleClientContact = (quote) => {
+    setContactModalQuote(quote);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalQuote(null);
   };
 
   const handleDeleteConfirmation = (quote) => {
-    dispatch(clearDeletionError());
-    setModalDeleteQuote(quote);
+    setDeleteModalQuote(quote);
   };
 
   const handleCloseDeleteModal = () => {
-    dispatch(clearDeletionError());
-    setModalDeleteQuote(null);
+    setDeleteModalQuote(null);
   };
 
-  const onConfirmDelete = async (quote) => {
-    const resultAction = await dispatch(deleteQuote({ id: quote._id }));
-    if (deleteQuote.fulfilled.match(resultAction)) {
-      handleCloseDeleteModal();
-    }
-  };
-
-  const onSubmitReview = async ({ adminOfferPrice, adminMessage }) => {
-    const resultAction = await dispatch(
-      reviewManualQuote({
-        data: { adminOfferPrice, adminMessage },
-        id: modalReviewQuote._id,
-      })
-    );
-
-    if (reviewManualQuote.fulfilled.match(resultAction)) {
-      handleCloseReviewModal();
-      dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
+  const handleConfirmDelete = async (quote) => {
+    if (quote?._id) {
+      // Dispatch the delete action
+      await dispatch(deleteQuote({ id: quote._id }));
+      // Set the deleteModalQuote to null to close the modal
+      // This will only happen after the async dispatch has completed
+      setDeleteModalQuote(null);
     }
   };
 
@@ -141,6 +127,7 @@ const AllManualQuotes = () => {
     });
   };
 
+  // Helper function to safely get vehicle information
   const getVehicleString = (quote) => {
     const make = quote?.vehicleRegistration?.Make;
     const model = quote?.vehicleRegistration?.Model;
@@ -156,6 +143,10 @@ const AllManualQuotes = () => {
     return price ? `£${parseFloat(price).toLocaleString()}` : 'N/A';
   };
 
+  const formatWeight = (weight) => {
+    return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
+  };
+  
   const renderDesktopTable = () => (
     <div className={styles['table-wrapper']}>
       <table>
@@ -164,8 +155,8 @@ const AllManualQuotes = () => {
             <th>Reg No</th>
             <th>Vehicle</th>
             <th>Client</th>
-            <th>Reason</th>
-            <th>Client Offer</th>
+            <th>Price</th>
+            <th>Weight</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -181,13 +172,11 @@ const AllManualQuotes = () => {
               <td title={quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}>
                 {quote.user ? `${quote.user.firstName} ${quote.user.lastName}` : 'N/A'}
               </td>
-              <td title={quote.manualDetails.manualQuoteReason || 'N/A'}>
-                <span className={styles['reason-text']}>
-                  {quote.manualDetails.manualQuoteReason || 'N/A'}
-                </span>
+              <td title={formatPrice(quote.estimatedScrapPrice)}>
+                {formatPrice(quote.estimatedScrapPrice)}
               </td>
-              <td title={formatPrice(quote.manualDetails.userEstimatedPrice)}>
-                {formatPrice(quote.manualDetails.userEstimatedPrice)}
+              <td title={formatWeight(quote?.otherVehicleData?.KerbWeight)}>
+                {formatWeight(quote?.otherVehicleData?.KerbWeight)}
               </td>
               <td>
                 <div className={styles['actions-container']}>
@@ -199,16 +188,16 @@ const AllManualQuotes = () => {
                     View
                   </button>
                   <button
-                    className={styles['btn-review']}
-                    onClick={() => handleReview(quote)}
-                    aria-label={`Review quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
+                    className={styles['btn-contact']}
+                    onClick={() => handleClientContact(quote)}
+                    aria-label={`Contact client for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
                   >
-                    Review
+                    Client Contact
                   </button>
                   <button
                     className={styles['btn-delete']}
                     onClick={() => handleDeleteConfirmation(quote)}
-                    aria-label={`Delete quote for ${quote?.vehicleRegistration?.Vrm || 'vehicle'}`}
+                    aria-label={`Delete quote for ${quote?.vehicleRegistration?.Vrm || 'quote'}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +233,6 @@ const AllManualQuotes = () => {
         <div key={quote._id} className={styles['quote-card']}>
           <div className={styles['card-header']}>
             <h3 className={styles['card-title']}>{quote?.vehicleRegistration?.Vrm || 'N/A'}</h3>
-            <div className={styles['card-badges']}></div>
           </div>
           <div className={styles['card-details']}>
             <div className={styles['detail-item']}>
@@ -258,12 +246,12 @@ const AllManualQuotes = () => {
               </div>
             </div>
             <div className={styles['detail-item']}>
-              <div className={styles.label}>Reason</div>
-              <div className={styles.value}>{quote.manualDetails.manualQuoteReason || 'N/A'}</div>
+              <div className={styles.label}>Price</div>
+              <div className={styles.value}>{formatPrice(quote.estimatedScrapPrice)}</div>
             </div>
             <div className={styles['detail-item']}>
-              <div className={styles.label}>Client Offer</div>
-              <div className={styles.value}>{formatPrice(quote.manualDetails.userEstimatedPrice)}</div>
+              <div className={styles.label}>Weight</div>
+              <div className={styles.value}>{formatWeight(quote?.otherVehicleData?.KerbWeight)}</div>
             </div>
           </div>
           <div className={styles['card-actions']}>
@@ -274,10 +262,10 @@ const AllManualQuotes = () => {
               View Details
             </button>
             <button
-              className={styles['btn-review']}
-              onClick={() => handleReview(quote)}
+              className={styles['btn-contact']}
+              onClick={() => handleClientContact(quote)}
             >
-              Review Quote
+              Client Contact
             </button>
             <button
               className={styles['btn-delete']}
@@ -292,23 +280,15 @@ const AllManualQuotes = () => {
   );
 
   const renderTableContent = () => {
-    if (pendingLoading) {
-      return (
-        <div className={styles['spinner-container']}>
-          <Spinner />
-        </div>
-      );
-    }
-
-    if (pendingError) {
-      return <p className={styles['error-text']}>{pendingError}</p>;
-    }
-
-    if (quotes.length === 0) {
-      return <div className={styles['empty-state']}>No manual quotes pending review.</div>;
-    }
-
-    return (
+    return pendingAutoLoading ? (
+      <div className={styles['spinner-container']}>
+        <Spinner />
+      </div>
+    ) : pendingAutoError ? (
+      <p className={styles['error-text']}>{pendingAutoError}</p>
+    ) : quotes.length === 0 ? (
+      <div className={styles['empty-state']}>No pending auto quotes available.</div>
+    ) : (
       <>
         {renderDesktopTable()}
         {renderMobileCards()}
@@ -336,19 +316,20 @@ const AllManualQuotes = () => {
   return (
     <section className={styles['admin-quotes-page']}>
       <div className={styles['page-header']}>
-        <h1>Manual Quote Reviews</h1>
+        <h1>Pending Auto Quotes</h1>
         <p className={styles['page-description']}>
-          Review and process manual quote requests that require admin attention.
+          View and manage auto-generated quotes that have not yet been accepted or rejected.
         </p>
       </div>
 
+      {/* Info banners */}
       <div className={styles['admin-info-banner']}>
         <div className={`${styles['admin-info-card']} ${styles['highlight-blue']}`}>
           <div className={styles.icon}>📄</div>
           <div className={styles.content}>
             <h3>What Is This Page?</h3>
             <p>
-              Manage <strong>manual quote requests</strong> that couldn't be auto-processed and require your review and pricing decision.
+              This page displays all quotes that were automatically generated and are awaiting a response from the customer.
             </p>
           </div>
         </div>
@@ -358,9 +339,10 @@ const AllManualQuotes = () => {
           <div className={styles.content}>
             <h3>What Can You Do?</h3>
             <ul>
-              <li><strong>View:</strong> Inspect complete quote and vehicle details</li>
-              <li><strong>Review:</strong> Set final price and send response to client</li>
-              <li><strong>Filter:</strong> Search by customer, vehicle, or registration</li>
+              <li><strong>View:</strong> Inspect quote and vehicle details.</li>
+              <li><strong>Client Contact:</strong> Get contact details for the client.</li>
+              <li><strong>Filter:</strong> Search by customer, vehicle, or registration.</li>
+              <li><strong>Delete:</strong> Remove quotes that are no longer needed.</li>
             </ul>
           </div>
         </div>
@@ -370,19 +352,20 @@ const AllManualQuotes = () => {
           <div className={styles.content}>
             <h3>Key Information</h3>
             <ul>
-              <li><strong>Reason:</strong> Why automatic processing failed</li>
-              <li><strong>Client Offer:</strong> Customer's estimated price</li>
+              <li><strong>Price:</strong> The auto-generated price for the vehicle.</li>
+              <li><strong>Weight:</strong> Kerb weight in kilograms (from vehicle API).</li>
+              <li><strong>Type:</strong> All quotes on this page are auto-generated.</li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Filter Section */}
+      {/* Filters */}
       <div className={styles['filter-controls']}>
         <div className={styles['filter-header']}>
           <h3>Search & Filter</h3>
           <div className={styles['results-count']}>
-            {total} pending review{total !== 1 ? 's' : ''}
+            {total} result{total !== 1 ? 's' : ''}
           </div>
         </div>
         <div className={styles['filter-grid']}>
@@ -414,46 +397,45 @@ const AllManualQuotes = () => {
         </div>
       </div>
 
-      {/* Table Section */}
+      {/* Table */}
       <div className={styles['quote-table-container']}>
         <div className={styles['quote-table-header']}>
-          <p>Manual Quotes Pending Review: {total}</p>
+          <p>Total Pending Auto Quotes: {total}</p>
         </div>
         {renderTableContent()}
       </div>
 
-      {/* Modals */}
-      {modalViewQuote && (
+      {/* Quote Details Modal */}
+      {modalQuote && (
         <QuoteDetailsModal
-          quote={modalViewQuote}
+          quote={modalQuote}
           onClose={handleCloseDetailsModal}
+          pageType={"pending-auto"}
         />
       )}
 
-      {modalReviewQuote && (
-        <QuoteReviewModal
-          quote={modalReviewQuote}
-          onClose={handleCloseReviewModal}
-          onSubmitReview={onSubmitReview}
-          loading={reviewLoading}
-          error={reviewError}
+      {/* Client Contact Modal */}
+      {contactModalQuote && (
+        <ClientContactModal
+          quote={contactModalQuote}
+          onClose={handleCloseContactModal}
         />
       )}
 
-      {modalDeleteQuote && (
+      {/* Delete Confirmation Modal */}
+      {deleteModalQuote && (
         <DeleteModal
-          title="Delete Manual Quote"
-          message="Are you sure you want to delete this quote? This action is permanent and cannot be undone. Deleting this quote will remove it from all lists."
-          quote={modalDeleteQuote}
-          status={"Manual_Pending_NotReviewed"}
+          title="Confirm Deletion"
+          vehicle={getVehicleString(deleteModalQuote)}
+          status={"Auto Pending"}
           onClose={handleCloseDeleteModal}
-          onConfirm={onConfirmDelete}
-          loading={deletionLoading}
-          error={deletionError}
+          onConfirm={() => handleConfirmDelete(deleteModalQuote)}
+          loading={deleteLoading}
+          error={deleteError}
         />
       )}
     </section>
   );
 };
 
-export default AllManualQuotes;
+export default PendingAutoQuotes;

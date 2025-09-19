@@ -84,7 +84,6 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
         { label: 'Rejected Quotes', path: '/dashboard/rejected-quotes' }
       ]
     },
-  
     {
       key: 'blog',
       icon: FaPencilAlt,
@@ -93,6 +92,12 @@ const AdminSidebar = ({ isOpen, isCollapsed, isMobile, onClose }) => {
         { label: 'All Posts', path: '/dashboard/blog' },
         { label: 'Create New', path: '/dashboard/blog/create' }
       ]
+    },
+    {
+      key: 'emails', // <-- NEW MENU ITEM
+      icon: FaEnvelope,
+      label: 'Promotional Emails',
+      path: '/dashboard/promo-email'
     },
     {
       key: 'vehicles',

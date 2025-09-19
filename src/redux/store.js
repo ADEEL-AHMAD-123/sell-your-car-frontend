@@ -1,3 +1,4 @@
+// src/redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -7,6 +8,7 @@ import quoteReducer from './slices/quoteSlice';
 import adminReducer from './slices/adminSlice';
 import adminQuoteReducer from './slices/adminQuoteSlice';
 import blogReducer from './slices/blogSlice';
+import promoReducer from './slices/promoSlice'; 
 
 const persistConfig = {
   key: 'root',
@@ -19,6 +21,7 @@ const rootReducer = combineReducers({
   admin: adminReducer,
   adminQuotes: adminQuoteReducer,
   blogs: blogReducer,
+  promo: promoReducer, 
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

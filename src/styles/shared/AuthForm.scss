@@ -199,7 +199,7 @@
   .form-group {
     display: flex;
     flex-direction: column;
-
+margin-bottom: 0;
     label {
       font-size: 0.9rem;
       font-weight: 600;
@@ -634,3 +634,60 @@
     animation: none;
   }
 }
+
+
+
+  .form-group--checkbox {
+    // This removes any centering that might be happening from the parent
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    
+    // The label is the primary container for the checkbox and text
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #6b7280;
+      user-select: none;
+      
+      // Target the input directly within the label
+      input[type="checkbox"] {
+        appearance: none;
+        width: 20px; 
+        height: 20px;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        background-color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-right: 5px;
+        &:checked {
+          background-color: $color-primary;
+          border-color: $color-primary;
+        }
+        
+        &:focus {
+          outline: none;
+          border-color: $color-primary;
+          box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+        }
+        
+        &:checked::after {
+          content: '\2713';
+          color: white;
+          font-size: 14px;
+          font-weight: bold;
+          transition: opacity 0.2s ease;
+        }
+      }
+    }
+  }

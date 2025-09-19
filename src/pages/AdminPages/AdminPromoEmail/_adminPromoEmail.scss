@@ -1,0 +1,210 @@
+@import '../../../styles/base/admin-variables.scss';
+
+.promo-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background: $admin-bg-primary;
+  color: $admin-text-primary;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.promo-header {
+  margin-bottom: 2rem;
+  
+  .promo-title {
+    margin-bottom: 1.5rem;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: $admin-text-primary;
+      
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+      }
+    }
+    
+    p {
+      color: $admin-text-secondary;
+      font-size: 1.1rem;
+      margin: 0;
+    }
+  }
+  
+  .promo-tips {
+    .tip {
+      background: rgba(99, 102, 241, 0.1);
+      border-left: 4px solid $admin-primary;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      color: $admin-text-secondary;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      
+      strong {
+        color: $admin-primary-light;
+      }
+    }
+  }
+}
+
+.promo-form {
+  background: $admin-bg-card;
+  border: 1px solid $admin-border;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: $admin-shadow-md;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: end;
+  margin-bottom: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.form-field {
+  label {
+    display: block;
+    font-weight: 600;
+    color: $admin-text-primary;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: $admin-bg-tertiary;
+    border: 1px solid $admin-border;
+    border-radius: 8px;
+    color: $admin-text-primary;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    
+    &::placeholder {
+      color: $admin-text-muted;
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: $admin-primary;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+  }
+  
+  .error {
+    display: block;
+    color: $admin-error;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.send-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: $admin-primary-gradient;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  min-height: 48px;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.editor-section {
+  label {
+    display: block;
+    font-weight: 600;
+    color: $admin-text-primary;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+.editor-wrapper {
+  border: 1px solid $admin-border;
+  border-radius: 8px;
+  overflow: hidden;
+  background: $admin-bg-tertiary;
+  
+  // TinyMCE styling
+  :global(.tox) {
+    border: none !important;
+    
+    .tox-toolbar {
+      background: $admin-bg-secondary !important;
+      border-bottom: 1px solid $admin-border !important;
+    }
+    
+    .tox-edit-area {
+      background: $admin-bg-tertiary !important;
+    }
+    
+    .tox-menu,
+    .tox-collection {
+      z-index: 1000 !important;
+      background: $admin-bg-card !important;
+      border: 1px solid $admin-border !important;
+      border-radius: 6px !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    &.tox-fullscreen {
+      z-index: 9999 !important;
+      background: $admin-bg-primary !important;
+      
+      .tox-toolbar {
+        background: $admin-bg-card !important;
+        border-bottom: 1px solid $admin-border !important;
+      }
+      
+      .tox-menu,
+      .tox-collection {
+        z-index: 10000 !important;
+      }
+      
+      .tox-edit-area {
+        background: $admin-bg-primary !important;
+      }
+    }
+  }
+}

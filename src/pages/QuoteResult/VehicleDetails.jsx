@@ -7,7 +7,7 @@ const VehicleDetails = ({ quote }) => {
     technical: false,
     registration: false,
     dimensions: false,
-  });
+  });  
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({

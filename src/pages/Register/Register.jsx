@@ -8,14 +8,14 @@ import { toast } from 'react-toastify';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUser, 
-  faEnvelope, 
-  faLock, 
+import {
+  faUser,
+  faEnvelope,
+  faLock,
   faPhone,
-  faEye, 
+  faEye,
   faEyeSlash,
-  faTimes 
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../components/common/Logo/Logo';
 import '../../styles/shared/AuthForm.scss';
@@ -33,6 +33,7 @@ const Register = ({ onClose }) => {
       email: '',
       password: '',
       phone: '',
+      isSubscribed: true, // <-- NEW: Set to true by default
     },
     validationSchema: Yup.object({
       firstName: Yup.string()
@@ -58,6 +59,7 @@ const Register = ({ onClose }) => {
       phone: Yup.string()
         .min(10, 'Please enter a valid phone number')
         .required('Phone number is required'),
+      // No validation needed for the checkbox
     }),
     onSubmit: async (values) => {
       const payload = {
@@ -66,16 +68,16 @@ const Register = ({ onClose }) => {
         email: values.email,
         password: values.password,
         phone: values.phone,
+        // <-- NEW: Include the isSubscribed value in the payload
+        isSubscribed: values.isSubscribed,
       };
 
       try {
         const result = await dispatch(registerUser({ data: payload }));
 
         if (registerUser.fulfilled.match(result)) {
-
           toast.success('🎉 Account created! Please check your email to verify your account.');
           if (onClose) onClose();
-          // Do not navigate to login yet, as the user must verify their email.
         } else if (registerUser.rejected.match(result)) {
           toast.error(result.payload?.message || 'Registration failed. Please try again.');
         }
@@ -99,7 +101,7 @@ const Register = ({ onClose }) => {
 
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, label: '' };
-    
+
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[a-z]/.test(password)) strength++;
@@ -116,14 +118,11 @@ const Register = ({ onClose }) => {
   return (
     <div className="auth-overlay" onClick={onClose}>
       <div className="auth-modal auth-modal--register" onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
         {onClose && (
           <button className="auth-modal__close" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
         )}
-
-      
 
         <div className="auth-modal__content">
           <div className="auth-modal__header">
@@ -132,156 +131,171 @@ const Register = ({ onClose }) => {
           </div>
 
           <form onSubmit={formik.handleSubmit} className="auth-form">
+            {/* ... (existing form fields) ... */}
+            
             {/* Name Fields Row */}
             <div className="form-row">
-              {/* First Name */}
-              <div className="form-group">
+                {/* First Name */}
+                <div className="form-group">
                 <label htmlFor="firstName">First Name</label>
                 <div className="form-input-wrapper">
-                  <FontAwesomeIcon icon={faUser} className="form-input-icon" />
-                  <input
+                    <FontAwesomeIcon icon={faUser} className="form-input-icon" />
+                    <input
                     id="firstName"
                     type="text"
                     placeholder="First name"
                     className={`form-input ${
-                      formik.touched.firstName && formik.errors.firstName ? 'form-input--error' : ''
+                        formik.touched.firstName && formik.errors.firstName ? 'form-input--error' : ''
                     }`}
                     {...formik.getFieldProps('firstName')}
-                  />
+                    />
                 </div>
                 {formik.touched.firstName && formik.errors.firstName && (
-                  <div className="form-error">{formik.errors.firstName}</div>
+                    <div className="form-error">{formik.errors.firstName}</div>
                 )}
-              </div>
+                </div>
 
-              {/* Last Name */}
-              <div className="form-group">
+                {/* Last Name */}
+                <div className="form-group">
                 <label htmlFor="lastName">Last Name</label>
                 <div className="form-input-wrapper">
-                  <FontAwesomeIcon icon={faUser} className="form-input-icon" />
-                  <input
+                    <FontAwesomeIcon icon={faUser} className="form-input-icon" />
+                    <input
                     id="lastName"
                     type="text"
                     placeholder="Last name"
                     className={`form-input ${
-                      formik.touched.lastName && formik.errors.lastName ? 'form-input--error' : ''
+                        formik.touched.lastName && formik.errors.lastName ? 'form-input--error' : ''
                     }`}
                     {...formik.getFieldProps('lastName')}
-                  />
+                    />
                 </div>
                 {formik.touched.lastName && formik.errors.lastName && (
-                  <div className="form-error">{formik.errors.lastName}</div>
+                    <div className="form-error">{formik.errors.lastName}</div>
                 )}
-              </div>
+                </div>
             </div>
 
             {/* Email Field */}
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <div className="form-input-wrapper">
+                <label htmlFor="email">Email Address</label>
+                <div className="form-input-wrapper">
                 <FontAwesomeIcon icon={faEnvelope} className="form-input-icon" />
                 <input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className={`form-input ${
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    className={`form-input ${
                     formik.touched.email && formik.errors.email ? 'form-input--error' : ''
-                  }`}
-                  {...formik.getFieldProps('email')}
+                    }`}
+                    {...formik.getFieldProps('email')}
                 />
-              </div>
-              {formik.touched.email && formik.errors.email && (
+                </div>
+                {formik.touched.email && formik.errors.email && (
                 <div className="form-error">{formik.errors.email}</div>
-              )}
+                )}
             </div>
 
             {/* Password Field */}
             <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <div className="form-input-wrapper">
+                <label htmlFor="password">Password</label>
+                <div className="form-input-wrapper">
                 <FontAwesomeIcon icon={faLock} className="form-input-icon" />
                 <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a strong password"
-                  className={`form-input ${
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a strong password"
+                    className={`form-input ${
                     formik.touched.password && formik.errors.password ? 'form-input--error' : ''
-                  }`}
-                  {...formik.getFieldProps('password')}
+                    }`}
+                    {...formik.getFieldProps('password')}
                 />
                 <button
-                  type="button"
-                  className="form-input-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
+                    type="button"
+                    className="form-input-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
-              </div>
-              
-              {/* Password Strength Indicator */}
-              {formik.values.password && (
-                <div className="password-strength">
-                  <div className="password-strength__bar">
-                    <div 
-                      className={`password-strength__fill password-strength__fill--${Math.min(passwordStrength.strength, 4)}`}
-                      style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="password-strength__label">{passwordStrength.label}</span>
                 </div>
-              )}
-              
-              {formik.touched.password && formik.errors.password && (
+                
+                {/* Password Strength Indicator */}
+                {formik.values.password && (
+                <div className="password-strength">
+                    <div className="password-strength__bar">
+                    <div
+                        className={`password-strength__fill password-strength__fill--${Math.min(passwordStrength.strength, 4)}`}
+                        style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
+                    ></div>
+                    </div>
+                    <span className="password-strength__label">{passwordStrength.label}</span>
+                </div>
+                )}
+                
+                {formik.touched.password && formik.errors.password && (
                 <div className="form-error">{formik.errors.password}</div>
-              )}
+                )}
             </div>
 
             {/* Phone Field */}
             <div className="form-group">
-              <label htmlFor="phone">Phone Number</label>
-              <div className="form-phone-wrapper">
+                <label htmlFor="phone">Phone Number</label>
+                <div className="form-phone-wrapper">
                 <PhoneInput
-                  country={'gb'}
-                  value={formik.values.phone}
-                  onChange={(value) => formik.setFieldValue('phone', value)}
-                  inputProps={{
+                    country={'gb'}
+                    value={formik.values.phone}
+                    onChange={(value) => formik.setFieldValue('phone', value)}
+                    inputProps={{
                     id: 'phone',
                     className: `form-phone-input ${
-                      formik.touched.phone && formik.errors.phone ? 'form-input--error' : ''
+                        formik.touched.phone && formik.errors.phone ? 'form-input--error' : ''
                     }`,
-                  }}
-                  containerClass="form-phone-container"
-                  buttonClass="form-phone-button"
+                    }}
+                    containerClass="form-phone-container"
+                    buttonClass="form-phone-button"
                 />
-              </div>
-              {formik.touched.phone && formik.errors.phone && (
+                </div>
+                {formik.touched.phone && formik.errors.phone && (
                 <div className="form-error">{formik.errors.phone}</div>
-              )}
+                )}
             </div>
+
+            {/*Promotion Email Checkbox */}
+<div className="form-group form-group--checkbox">
+  <label htmlFor="isSubscribed">
+    <input
+      id="isSubscribed"
+      type="checkbox"
+      checked={formik.values.isSubscribed}
+      onChange={formik.handleChange}
+    />
+    I want to receive updates and special offers.
+  </label>
+</div>
 
             {/* Terms and Conditions */}
             <div className="form-terms">
-              <p>
+                <p>
                 By creating an account, you agree to our{' '}
                 <Link to="/terms">Terms of Service</Link> and{' '}
                 <Link to="/privacy">Privacy Policy</Link>
-              </p>
+                </p>
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              className={`auth-btn auth-btn--primary ${isLoading ? 'auth-btn--loading' : ''}`}
-              disabled={isLoading}
+            <button
+                type="submit"
+                className={`auth-btn auth-btn--primary ${isLoading ? 'auth-btn--loading' : ''}`}
+                disabled={isLoading}
             >
-              {isLoading ? (
+                {isLoading ? (
                 <>
-                  <div className="auth-btn__spinner"></div>
-                  Creating account...
+                    <div className="auth-btn__spinner"></div>
+                    Creating account...
                 </>
-              ) : (
+                ) : (
                 'Create Account'
-              )}
+                )}
             </button>
           </form>
 

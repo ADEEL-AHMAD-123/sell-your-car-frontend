@@ -16,9 +16,10 @@ const ContactInfo = () => {
             </div>
             <div className="card-content">
               <h3>Call Us Now</h3>
-              <p className="contact-value">+44 7561 785668</p>
+              <p className="contact-value">+44 151 6620170
+</p>
               <span className="contact-subtitle">Available 24/7 for urgent queries</span>
-              <a href="tel:+447561785668" className="contact-action">Call Now</a>
+              <a href="tel:+441516620170" className="contact-action">Call Now</a>
             </div>
           </div>
 

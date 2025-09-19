@@ -50,7 +50,8 @@ const FreeQuoteCTA = ({
                 <span className="contact-icon">📱</span>
                 <div className="contact-details">
                   <div className="contact-type">WhatsApp</div>
-                  <div className="contact-value">+44 7561 785668</div>
+                  <div className="contact-value">+44 7561 785668
+</div>
                 </div>
               </a>
               

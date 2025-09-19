@@ -27,14 +27,16 @@ import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import ForgotPassword from '../pages/ForgotPasswordPage/ForgotPassword';
 import ResetPassword from '../pages/ResetPasswordPage/ResetPassword';
 import EmailVerification from '../pages/EmailVerificationPage/EmailVerification';
+import UnsubscribePage from '../pages/promoEmailUnsubscribe/UnsubscribeSuccess';
+
 import BlogPage from '../pages/Blog/BlogPage';
 import BlogPost from '../pages/Blog/BlogPost';
 import AdminBlogManagement from '../pages/AdminPages/AdminBlogManagement/AdminBlogManagement';
 import AdminBlogForm from '../pages/AdminPages/AdminBlogManagement/AdminBlogForm';
 
-// New Imports for the new routes
 import PendingAutoQuotes from '../pages/AdminPages/PendingAutoQuotes/PendingAutoQuotes';
 import RejectedQuotes from '../pages/AdminPages/RejectedQuotes/RejectedQuotes';
+import AdminPromoEmail from '../pages/AdminPages/AdminPromoEmail/AdminPromoEmail';
 
 const AppRoutes = () => (
   <Routes>
@@ -55,9 +57,13 @@ const AppRoutes = () => (
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/verify-email/:token" element={<EmailVerification />} />
+
       {/* Blog Routes */}
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+
+      {/* Unsubscribe route now uses the query parameter */}
+      <Route path="/unsubscribe" element={<UnsubscribePage />} />
     </Route>
 
     {/* Admin routes with Admin Layout */}
@@ -76,6 +82,8 @@ const AppRoutes = () => (
       <Route path="/dashboard/blog" element={<AdminBlogManagement />} />
       <Route path="/dashboard/blog/create" element={<AdminBlogForm />} />
       <Route path="/dashboard/blog/edit/:id" element={<AdminBlogForm />} />
+      {/* New Route for Promotional Emails */}
+      <Route path="/dashboard/promo-email" element={<AdminPromoEmail />} /> {/* <-- NEW ROUTE */}
     </Route>
 
     {/* 404 */}

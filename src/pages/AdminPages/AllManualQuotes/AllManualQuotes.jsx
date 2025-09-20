@@ -64,6 +64,14 @@ const AllManualQuotes = () => {
     dispatch(fetchPendingManualQuotes({ params: debouncedFilters }));
   }, [dispatch, debouncedFilters]);
 
+  // Use an effect to clear the deletion error when the modal is closed
+  useEffect(() => {
+    if (!modalDeleteQuote && deletionError) {
+      dispatch(clearDeletionError());
+    }
+  }, [modalDeleteQuote, deletionError, dispatch]);
+
+
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
@@ -87,19 +95,21 @@ const AllManualQuotes = () => {
   };
 
   const handleDeleteConfirmation = (quote) => {
-    dispatch(clearDeletionError());
     setModalDeleteQuote(quote);
   };
 
   const handleCloseDeleteModal = () => {
-    dispatch(clearDeletionError());
     setModalDeleteQuote(null);
   };
 
   const onConfirmDelete = async (quote) => {
-    const resultAction = await dispatch(deleteQuote({ id: quote._id }));
-    if (deleteQuote.fulfilled.match(resultAction)) {
-      handleCloseDeleteModal();
+    try {
+      const resultAction = await dispatch(deleteQuote({ id: quote._id }));
+      if (deleteQuote.fulfilled.match(resultAction)) {
+        handleCloseDeleteModal();
+      }
+    } catch (error) {
+      console.error("Failed to dispatch delete quote action:", error);
     }
   };
 
@@ -447,7 +457,7 @@ const AllManualQuotes = () => {
           quote={modalDeleteQuote}
           status={"Manual_Pending_NotReviewed"}
           onClose={handleCloseDeleteModal}
-          onConfirm={onConfirmDelete}
+          onConfirm={() => onConfirmDelete(modalDeleteQuote)}
           loading={deletionLoading}
           error={deletionError}
         />

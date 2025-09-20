@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchPendingAutoQuotes,
   deleteQuote,
+  clearDeletionError, // Import the new action
 } from '../../../redux/slices/adminQuoteSlice';
 import Spinner from '../../../components/common/Spinner';
 import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/QuoteDetailsModal';
@@ -42,7 +43,6 @@ const PendingAutoQuotes = () => {
       loading: pendingAutoLoading = false,
       error: pendingAutoError = null,
     } = {},
-    // CORRECTED LINE: Use 'deletion' instead of 'deleteQuote'
     deletion: {
       loading: deleteLoading = false,
       error: deleteError = null,
@@ -63,6 +63,13 @@ const PendingAutoQuotes = () => {
   useEffect(() => {
     dispatch(fetchPendingAutoQuotes({ params: debouncedFilters }));
   }, [dispatch, debouncedFilters]);
+
+  // Handler to clear deletion error when the modal is closed
+  useEffect(() => {
+    if (!deleteModalQuote && deleteError) {
+      dispatch(clearDeletionError());
+    }
+  }, [deleteModalQuote, deleteError, dispatch]);
 
   // Handlers
   const handlePageChange = (newPage) => {
@@ -86,6 +93,8 @@ const PendingAutoQuotes = () => {
   };
 
   const handleDeleteConfirmation = (quote) => {
+    // Clear any existing deletion error before opening the modal
+    dispatch(clearDeletionError());
     setDeleteModalQuote(quote);
   };
 
@@ -95,11 +104,21 @@ const PendingAutoQuotes = () => {
 
   const handleConfirmDelete = async (quote) => {
     if (quote?._id) {
-      // Dispatch the delete action
-      await dispatch(deleteQuote({ id: quote._id }));
-      // Set the deleteModalQuote to null to close the modal
-      // This will only happen after the async dispatch has completed
-      setDeleteModalQuote(null);
+      try {
+        // Dispatch the delete action
+        const resultAction = await dispatch(deleteQuote({ id: quote._id }));
+
+        // Check if the deletion was successful before closing the modal
+        if (deleteQuote.fulfilled.match(resultAction)) {
+          handleCloseDeleteModal();
+          // Optionally, refetch the list to ensure the UI is fully updated
+          dispatch(fetchPendingAutoQuotes({ params: debouncedFilters }));
+        }
+      } catch (error) {
+        // This catch block will only run if there's a problem with the dispatch itself,
+        // not a rejection from the API call (which is handled by the Redux slice).
+        console.error("Failed to dispatch delete quote action:", error);
+      }
     }
   };
 
@@ -146,7 +165,7 @@ const PendingAutoQuotes = () => {
   const formatWeight = (weight) => {
     return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
   };
-  
+
   const renderDesktopTable = () => (
     <div className={styles['table-wrapper']}>
       <table>

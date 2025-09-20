@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCollectedQuotes,
-  deleteQuote, // Reusing the generic delete action
+  deleteQuote,
+  clearDeletionError, // Import the new action
 } from '../../../redux/slices/adminQuoteSlice';
 import Spinner from '../../../components/common/Spinner';
 import QuoteDetailsModal from '../../../components/Admin/QuoteDetailsModal/QuoteDetailsModal';
@@ -33,15 +34,16 @@ const CollectedQuotes = () => {
   const [modalDeleteQuote, setModalDeleteQuote] = useState(null);
 
   // Redux selectors
-  // Pulling deleteLoading and deleteError from the top level of the state
   const {
     collected: {
       response: collectedResponseFromRedux,
       loading: collectedLoading = false,
       error: collectedError = null,
     } = {},
-    deleteLoading = false,
-    deleteError = null,
+    deletion: {
+      loading: deleteLoading = false,
+      error: deleteError = null,
+    } = {},
   } = useSelector((state) => state.adminQuotes || {});
 
   // === Defensive check for collectedResponse ===
@@ -59,6 +61,14 @@ const CollectedQuotes = () => {
     dispatch(fetchCollectedQuotes({ params: debouncedFilters }));
   }, [dispatch, debouncedFilters]);
 
+  // Handler to clear deletion error when the modal is closed
+  useEffect(() => {
+    if (!modalDeleteQuote && deleteError) {
+      dispatch(clearDeletionError());
+    }
+  }, [modalDeleteQuote, deleteError, dispatch]);
+
+
   // Handlers
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
@@ -73,6 +83,8 @@ const CollectedQuotes = () => {
   };
 
   const handleDeleteConfirmation = (quote) => {
+    // Clear any existing deletion error before opening the modal
+    dispatch(clearDeletionError());
     setModalDeleteQuote(quote);
   };
 
@@ -83,14 +95,23 @@ const CollectedQuotes = () => {
   const onConfirmDelete = async (quote) => {
     try {
       // Dispatch the generic deleteQuote action
-      await dispatch(deleteQuote(quote._id));
-      handleCloseDeleteModal();
-      // Refetch quotes to update the list after deletion
-      dispatch(fetchCollectedQuotes({ params: debouncedFilters }));
+      const resultAction = await dispatch(deleteQuote({ id: quote._id }));
+
+      // Check if the deletion was successful
+      if (deleteQuote.fulfilled.match(resultAction)) {
+        // If successful, close the modal and refetch the list
+        handleCloseDeleteModal();
+        dispatch(fetchCollectedQuotes({ params: debouncedFilters }));
+      }
+      // If rejected, the 'deleteError' state will be updated by the thunk,
+      // and the modal will stay open to show the error message.
     } catch (error) {
-      console.error("Failed to delete quote:", error);
+      // This catch block will only run if there's a problem with the dispatch itself,
+      // not a rejection from the API call (which is handled by the Redux slice).
+      console.error("Failed to dispatch delete quote action:", error);
     }
   };
+
 
   const updateFilter = (field) => (e) => {
     const value = e.target.value;
@@ -135,7 +156,7 @@ const CollectedQuotes = () => {
   const formatWeight = (weight) => {
     return weight ? `${parseFloat(weight).toLocaleString()} kg` : 'N/A';
   };
-  
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -433,7 +454,7 @@ const CollectedQuotes = () => {
           status={"collected"}
           quote={modalDeleteQuote}
           onClose={handleCloseDeleteModal}
-          onConfirm={onConfirmDelete}
+          onConfirm={() => onConfirmDelete(modalDeleteQuote)}
           loading={deleteLoading}
           error={deleteError}
           vehicle={getVehicleString(modalDeleteQuote)}

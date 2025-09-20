@@ -277,6 +277,7 @@ const adminQuoteSlice = createSlice({
       })
       .addCase(deleteQuote.fulfilled, (state, action) => {
         state.deletion.loading = false;
+        state.deletion.error = null; // Clear any previous error on success
         const deletedId = action.meta.arg.id;
         // Remove the deleted quote from all relevant state arrays
         const updateQuotes = (quotes) => quotes.filter((q) => q._id !== deletedId);

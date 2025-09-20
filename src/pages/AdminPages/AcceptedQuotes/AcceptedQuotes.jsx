@@ -111,12 +111,15 @@ const AcceptedQuotes = () => {
     setDeleteModalQuote(null);
   };
 
-  const handleConfirmDelete = async (quote) => {
-    if (quote?._id) {
-      // Dispatch the delete action
-      await dispatch(deleteQuote({ id: quote._id }));
-      // Set the deleteModalQuote to null to close the modal
-      setDeleteModalQuote(null);
+  const handleConfirmDelete = async () => {
+    if (deleteModalQuote?._id) {
+      const resultAction = await dispatch(deleteQuote({ id: deleteModalQuote._id }));
+      // Check if the deletion was successful before closing the modal
+      if (resultAction.type.endsWith('/fulfilled')) {
+        setDeleteModalQuote(null);
+        // Refresh the quotes list after a successful deletion
+        dispatch(fetchAcceptedQuotes({ params: debouncedFilters }));
+      }
     }
   };
 
@@ -500,7 +503,7 @@ const AcceptedQuotes = () => {
           vehicle={getVehicleString(deleteModalQuote)}
           status={"Accepted"}
           onClose={handleCloseDeleteModal}
-          onConfirm={() => handleConfirmDelete(deleteModalQuote)}
+          onConfirm={handleConfirmDelete}
           loading={deleteLoading}
           error={deleteError}
         />

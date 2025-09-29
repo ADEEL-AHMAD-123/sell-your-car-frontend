@@ -63,12 +63,9 @@ const MaintenancePage = () => (
 );
 
 
-// ------------------------------------------------------------------
-// ⚡ 2. TOGGLE SWITCH ⚡
-// Change this value to true or false to switch modes.
-// ------------------------------------------------------------------
-const IS_MAINTENANCE_MODE_ENABLED = false; // **<-- CHANGE TO `true` TO ACTIVATE THE STRICT BLOCK**
-// ------------------------------------------------------------------
+
+const IS_MAINTENANCE_MODE_ENABLED = true; 
+
 
 
 const AppRoutes = () => {
